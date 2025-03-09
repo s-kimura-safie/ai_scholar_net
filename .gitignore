@@ -1,7 +1,10 @@
-.env
-
+# dependencies
 node_modules
 
+# misc
+.env
+
+# images
 *.jpeg
 *.jpg
 *.png
