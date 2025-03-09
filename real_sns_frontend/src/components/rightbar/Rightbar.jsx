@@ -2,6 +2,10 @@ import React from 'react'
 import "./Rightbar.css"
 import { Users } from '../../dummyData'
 import Online from '../online/Online'
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { Link } from 'react-router-dom';
+
 
 export default function Rightbar({ user }) {
 
@@ -11,12 +15,12 @@ export default function Rightbar({ user }) {
         return (
             <>
                 <div className="eventContainer">
-                    <img src={PUBLIC_FOLDER+"/star.png"} alt="" className="starImg" />
+                    <img src={PUBLIC_FOLDER + "/star.png"} alt="" className="starImg" />
                     <span className="eventText">
                         <b>フォロワー限定</b>イベント開催中！
                     </span>
                 </div>
-                <img src={PUBLIC_FOLDER+"/ad.jpeg"} alt="" className="eventImg" />
+                <img src={PUBLIC_FOLDER + "/ad.jpeg"} alt="" className="eventImg" />
                 <h4 className="rightbartitle">オンラインの友達</h4>
                 <ul className="rightbarFriendList">
                     {Users.map((user) => (
@@ -25,11 +29,11 @@ export default function Rightbar({ user }) {
                 </ul>
 
                 <div className="promotionTitle">プロモーション広告
-                    <img src={PUBLIC_FOLDER+"/promotion/promotion1.jpeg"} alt="" className="promotionImg" />
+                    <img src={PUBLIC_FOLDER + "/promotion/promotion1.jpeg"} alt="" className="promotionImg" />
                     <p className="promotionName">ショッピング</p>
-                    <img src={PUBLIC_FOLDER+"/promotion/promotion2.jpeg"} alt="" className="promotionImg" />
+                    <img src={PUBLIC_FOLDER + "/promotion/promotion2.jpeg"} alt="" className="promotionImg" />
                     <p className="promotionName">カーショップ</p>
-                    <img src={PUBLIC_FOLDER+"/promotion/promotion3.jpeg"} alt="" className="promotionImg" />
+                    <img src={PUBLIC_FOLDER + "/promotion/promotion3.jpeg"} alt="" className="promotionImg" />
                     <p className="promotionName">Shunsuuuuuu .inc</p>
                 </div>
             </>
@@ -37,38 +41,44 @@ export default function Rightbar({ user }) {
     }
 
     const ProfileRightbar = () => {
-        const PUBLIC_FOLDER = process.env.REACT_APP_PUBLIC_FOLDER;
+        const [friends, setFriends] = useState([]);
+
+        // コンポーネントがレンダリングされた後、フォローしているユーザーの情報を取得
+        useEffect(() => { // APIでフォロワー情報を取得し終えたら、setFriendsでfriendsを更新
+            const fetchFriends = async () => {
+                // Promise.all: 複数のPromiseを並行して実行し、すべてのPromiseが解決されるのを待つためのメソッドです。
+                // 引数として渡されたすべてのPromiseが解決されると、結果を配列として返します。
+                if (user.followings) {
+                    const friendList = await Promise.all(
+                        user.followings.map(async (userId) => {
+                            const response = await axios.get(`/users/${userId}`);
+                            return response.data;
+                        })
+                    );
+                    setFriends(friendList);
+                }
+            };
+            fetchFriends();
+        }, []);
+
+
         return (
             <>
                 <h4 className="rightbarTitle">ユーザー情報</h4>
-                <div className="rightbarInfo">
-                    <div className="rightbarInfoItem">
-                        <span className="rightbarInfoKey">出身：</span>
-                        <span className="rightbarInfoKey">熊本</span>
-                    </div>
-                    <h4 className="rightbarTitle">あなたの友達</h4>
-                    <div className="rightbarFollowings">
+                <div className="rightbarInfoItem">
+                    <span className="rightbarInfoKey">出身：</span>
+                    <span className="rightbarInfoKey">熊本</span>
+                </div>
+                <h4 className="rightbarTitle">{`${user.username}`} の友達</h4>
+                <div className="rightbarFollowings">
+                    {friends.map((user) => (
                         <div className="rightbarFollowing">
-                            <img src={PUBLIC_FOLDER+"/person/1.jpeg"} alt="" className='rightbarFollowingImg'/>
-                            <span className="rightbarFollowingName">Shun code</span>
+                            <Link to={`/profile/${user.username}`}>
+                                <img src={PUBLIC_FOLDER + user.profilePicture || PUBLIC_FOLDER + "/person/noAvatar.png"} alt="" className="rightbarFollowingImg" />
+                            </Link>
+                            <span className="rightbarFollowingName">{user.username}</span>
                         </div>
-                        <div className="rightbarFollowing">
-                            <img src={PUBLIC_FOLDER+"/person/2.jpeg"} alt="" className='rightbarFollowingImg'/>
-                            <span className="rightbarFollowingName">Koji code</span>
-                        </div>
-                        <div className="rightbarFollowing">
-                            <img src={PUBLIC_FOLDER+"/person/3.jpeg"} alt="" className='rightbarFollowingImg'/>
-                            <span className="rightbarFollowingName">Itoooon code</span>
-                        </div>
-                        <div className="rightbarFollowing">
-                            <img src={PUBLIC_FOLDER+"/person/4.jpeg"} alt="" className='rightbarFollowingImg'/>
-                            <span className="rightbarFollowingName">Isshy code</span>
-                        </div>
-                        <div className="rightbarFollowing">
-                            <img src={PUBLIC_FOLDER+"/person/5.jpeg"} alt="" className='rightbarFollowingImg'/>
-                            <span className="rightbarFollowingName">Uezy code</span>
-                        </div>
-                    </div>
+                    ))}
                 </div>
             </>
         );

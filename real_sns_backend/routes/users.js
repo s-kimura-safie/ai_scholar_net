@@ -14,14 +14,16 @@ router.post("/", (req, res) => {
 });
 
 // Read
-// router.get("/:id", async (req, res) => {
-//     try {
-//         const user = await User.findById(req.params.id);
-//         return res.status(200).json(user);
-//     } catch (err) {
-//         return res.status(500).json(err);
-//     }
-// });
+router.get("/:id", async (req, res) => {
+    try {
+        console.log(req.params.id);
+        const user = await User.findById(req.params.id);
+        console.log(user);
+        return res.status(200).json(user);
+    } catch (err) {
+        return res.status(500).json(err);
+    }
+});
 
 // Query で取得
 router.get("/", async (req, res) => {
