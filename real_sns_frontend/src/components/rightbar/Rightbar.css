@@ -1,9 +1,12 @@
 .rightbar{
     flex: 3.5;
+    padding: 0px 10px;
+    background-color: #ffffff;
+    box-shadow: -5px 0px 5px rgba(0, 0, 0, 0.1);
 }
 
 .rightbarWrapper{
-    padding: 20px 20px 0 0;
+    padding: 20px 20px 10px 30px;
 }
 
 .eventContainer{
@@ -51,7 +54,7 @@
 }
 
 .rightbarOnline {
-    background-color: palevioletred;
+    background-color: rgb(26, 151, 168);
     position: absolute;
     width: 12px;
     height: 12px;
@@ -80,10 +83,11 @@
     margin-top: -20px;
 }
 
-.rightbarTittle {
+.rightbarTitle {
     font-size: 18px;
     font-weight: 550;
     margin-bottom: 10px;
+    margin-top: 20px;
 }
 
 .rightbarInfo {
@@ -101,14 +105,14 @@
 .rightbarFollowings {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
+    justify-content: flex-start;
 }
 
 .rightbarFollowing {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 20px;
+    margin: 20px;
     cursor: pointer;
 }
 

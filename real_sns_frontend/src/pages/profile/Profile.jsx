@@ -13,7 +13,7 @@ const Profile = () => {
   const PUBLIC_FOLDER = process.env.REACT_APP_PUBLIC_FOLDER;
 
   const [user, setUser] = useState({});
-  const username = useParams().username;
+  const username = useParams().username; // URLパラメータを取得
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -21,7 +21,7 @@ const Profile = () => {
       setUser(response.data);
     }
     fetchUser();
-  }, [username]); //
+  }, [username]);
 
   return (
     <>

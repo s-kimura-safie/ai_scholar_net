@@ -7,7 +7,6 @@ import { AuthContext } from '../../states/AuthContext';
 
 export default function Topbar() {
     const { user } = useContext(AuthContext); // global state
-    console.log(`Topbar user: ${user.profilePicture}`);
     const PUBLIC_FOLDER = process.env.REACT_APP_PUBLIC_FOLDER;
 
     return (

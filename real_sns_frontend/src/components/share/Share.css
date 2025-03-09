@@ -72,7 +72,9 @@
 
 .shareButton {
     border: none;
-    padding: 7px 17px;
+    padding: 0px 12px;
+    padding-top: 6px;
+    padding-bottom: 3px;
     border-radius: 5px;
     cursor: pointer;
     background-color: rgb(41, 95, 127);
@@ -80,6 +82,7 @@
     font-weight: 550;
     transition: all 0.3s;
     margin-right: 20px;
+    font-size: 20px;
 }
 
 .shareButton:hover {

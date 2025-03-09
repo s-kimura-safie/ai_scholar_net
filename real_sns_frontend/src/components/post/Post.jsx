@@ -122,7 +122,7 @@ const Post = (props) => {
                     </div>
                 </div>
                 <div className="postCenter">
-                <span className="postText" style={{ whiteSpace: 'pre-line' }}>{post.desc}</span>
+                    <span className="postText" style={{ whiteSpace: 'pre-line' }}>{post.desc}</span>
                     <img src={PUBLIC_FOLDER + post.img} alt="" className="postImg" />
                 </div>
                 <div className="postBottom">
