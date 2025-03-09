@@ -1,6 +1,6 @@
 .share {
     width: 100%;
-    height: 170px;
+    height: 200px;
     box-shadow: 0px 0px 10px 0px rgb(72, 178, 194);
     border-radius: 10px;
 }
@@ -16,19 +16,26 @@
 }
 
 .shareProfileImg {
-    width: 40px;
-    height: 40px;
+    border: 1px solid rgb(1, 80, 75);
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     object-fit: cover;
     margin-right: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 30px;
 }
 
 .shareInput {
-    border: none;
+    border-color: rgb(145, 205, 215);
     width: 100%;
-    height: 30px;
+    height: 80px;
     border-radius: 5px;
+    margin: 10px;
+    padding: 10px;  /* 上下左右均等にパディングを設定 */
+    white-space: pre-wrap;
+    vertical-align: top;
+    resize: none;  /* リサイズハンドルを非表示にする（必要に応じて） */
+    font-family: inherit;  /* フォントを親要素から継承 */
 }
 
 .shareInput:focus {

@@ -18,6 +18,7 @@
 }
 
 .profileUserImg {
+    border: 1px solid rgb(1, 80, 75);
     position: absolute;
     left: 0;
     right: 0;

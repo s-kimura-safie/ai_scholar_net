@@ -50,9 +50,13 @@ export default function Share() {
             <div className="shareWrapper">
                 <div className="shareTop">
                     <Link to={`/profile/${user.username}`}>
-                        <img src={PUBLIC_FOLDER + user.profilePicture || PUBLIC_FOLDER + "/person/noAvatar.png"} alt="" className="postProfileImg" />
+                        <img src={PUBLIC_FOLDER + user.profilePicture || PUBLIC_FOLDER + "/person/noAvatar.png"} alt="" className="shareProfileImg" />
                     </Link>
-                    <input type="text" className="shareInput" placeholder="なんばしよると？" ref={desc} />
+                    <textarea
+                        className="shareInput"
+                        placeholder="なんばしよると？"
+                        ref={desc}
+                    ></textarea>
                 </div>
                 <hr className="shareHr" />
             </div>
@@ -65,6 +69,7 @@ export default function Share() {
                         <input type="file" id="file" accept=".png, .jpg, .jpeg" style={{ display: "none" }}
                             onChange={(e) => setFile(e.target.files[0])} />
                     </label>
+                    {/*
                     <div className="shareOption">
                         <Gif className="shareIcon" htmlColor="hotpink" />
                         <span className="shareOptionText">GIF</span>
@@ -77,7 +82,10 @@ export default function Share() {
                         <Analytics className="shareIcon" htmlColor="red" />
                         <span className="shareOptionText">投票</span>
                     </div>
-
+*/}
+                    <div>
+                        {file && <p>{file.name}</p>}
+                    </div>
                 </div>
                 <button className="shareButton" type="submit">投稿</button>
 
