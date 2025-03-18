@@ -6,14 +6,17 @@ import Rightbar from '../../components/rightbar/Rightbar'
 import axios from 'axios'
 import "./Profile.css"
 
-import {useParams} from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
 
 const Profile = () => {
   const PUBLIC_FOLDER = process.env.REACT_APP_PUBLIC_FOLDER;
 
   const [user, setUser] = useState({});
-  const username = useParams().username; // URLパラメータを取得
+  const [showModal, setShowModal] = useState(false); // モーダル表示状態
+  const [selectedImage, setSelectedImage] = useState(null); // 選択された画像
+  const [imageType, setImageType] = useState(""); // 画像の種類 ("cover" または "profile")
+  const username = useParams().username; // URLのパラメータを取得
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -23,6 +26,45 @@ const Profile = () => {
     fetchUser();
   }, [username]);
 
+  const handleImageClick = (type) => {
+    setImageType(type); // 画像の種類を設定
+    setShowModal(true); // モーダルを表示
+  };
+
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+
+    if (file) {
+      setSelectedImage(file);
+      const data = new FormData(); // ファイルを送信するためのFormDataオブジェクトを作成
+      const fileName = Date.now() + "_" + file.name;
+      data.append("name", fileName);
+      data.append("file", file);
+
+      try {
+        // 画像をアップロード
+        const uploadResponse = await axios.post("/upload", data);
+        const filePath = uploadResponse.data.filePath;
+
+        // ユーザー情報を更新
+        await axios.put(`/users/${user._id}`, {
+          userId: user._id, // 自分のユーザーID
+          [imageType === "cover" ? "coverPicture" : "profilePicture"]: fileName, // カバー写真またはプロフィール写真を更新
+        });
+
+        // 状態を更新
+        setUser((prev) => ({
+          ...prev,
+          [imageType === "cover" ? "coverPicture" : "profilePicture"]: filePath,
+        }));
+        setShowModal(false); // モーダルを閉じる
+        window.location.reload(); // ページをリロード
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  };
+
   return (
     <>
       <Topbar />
@@ -31,8 +73,18 @@ const Profile = () => {
         <div className="profileRight">
           <div className="profileRightTop">
             <div className="profileCover">
-              <img src={PUBLIC_FOLDER + user.coverPicture || PUBLIC_FOLDER + "/post/3.jpeg"} alt="" className="profileCoverImg" />
-              <img src={PUBLIC_FOLDER + user.profilePicture || PUBLIC_FOLDER + "/person/noAvatar.png"} alt="" className="profileUserImg" />
+              <img
+                src={PUBLIC_FOLDER + user.coverPicture || PUBLIC_FOLDER + "/post/3.jpeg"}
+                alt=""
+                className="profileCoverImg"
+                onClick={() => handleImageClick("cover")} // クリックイベントを追加
+              />
+              <img
+                src={PUBLIC_FOLDER + user.profilePicture || PUBLIC_FOLDER + "/person/noAvatar.png"}
+                alt=""
+                className="profileUserImg"
+                onClick={() => handleImageClick("profile")} // クリックイベントを追加
+              />
               <div className="profileInfo">
                 <span className='profileInfoName'>{user.username}</span>
                 <span className='profileInfoDesc'>{user.desc}</span>
@@ -45,6 +97,17 @@ const Profile = () => {
           </div>
         </div>
       </div>
+
+      {/* モーダル */}
+      {showModal && (
+        <div className="modal">
+          <div className="modalContent">
+          <h3>{imageType === "cover" ? "カバー写真を選択してください" : "プロフィール写真を選択してください"}</h3>
+          <input type="file" accept="image/*" onChange={handleImageChange} />
+            <button onClick={() => setShowModal(false)}>キャンセル</button>
+          </div>
+        </div>
+      )}
     </>
   )
 }
