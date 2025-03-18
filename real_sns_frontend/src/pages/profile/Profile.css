@@ -50,21 +50,131 @@
     display: flex;
 }
 
+/* モーダル全体の背景 */
 .modal {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.7);
+    /* 背景を少し濃く */
     display: flex;
     justify-content: center;
     align-items: center;
-  }
+    z-index: 1000;
+    opacity: 0;
+    animation: fadeIn 0.3s forwards;
+    /* フェードインアニメーション */
+}
 
-  .modalContent {
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
+/* モーダルのコンテンツ */
+.modalContent {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 16px;
     text-align: center;
-  }
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    /* 立体感のあるシャドウ */
+    max-width: 500px;
+    width: 90%;
+    transform: scale(0.8);
+    animation: scaleUp 0.3s forwards;
+    /* 拡大アニメーション */
+    font-family: 'Arial', sans-serif;
+}
+
+/* モーダルのタイトル */
+.modalTitle {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* キャンセルボタン */
+.modalButton {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    margin-left: 50px;
+    cursor: pointer;
+    background-color: #4c4c4c;
+    color: #ffffff;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    display: inline-flex
+}
+
+.modalButton:hover {
+    font-weight: 600;
+    color: #0b0b0b;
+    background-color: #e0e0e0;
+    opacity: 0.5;
+    /* 半透明 */
+    border: 2px solid rgb(41, 39, 39);
+    /* 枠線(赤色) */
+    cursor: pointer;
+    /* マウス形状(ポインタ) */
+}
+
+.filelabel {
+    font-weight: 600;
+    font-size: 20px;
+
+    background-color: orange;
+    /* 背景色 */
+    color: white;
+    /* 文字色 */
+    border: 2px solid orange;
+    /* 枠線 */
+    width: 80px;
+    /* 幅 */
+    border-radius: 3em;
+    /* 角丸 */
+    padding: 12px 50px;
+    /* 内側の余白 */
+    display: inline-flex
+}
+
+.filelabel img {
+    vertical-align: bottom;
+    /* 画像の垂直方向の配置 */
+    margin-right: 8px;
+    /* 画像とラベルの間隔 */
+}
+
+.filelabel:hover {
+    opacity: 0.5;
+    /* 半透明 */
+    border: 2px solid red;
+    /* 枠線(赤色) */
+    cursor: pointer;
+    /* マウス形状(ポインタ) */
+}
+
+#filesend {
+    display: none;
+    /* 本来のファイル選択フォームは非表示に */
+}
+
+/* フェードインアニメーション */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* 拡大アニメーション */
+@keyframes scaleUp {
+    from {
+        transform: scale(0.8);
+    }
+
+    to {
+        transform: scale(1);
+    }
+}

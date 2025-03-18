@@ -102,9 +102,22 @@ const Profile = () => {
       {showModal && (
         <div className="modal">
           <div className="modalContent">
-          <h3>{imageType === "cover" ? "カバー写真を選択してください" : "プロフィール写真を選択してください"}</h3>
-          <input type="file" accept="image/*" onChange={handleImageChange} />
-            <button onClick={() => setShowModal(false)}>キャンセル</button>
+            <h3 className="modalTitle">
+              {imageType === "cover" ? "カバー写真を選択してください" : "プロフィール写真を選択してください"}
+            </h3>
+            <label>
+              <span class="filelabel" title="ファイルを選択">
+                <img src={PUBLIC_FOLDER + "/preset/camera-orange-rev.png"} width="32" height="26" alt="＋画像" />
+                選択
+              </span>
+              <input type="file" onChange={handleImageChange} name="datafile" id="filesend"></input>
+            </label>
+            <button
+              className="modalButton cancelButton"
+              onClick={() => setShowModal(false)}
+            >
+              キャンセル
+            </button>
           </div>
         </div>
       )}
