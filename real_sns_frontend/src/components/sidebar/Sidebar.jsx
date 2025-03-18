@@ -12,7 +12,6 @@ export default function Sidebar() {
     const { user: loginUser } = useContext(AuthContext); // user:loginUser => userをloginUserとして使用
 
     const [friends, setFriends] = useState([]);
-    console.log("friends: ", friends);
 
     // コンポーネントがレンダリングされた後、フォローしているユーザーの情報を取得
     useEffect(() => { // APIでフォロワー情報を取得し終えたら、setFriendsでfriendsを更新

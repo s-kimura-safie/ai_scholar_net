@@ -74,29 +74,58 @@ router.put("/:id/like", async (req, res) => {
 
 // Get timeline posts
 router.get("/timeline/:userId", async (req, res) => {
+    const page = parseInt(req.query.page) || 1; // クエリからページ番号を取得（デフォルトは1）
+    const limit = 10; // 1ページあたりの投稿数
+    const skip = (page - 1) * limit; // スキップする投稿数を計算
+
     try {
         const currentUser = await User.findById(req.params.userId);
-        const myPosts = await Post.find({ userId: currentUser._id });
 
+        // 自分の投稿を取得
+        const myPosts = await Post.find({ userId: currentUser._id })
+            .sort({ createdAt: -1 }) // 作成日時で降順ソート
+            .skip(skip) // スキップ
+            .limit(limit); // 制限
+
+        // フォローしているユーザーの投稿を取得
         const friendPosts = await Promise.all(
             currentUser.followings.map((friendId) => {
-                return Post.find({ userId: friendId });
+                return Post.find({ userId: friendId })
+                    .sort({ createdAt: -1 }) // 作成日時で降順ソート
+                    .skip(skip) // スキップ
+                    .limit(limit); // 制限
             })
         );
 
-        return res.status(200).json(myPosts.concat(...friendPosts));
+        // 自分の投稿とフォローしているユーザーの投稿を結合
+        const allPosts = myPosts.concat(...friendPosts);
+
+        // 投稿を作成日時で降順ソート
+        const sortedPosts = allPosts.sort((a, b) => {
+            return new Date(b.createdAt) - new Date(a.createdAt);
+        });
+
+        return res.status(200).json(sortedPosts);
 
     } catch (err) {
-        console.log("error");
+        console.log("error", err);
         return res.status(500).json(err);
     }
 });
 
 // Get timeline personal posts
 router.get("/profile/:username", async (req, res) => {
+    const page = parseInt(req.query.page) || 1; // クエリからページ番号を取得（デフォルトは1）
+    const limit = 10; // 1ページあたりの投稿数
+    const skip = (page - 1) * limit; // スキップする投稿数を計算
+
     try {
+
         const user = await User.findOne({ username: req.params.username });
-        const posts = await Post.find({ userId: user._id });
+        const posts = await Post.find({ userId: user._id })
+            .sort({ createdAt: -1 }) // 作成日時で降順ソート
+            .skip(skip) // スキップ
+            .limit(limit); // 制限
         return res.status(200).json(posts);
     } catch (err) {
         console.log("error");
