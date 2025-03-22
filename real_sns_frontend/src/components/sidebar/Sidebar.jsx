@@ -1,7 +1,7 @@
 import React from 'react'
 import { useState, useEffect, useContext } from 'react';
 import "./Sidebar.css"
-import { Bookmark, Home, Notifications, Person, Search, Settings } from '@mui/icons-material';
+import { Favorite, Home, Notifications, Person, Search, Settings } from '@mui/icons-material';
 import CloseFriend from '../closeFriend/CloseFriend'
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../states/AuthContext';
@@ -33,30 +33,26 @@ export default function Sidebar() {
         <div className="sidebar">
             <div className="sidebarWrapper">
                 <ul className="sidebarList">
-                    <li className="sidebarListItem">
-                        <Home className="sidebarIcon" />
-                        <Link to="/" style={{ textDecoration: 'none', color: "black" }}>
+                    <Link to="/" style={{ textDecoration: 'none', color: "black" }}>
+                        <li className="sidebarListItem">
+                            <Home className="sidebarIcon" />
                             <span className="sidebarListItemText">ホーム</span>
-                        </Link>
-                    </li>
+                        </li>
+                    </Link>
                     <li className="sidebarListItem">
                         <Search className="sidebarIcon" />
                         <span className="sidebarListItemText">検索</span>
                     </li>
                     <li className="sidebarListItem">
-                        <Notifications className="sidebarIcon" />
-                        <span className="sidebarListItemText">通知</span>
+                        <Favorite className="sidebarIcon" />
+                        <span className="sidebarListItemText">お気に入り</span>
                     </li>
-                    <li className="sidebarListItem">
-                        <Bookmark className="sidebarIcon" />
-                        <span className="sidebarListItemText">ブックマーク</span>
-                    </li>
-                    <li className="sidebarListItem">
-                        <Person className="sidebarIcon" />
-                        <Link to={`/profile/${loginUser.username}`} style={{ textDecoration: 'none', color: "black" }}>
+                    <Link to={`/profile/${loginUser.username}`} style={{ textDecoration: 'none', color: "black" }}>
+                        <li className="sidebarListItem">
+                            <Person className="sidebarIcon" />
                             <span className="sidebarListItemText">プロフィール</span>
-                        </Link>
-                    </li>
+                        </li>
+                    </Link>
                     <li className="sidebarListItem">
                         <Settings className="sidebarIcon" />
                         <span className="sidebarListItemText">設定</span>
