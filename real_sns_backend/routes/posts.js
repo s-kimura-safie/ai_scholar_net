@@ -44,6 +44,38 @@ router.delete("/:id", async (req, res) => {
     }
 });
 
+// 検索キーワードを含む投稿を取得
+router.get("/search", async (req, res) => {
+    try {
+        const keyword = req.query.keyword?.trim() || ""; // 検索キーワード
+
+        // クエリ条件を構築
+        const query = {
+            $or: [
+                { desc: { $regex: keyword, $options: "i" } }, // 投稿内容の部分一致
+            ],
+        };
+
+        // ユーザー名の部分一致を検索
+        const users = await User.find({
+            username: { $regex: keyword, $options: "i" }, // ユーザー名の部分一致
+        });
+
+        if (users.length > 0) {
+            // ユーザーIDを条件に追加
+            const userIds = users.map((user) => user._id);
+            query.$or.push({ userId: { $in: userIds } }); // userId が一致する投稿を検索
+        }
+
+        // クエリを実行
+        const posts = await Post.find(query).sort({ createdAt: -1 }); // 作成日時で降順ソート
+        return res.status(200).json(posts);
+    } catch (err) {
+        console.error("Error fetching posts:", err);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
 // Get a Post
 router.get("/:id", async (req, res) => {
     try {

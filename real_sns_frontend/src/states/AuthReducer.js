@@ -18,6 +18,11 @@ const AuthReducer = (state, action) => {
                 isFetching: false,
                 error: action.payload,
             };
+        case "SET_SEARCH_KEYWORD": // 検索キーワードを更新するアクション
+            return {
+                ...state,
+                searchKeyword: action.payload,
+            };
         default:
             return state;
     }

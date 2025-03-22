@@ -6,6 +6,7 @@ const initialState = {
     user: JSON.parse(localStorage.getItem("user")) || null, // ローカルストレージにユーザー情報があれば取得
     isFetching: false,
     error: false,
+    searchKeyword: "", // 検索キーワードの初期値
 };
 
 // 状態をグローバルで管理する。
@@ -23,6 +24,7 @@ export const AuthcontextProvider = ({ children }) => { // childrenはAppコン�
             user: state.user,
             isFetching: state.isFetching,
             error: state.error,
+            searchKeyword: state.searchKeyword,
             dispatch
         }}>
             {children}

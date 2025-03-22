@@ -1,12 +1,16 @@
+import "./Topbar.css"
 import { Search, Chat, Notifications } from '@mui/icons-material'; //  SVG形式のアイコンをインポート
 import React, { useContext } from 'react'
 import { Link } from 'react-router-dom';
-import "./Topbar.css"
 import { AuthContext } from '../../states/AuthContext';
 
 export default function Topbar() {
-    const { user } = useContext(AuthContext); // global state
     const PUBLIC_FOLDER = process.env.REACT_APP_PUBLIC_FOLDER;
+    const { user } = useContext(AuthContext); // global state
+    const { dispatch } = useContext(AuthContext);
+    const handleSearchChange = (e) => {
+        dispatch({ type: "SET_SEARCH_KEYWORD", payload: e.target.value }); // 検索キーワードを更新
+    };
 
     return (
         <div className="topbarContainer">
@@ -20,8 +24,9 @@ export default function Topbar() {
                     <Search className="searchIcon"></Search>
                     <input
                         type="text"
+                        placeholder="検索キーワードを入力..."
+                        onChange={handleSearchChange}
                         className="searchInput"
-                        placeholder="探し物は？"
                     />
                 </div>
             </div>
@@ -44,6 +49,5 @@ export default function Topbar() {
                 </div>
             </div>
         </div>
-
     );
 }
