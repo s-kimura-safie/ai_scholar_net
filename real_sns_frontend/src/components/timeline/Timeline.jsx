@@ -15,15 +15,19 @@ export default function Timeline({ username }) {
 
     useEffect(() => {
         const fetchPosts = async () => {
-            const response = username
-                ? await axios.get(`/posts/profile/${username}?page=1`)
-                : await axios.get(`/posts/timeline/${user._id}?page=1`);
-            const sortedPosts = response.data.sort((post1, post2) => {
-                return new Date(post2.createdAt) - new Date(post1.createdAt);
-            });
-            setPosts(sortedPosts);
-            setHasMore(response.data.length > 0); // 初回取得で投稿があるか確認
-        };
+            try {
+                const response = username
+                    ? await axios.get(`/posts/profile/${username}?page=1`)
+                    : await axios.get(`/posts/timeline/${user._id}?page=1`);
+                const sortedPosts = response.data.sort((post1, post2) => {
+                    return new Date(post2.createdAt) - new Date(post1.createdAt);
+                });
+                setPosts(sortedPosts);
+                setHasMore(response.data.length > 0); // 初回取得で投稿があるか確認
+            } catch (err) {
+                console.error(err);
+            }
+        }
         fetchPosts();
     }, [username]);
 
@@ -48,19 +52,25 @@ export default function Timeline({ username }) {
     // 追加の投稿を取得
     const fetchMorePosts = async () => {
         const nextPage = page + 1;
-        const response = username
-            ? await axios.get(`/posts/profile/${username}?page=${nextPage}`)
-            : await axios.get(`/posts/timeline/${user._id}?page=${nextPage}`);
 
-        if (response.data.length === 0) {
-            setHasMore(false); // 追加の投稿がない場合
-        } else {
-            const newPosts = response.data.filter(
-                (newPost) => !posts.some((post) => post._id === newPost._id)
-            ); // 重複を排除
-            setPosts((prevPosts) => [...prevPosts, ...newPosts]);
-            setPage(nextPage); // ページ番号を更新
+        try {
+            const response = username
+                ? await axios.get(`/posts/profile/${username}?page=${nextPage}`)
+                : await axios.get(`/posts/timeline/${user._id}?page=${nextPage}`);
+
+            if (response.data.length === 0) {
+                setHasMore(false); // 追加の投稿がない場合
+            } else {
+                const newPosts = response.data.filter(
+                    (newPost) => !posts.some((post) => post._id === newPost._id)
+                ); // 重複を排除
+                setPosts((prevPosts) => [...prevPosts, ...newPosts]);
+                setPage(nextPage); // ページ番号を更新
+            }
+        } catch (err) {
+            console.error(err);
         }
+
     };
 
     return (

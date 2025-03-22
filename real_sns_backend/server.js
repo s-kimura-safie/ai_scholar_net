@@ -21,7 +21,16 @@ mongoose
 
 // Set middleware
 // localserver のパス /images にアクセスしたら、サーバーに保存された public/images の性的ファイルを使う
-app.use("/images", express.static(path.join(__dirname, "public/images")));
+app.use(
+    "/images",
+    express.static(path.join(__dirname, "public/images"), {
+        maxAge: "7d", // 7日間キャッシュ
+        immutable: true, // ファイルが変更されない場合にキャッシュを最適化
+        setHeaders: (res, path) => {
+            res.setHeader("Cache-Control", "public, max-age=604800, immutable"); // 7日間キャッシュ
+        },
+    })
+);
 
 app.use(express.json());
 app.use("/api/users", userRoute); // /api/usersにアクセスしたら、userRouteを使う

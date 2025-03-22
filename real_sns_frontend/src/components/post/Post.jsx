@@ -25,13 +25,31 @@ const Post = (props) => {
     const [openEditModal, setOpenEditModal] = useState(false);
     const [newDesc, setNewDesc] = useState(post.desc);
 
+
     useEffect(() => {
+        const source = axios.CancelToken.source(); // キャンセルトークンを作成
+
         const fetchUser = async () => {
-            const response = await axios.get(`/users?userId=${post.userId}`);
-            setUser(response.data);
-        }
+            try {
+                const response = await axios.get(`/users?userId=${post.userId}`, {
+                    cancelToken: source.token, // キャンセルトークンを設定
+                });
+                setUser(response.data);
+            } catch (err) {
+                if (axios.isCancel(err)) {
+                    console.log("Request canceled:", err.message);
+                } else {
+                    console.error(err);
+                }
+            }
+        };
+
         fetchUser();
-    }, [post]); // postが変更されたら再レンダリング
+
+        return () => {
+            source.cancel("Component unmounted or post changed"); // リクエストをキャンセル
+        };
+    }, [post]);
 
     const handleLike = async () => {
         try {
@@ -101,7 +119,7 @@ const Post = (props) => {
                 <div className="postTop">
                     <div className="postTopLeft">
                         <Link to={`/profile/${postUser.username}`}>
-                            <img src={PUBLIC_FOLDER + postUser.profilePicture || PUBLIC_FOLDER + "/person/noAvatar.png"} alt="" className="postProfileImg" />
+                            <img src={PUBLIC_FOLDER + postUser.profilePicture || PUBLIC_FOLDER + "/person/noAvatar.png"} alt="" loading="lazy" className="postProfileImg" />
                         </Link>
                         <span className="postUsername">{postUser.username}</span>
                         <span className="postDate">{format(post.createdAt)}</span>
