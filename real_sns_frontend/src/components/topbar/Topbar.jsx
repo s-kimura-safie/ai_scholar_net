@@ -1,6 +1,6 @@
 import "./Topbar.css"
 import { Search, Chat, Notifications } from '@mui/icons-material'; //  SVG形式のアイコンをインポート
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../states/AuthContext';
 
@@ -8,6 +8,13 @@ export default function Topbar() {
     const PUBLIC_FOLDER = process.env.REACT_APP_PUBLIC_FOLDER;
     const { user } = useContext(AuthContext); // global state
     const { dispatch } = useContext(AuthContext);
+
+    // ページが更新されたときに検索キーワードをリセット
+    useEffect(() => {
+        dispatch({ type: "SET_SEARCH_KEYWORD", payload: "" });
+    }, [dispatch]);
+
+
     const handleSearchChange = (e) => {
         dispatch({ type: "SET_SEARCH_KEYWORD", payload: e.target.value }); // 検索キーワードを更新
     };
