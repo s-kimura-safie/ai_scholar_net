@@ -29,7 +29,7 @@ export default function Timeline({ username }) {
             }
         }
         fetchPosts();
-    }, [username]);
+    }, [username, user._id]);
 
     // 検索キーワードが変更されたときに投稿をフィルタリング
     useEffect(() => {
@@ -77,7 +77,7 @@ export default function Timeline({ username }) {
     return (
         <div className="timeline">
             <div className="timelineWrapper">
-                <Shere />
+                {user.username === username && <Shere />}
                 <InfiniteScroll
                     dataLength={filteredPosts.length}
                     next={fetchMorePosts}

@@ -7,12 +7,12 @@ const CloseFriend = (props) => {
     const PUBLIC_FOLDER = process.env.REACT_APP_PUBLIC_FOLDER;
     return (
         <div>
-            <li className="sidebarFriend">
-                <Link to={`/profile/${user.username}`}>
+            <Link to={`/profile/${user.username}`} style={{ textDecoration: 'none', color: "black" }}>
+                <li className="sidebarFriend">
                     <img src={PUBLIC_FOLDER + user.profilePicture || PUBLIC_FOLDER + "/person/noAvatar.png"} alt="" className="sidebarFriendImg" />
-                </Link>
-                <span className="sidebarFriendName">{user.username}</span>
-            </li>
+                    <span className="sidebarFriendName">{user.username}</span>
+                </li>
+            </Link>
         </div>
     )
 }
