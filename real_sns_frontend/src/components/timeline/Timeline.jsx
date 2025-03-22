@@ -31,13 +31,14 @@ export default function Timeline({ username }) {
         fetchPosts();
     }, [username]);
 
-    // searchKeywordが変更されたときに投稿をフィルタリング
+    // 検索キーワードが変更されたときに投稿をフィルタリング
     useEffect(() => {
         const filterPosts = async () => {
             if (searchKeyword?.trim()) {
                 // 検索キーワードがある場合、フィルタリングされた投稿を取得
-                const response = await axios.get(`/posts/search`, {
-                    params: { keyword: searchKeyword },
+                const response = await axios.post(`/posts/search`, {
+                    keyword: searchKeyword,
+                    posts: posts
                 });
                 setFilteredPosts(response.data); // フィルタリングされた投稿を設定
             } else {

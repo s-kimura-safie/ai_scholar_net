@@ -45,33 +45,33 @@ router.delete("/:id", async (req, res) => {
 });
 
 // 検索キーワードを含む投稿を取得
-router.get("/search", async (req, res) => {
+router.post("/search", async (req, res) => {
     try {
-        const keyword = req.query.keyword?.trim() || ""; // 検索キーワード
+        const keyword = req.body.keyword?.trim() || ""; // 検索キーワード
+        const posts = req.body.posts || []; // クライアントから送られてきた投稿データ
 
-        // クエリ条件を構築
-        const query = {
-            $or: [
-                { desc: { $regex: keyword, $options: "i" } }, // 投稿内容の部分一致
-            ],
-        };
+        // 投稿データに含まれる userId 基づいてユーザー情報を取得
+        const userIds = [...new Set(posts.map((post) => post.userId))];
+        const users = await User.find({ _id: { $in: userIds } });
 
-        // ユーザー名の部分一致を検索
-        const users = await User.find({
-            username: { $regex: keyword, $options: "i" }, // ユーザー名の部分一致
+        // userId をキーにしたユーザーマップを作成
+        const userMap = users.reduce((map, user) => {
+            map[user._id] = user.username;
+            return map;
+        }, {});
+
+        // 検索キーワードに一致する投稿をフィルタリング
+        const filteredPosts = posts.filter((post) => {
+            const username = userMap[post.userId]?.toLowerCase() || ""; // userId に対応する username を取得
+            return (
+                post.desc?.toLowerCase().includes(keyword.toLowerCase()) || // 投稿内容の部分一致
+                username.includes(keyword.toLowerCase()) // ユーザー名の部分一致
+            );
         });
 
-        if (users.length > 0) {
-            // ユーザーIDを条件に追加
-            const userIds = users.map((user) => user._id);
-            query.$or.push({ userId: { $in: userIds } }); // userId が一致する投稿を検索
-        }
-
-        // クエリを実行
-        const posts = await Post.find(query).sort({ createdAt: -1 }); // 作成日時で降順ソート
-        return res.status(200).json(posts);
+        return res.status(200).json(filteredPosts); // フィルタリングされた投稿を返す
     } catch (err) {
-        console.error("Error fetching posts:", err);
+        console.error("Error filtering posts:", err);
         return res.status(500).json({ error: "Internal Server Error" });
     }
 });
