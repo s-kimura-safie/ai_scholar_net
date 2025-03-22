@@ -69,20 +69,6 @@ export default function Share() {
                         <input type="file" id="file" accept=".png, .jpg, .jpeg" style={{ display: "none" }}
                             onChange={(e) => setFile(e.target.files[0])} />
                     </label>
-                    {/*
-                    <div className="shareOption">
-                        <Gif className="shareIcon" htmlColor="hotpink" />
-                        <span className="shareOptionText">GIF</span>
-                    </div>
-                    <div className="shareOption">
-                        <Face className="shareIcon" htmlColor="green" />
-                        <span className="shareOptionText">気持ち</span>
-                    </div>
-                    <div className="shareOption">
-                        <Analytics className="shareIcon" htmlColor="red" />
-                        <span className="shareOptionText">投票</span>
-                    </div>
-*/}
                     <div>
                         {file && <p>{file.name}</p>}
                     </div>

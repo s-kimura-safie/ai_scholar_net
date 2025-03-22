@@ -1,5 +1,4 @@
-import { Search } from '@mui/icons-material';
-import { Chat, Notifications } from '@mui/icons-material';
+import { Search, Chat, Notifications } from '@mui/icons-material'; //  SVG形式のアイコンをインポート
 import React, { useContext } from 'react'
 import { Link } from 'react-router-dom';
 import "./Topbar.css"
@@ -30,11 +29,11 @@ export default function Topbar() {
                 <div className="topbarIconItems">
                     <div className="topbarIconItem">
                         <Chat />
-                        <span className="topbarIconBadge">1</span>
+                        <span className="topbarIconBadge">?</span>
                     </div>
                     <div className="topbarIconItem">
                         <Notifications />
-                        <span className="topbarIconBadge">5</span>
+                        <span className="topbarIconBadge">?</span>
                     </div>
                     <Link to={`/profile/${user.username}`}>
                         <img src={user.profilePicture
