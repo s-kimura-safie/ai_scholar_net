@@ -27,7 +27,8 @@ router.post("/", upload.single("file"), async (req, res) => {
 
         // Sharpで画像を圧縮・リサイズ
         await sharp(req.file.buffer)
-            .resize({ width: 400 }) // 幅を800pxにリサイズ（高さは自動調整）
+            .resize({ width: 800 }) // 幅を800pxにリサイズ（高さは自動調整）
+            .flatten({ background: { r: 255, g: 255, b: 255 } })
             .jpeg({ quality: 80 }) // JPEG形式で圧縮（品質80%）
             .toFile(outputPath);
 
