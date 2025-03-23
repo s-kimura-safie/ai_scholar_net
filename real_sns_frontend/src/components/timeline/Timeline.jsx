@@ -31,25 +31,6 @@ export default function Timeline({ username }) {
         fetchPosts();
     }, [username, user._id]);
 
-    // 検索キーワードが変更されたときに投稿をフィルタリング
-    useEffect(() => {
-        const filterPosts = async () => {
-            if (searchKeyword?.trim()) {
-                // 検索キーワードがある場合、フィルタリングされた投稿を取得
-                const response = await axios.post(`/posts/search`, {
-                    keyword: searchKeyword,
-                    posts: posts
-                });
-                setFilteredPosts(response.data); // フィルタリングされた投稿を設定
-            } else {
-                // 検索キーワードがない場合、全投稿を表示
-                setFilteredPosts(posts);
-            }
-        };
-
-        filterPosts(); // 非同期関数を呼び出す
-    }, [searchKeyword, posts]);
-
     // 追加の投稿を取得
     const fetchMorePosts = async () => {
         const nextPage = page + 1;
@@ -71,8 +52,26 @@ export default function Timeline({ username }) {
         } catch (err) {
             console.error(err);
         }
-
     };
+
+    // 検索キーワードが変更されたときに投稿をフィルタリング
+    useEffect(() => {
+        const filterPosts = async () => {
+            if (searchKeyword?.trim()) {
+                // 検索キーワードがある場合、フィルタリングされた投稿を取得
+                const response = await axios.post(`/posts/search`, {
+                    keyword: searchKeyword,
+                    posts: posts
+                });
+                setFilteredPosts(response.data); // フィルタリングされた投稿を設定
+            } else {
+                // 検索キーワードがない場合、全投稿を表示
+                setFilteredPosts(posts);
+            }
+        };
+
+        filterPosts(); // 非同期関数を呼び出す
+    }, [searchKeyword, posts]);
 
     return (
         <div className="timeline">

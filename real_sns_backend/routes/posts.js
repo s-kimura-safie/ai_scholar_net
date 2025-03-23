@@ -152,7 +152,6 @@ router.get("/profile/:username", async (req, res) => {
     const skip = (page - 1) * limit; // スキップする投稿数を計算
 
     try {
-
         const user = await User.findOne({ username: req.params.username });
         const posts = await Post.find({ userId: user._id })
             .sort({ createdAt: -1 }) // 作成日時で降順ソート
