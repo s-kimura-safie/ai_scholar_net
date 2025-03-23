@@ -65,10 +65,10 @@ export default function Rightbar({ user }) {
                     <span className="rightbarInfoKey">出身：</span>
                     <span className="rightbarInfoKey">熊本</span>
                 </div>
-                <h4 className="rightbarTitle">{`${user.username}`} の友達</h4>
+                <h4 className="rightbarFriends">{`${user.username}`} の友達</h4>
                 <div className="rightbarFollowings">
                     {friends.map((user) => (
-                        <div className="rightbarFollowing">
+                        <div className="rightbarFollowing" key={user._id}>
                             <Link to={`/profile/${user.username}`}>
                                 <img src={PUBLIC_FOLDER + user.profilePicture || PUBLIC_FOLDER + "/person/noAvatar.png"} alt="" className="rightbarFollowingImg" />
                             </Link>

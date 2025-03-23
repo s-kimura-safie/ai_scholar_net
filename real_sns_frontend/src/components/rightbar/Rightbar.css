@@ -90,6 +90,13 @@
     margin-top: 20px;
 }
 
+.rightbarFriends {
+    font-size: 18px;
+    font-weight: 550;
+    margin-bottom: 10px;
+    margin-top: 20px;
+}
+
 .rightbarInfo {
     /* display: flex;
     align-items: center; */
