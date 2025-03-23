@@ -18,13 +18,15 @@ export default function Sidebar() {
         const fetchFriends = async () => {
             // Promise.all: 複数のPromiseを並行して実行し、すべてのPromiseが解決されるのを待つためのメソッドです。
             // 引数として渡されたすべてのPromiseが解決されると、結果を配列として返します。
-            const friendList = await Promise.all(
-                loginUser.followings.map(async (userId) => {
-                    const response = await axios.get(`/users/${userId}`);
-                    return response.data;
-                })
-            );
-            setFriends(friendList);
+            if (loginUser.followings) {
+                const friendList = await Promise.all(
+                    loginUser.followings.map(async (userId) => {
+                        const response = await axios.get(`/users/${userId}`);
+                        return response.data;
+                    })
+                );
+                setFriends(friendList);
+            }
         };
         fetchFriends();
     }, [loginUser.followings]);

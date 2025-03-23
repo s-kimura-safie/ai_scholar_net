@@ -15,12 +15,15 @@ import { useParams } from 'react-router-dom'
 const Profile = () => {
   const PUBLIC_FOLDER = process.env.REACT_APP_PUBLIC_FOLDER;
   const { user: loginUser } = useContext(AuthContext);
+  const { dispatch } = useContext(AuthContext);
 
+  const username = useParams().username; // URLのパラメータを取得
   const [user, setUser] = useState({});
+  const [isFollowing, setIsFollowing] = useState(false);
   const [showModal, setShowModal] = useState(false); // モーダル表示状態
   const [selectedImage, setSelectedImage] = useState(null); // 選択された画像
   const [imageType, setImageType] = useState(""); // 画像の種類 ("cover" または "profile")
-  const username = useParams().username; // URLのパラメータを取得
+
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -29,6 +32,45 @@ const Profile = () => {
     }
     fetchUser();
   }, [username]);
+
+  // フォロワーかどうかの初期値を定める
+  useEffect(() => {
+    setIsFollowing(loginUser.followings.includes(user._id));
+  }, [loginUser.followings, user._id]);
+
+  const handleFollow = async () => {
+    try {
+      await axios.put(`/users/${user._id}/follow`, { userId: loginUser._id });
+
+      // ローカルの状態を更新
+      const updatedUser = {
+        ...loginUser,
+        followings: [...loginUser.followings, user._id], // フォローリストに追加
+      };
+      dispatch({ type: "LOGIN_SUCCESS", payload: updatedUser });
+
+      setIsFollowing(true);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleUnfollow = async () => {
+    try {
+      await axios.put(`/users/${user._id}/unfollow`, { userId: loginUser._id });
+
+      // ローカルの状態を更新
+      const updatedUser = {
+        ...loginUser,
+        followings: loginUser.followings.filter((id) => id !== user._id), // フォローリストから削除
+      };
+      dispatch({ type: "LOGIN_SUCCESS", payload: updatedUser });
+
+      setIsFollowing(false);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const handleImageClick = (type) => {
     setImageType(type); // 画像の種類を設定
@@ -98,8 +140,17 @@ const Profile = () => {
                   <span className='profileInfoDesc'>{user.desc}</span>
                 </div>
                 {loginUser.username !== username && (
-                  <button className="followButton" onClick={() => { }}>
-                    フォローする
+                  <button
+                    className={`followButton ${isFollowing ? "unfollowButton" : "followButton"}`}
+                    onClick={() => {
+                      if (isFollowing) {
+                        handleUnfollow();
+                      } else {
+                        handleFollow();
+                      }
+                    }}
+                  >
+                    {isFollowing ? "フォローをやめる" : "フォローする"}
                   </button>
                 )}
               </div>

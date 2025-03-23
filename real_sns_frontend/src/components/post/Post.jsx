@@ -35,8 +35,8 @@ export default function Post({ post }) {
                 });
                 setUser(response.data);
             } catch (err) {
-                if (err.name === "CanceledError") { // リクエストがキャンセルされた場合
-                    console.log("Request canceled:");
+                if (axios.isCancel(err)) { // リクエストがキャンセルされた場合
+                    console.log("Request canceled");
                 } else {
                     console.error("Error fetching user data:", err);
                 }

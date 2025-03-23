@@ -97,6 +97,23 @@
     cursor: pointer;
 }
 
+/* フォロー中のボタン */
+.unfollowButton {
+    background-color: #ff4d4d;
+    color: #ffffff;
+    border: 1px solid #ff4d4d;
+}
+
+.unfollowButton:hover {
+    font-weight: 600;
+    color: #270000;
+    background-color: #f99494;
+    opacity: 0.5;
+    border: 2px solid #ff4d4d;
+    border-width: 2px;
+    cursor: pointer;
+}
+
 
 .profileRightTop {
     margin-bottom: 20px;
