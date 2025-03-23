@@ -104,6 +104,18 @@ router.put("/:id/like", async (req, res) => {
     }
 });
 
+// Put a comment
+router.put("/:id/comment", async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id);
+        comment = req.body.comment;
+        await post.updateOne({ $push: { comments: comment } });
+        return res.status(200).json("Comment added");
+    } catch (err) {
+        return res.status(500).json(err);
+    }
+});
+
 // Get timeline posts
 router.get("/timeline/:userId", async (req, res) => {
     const page = parseInt(req.query.page) || 1; // クエリからページ番号を取得（デフォルトは1）

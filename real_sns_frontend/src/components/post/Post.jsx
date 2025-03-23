@@ -16,6 +16,7 @@ export default function Post({ post }) {
 
     const [like, setLike] = useState(post.likes.length);
     const [heartImgPath, setPath] = useState(PUBLIC_FOLDER + "/heart_off.png");
+    const [numComments, setNumComments] = useState(0);
     const [isLiked, setIsLiked] = useState(false);
     const [postUser, setUser] = useState({});
 
@@ -44,6 +45,8 @@ export default function Post({ post }) {
         };
 
         fetchUser();
+
+        setNumComments(post.comments.length);
 
         return () => {
             controller.abort(); // リクエストを中断するクリーンアップ関数を返す
@@ -148,7 +151,7 @@ export default function Post({ post }) {
                         <span className="postLikeCounter">{like}人がいいねを押しました。</span>
                     </div>
                     <div className="postBottomRight">
-                        <span className="postCommentText">{post.comment}: comments</span>
+                        <span onClick={() => { }} className="postCommentText">{numComments}:comments</span>
                     </div>
                 </div>
             </div>
