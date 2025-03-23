@@ -1,7 +1,6 @@
 import React from 'react'
 import "./Rightbar.css"
-import { Users } from '../../dummyData'
-import Online from '../online/Online'
+// import Online from '../online/Online'
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
@@ -23,9 +22,6 @@ export default function Rightbar({ user }) {
                 <img src={PUBLIC_FOLDER + "/ad.jpeg"} alt="" className="eventImg" />
                 <h4 className="rightbartitle">オンラインの友達</h4>
                 <ul className="rightbarFriendList">
-                    {Users.map((user) => (
-                        <Online user={user} key={user.id} />
-                    ))}
                 </ul>
 
                 <div className="promotionTitle">プロモーション広告

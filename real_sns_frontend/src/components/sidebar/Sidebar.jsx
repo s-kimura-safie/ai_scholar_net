@@ -1,7 +1,7 @@
 import React from 'react'
 import { useState, useEffect, useContext } from 'react';
 import "./Sidebar.css"
-import { Favorite, Home, Notifications, Person, Search, Settings } from '@mui/icons-material';
+import { Favorite, Home, Person, Search, Settings } from '@mui/icons-material';
 import CloseFriend from '../closeFriend/CloseFriend'
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../states/AuthContext';
