@@ -1,16 +1,20 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import Topbar from '../../components/topbar/Topbar'
 import Sidebar from '../../components/sidebar/Sidebar'
 import Timeline from '../../components/timeline/Timeline'
 import Rightbar from '../../components/rightbar/Rightbar'
 import axios from 'axios'
 import "./Profile.css"
+import EditNoteIcon from '@mui/icons-material/EditNote';
+import { AuthContext } from '../../states/AuthContext';
+
 
 import { useParams } from 'react-router-dom'
 
 
 const Profile = () => {
   const PUBLIC_FOLDER = process.env.REACT_APP_PUBLIC_FOLDER;
+  const { user: loginUser } = useContext(AuthContext);
 
   const [user, setUser] = useState({});
   const [showModal, setShowModal] = useState(false); // モーダル表示状態
@@ -85,15 +89,27 @@ const Profile = () => {
                 className="profileUserImg"
                 onClick={() => handleImageClick("profile")} // クリックイベントを追加
               />
-              <div className="profileInfo">
-                <span className='profileInfoName'>{user.username}</span>
-                <span className='profileInfoDesc'>{user.desc}</span>
+              <div className="profileWrapper">
+                <div className="profileInfo">
+                  <div className='profileNameItems'>
+                    <span className='profileName'>{user.username}</span>
+                    {loginUser.username === username && <EditNoteIcon className="editNameIcon" onClick={() => { }} />}
+                  </div>
+                  <span className='profileInfoDesc'>{user.desc}</span>
+                </div>
+                {loginUser.username !== username && (
+                  <button className="followButton" onClick={() => { }}>
+                    フォローする
+                  </button>
+                )}
               </div>
             </div>
           </div>
           <div className="profileRightBottom">
             <Timeline username={user.username} />
-            <Rightbar user={user} />
+            <div className="userDetail">
+              <Rightbar user={user} />
+            </div>
           </div>
         </div>
       </div>
