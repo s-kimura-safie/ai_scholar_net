@@ -9,7 +9,7 @@ Basic Features
 - いいねした投稿を表示する機能
 - ログアウト機能
 ~~- フォローボタン~~
-- 名前の変更
+~~- 名前と自己紹介文の変更~~
 
 Advanced Features
 - コメントをRight barに表示
