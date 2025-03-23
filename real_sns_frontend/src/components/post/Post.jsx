@@ -8,8 +8,7 @@ import { Link } from 'react-router-dom';
 import { AuthContext } from '../../states/AuthContext';
 
 
-const Post = (props) => {
-    const { post } = props;
+export default function Post({ post }) {
 
     const PUBLIC_FOLDER = process.env.REACT_APP_PUBLIC_FOLDER;
 
@@ -27,19 +26,19 @@ const Post = (props) => {
 
 
     useEffect(() => {
-        const source = axios.CancelToken.source(); // キャンセルトークンを作成
+        const controller = new AbortController(); // AbortController を作成
 
         const fetchUser = async () => {
             try {
                 const response = await axios.get(`/users?userId=${post.userId}`, {
-                    cancelToken: source.token, // キャンセルトークンを設定
+                    signal: controller.signal, // AbortController の signal を設定
                 });
                 setUser(response.data);
             } catch (err) {
-                if (axios.isCancel(err)) {
-                    console.log("Request canceled:", err.message);
+                if (err.name === "CanceledError") { // リクエストがキャンセルされた場合
+                    console.log("Request canceled:");
                 } else {
-                    console.error(err);
+                    console.error("Error fetching user data:", err);
                 }
             }
         };
@@ -47,7 +46,7 @@ const Post = (props) => {
         fetchUser();
 
         return () => {
-            source.cancel("Component unmounted or post changed"); // リクエストをキャンセル
+            controller.abort(); // リクエストを中断するクリーンアップ関数を返す
         };
     }, [post]);
 
@@ -183,5 +182,3 @@ const Post = (props) => {
         </div>
     )
 }
-
-export default Post
