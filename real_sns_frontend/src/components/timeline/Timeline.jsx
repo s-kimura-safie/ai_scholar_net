@@ -14,21 +14,36 @@ export default function Timeline({ username }) {
     const { user, searchKeyword } = useContext(AuthContext);
 
     useEffect(() => {
+        const controller = new AbortController();
+
         const fetchPosts = async () => {
             try {
+                setPosts([]);
+                setFilteredPosts([]);
                 const response = username
-                    ? await axios.get(`/posts/profile/${username}?page=1`)
-                    : await axios.get(`/posts/timeline/${user._id}?page=1`);
+                    ? await axios.get(`/posts/profile/${username}?page=1`, { signal: controller.signal })
+                    : await axios.get(`/posts/timeline/${user._id}?page=1`, { signal: controller.signal });
                 const sortedPosts = response.data.sort((post1, post2) => {
                     return new Date(post2.createdAt) - new Date(post1.createdAt);
                 });
                 setPosts(sortedPosts);
+                setFilteredPosts(sortedPosts); // フィルタリングされた投稿もリセット
+                setPage(1); // ページ番号をリセット
                 setHasMore(response.data.length > 0); // 初回取得で投稿があるか確認
             } catch (err) {
-                console.error(err);
+                if (axios.isCancel(err)) {
+                    console.log("Request canceled");
+                } else {
+                    console.error(err);
+                }
             }
         }
         fetchPosts();
+
+        return () => {
+            controller.abort(); // 古いリクエストをキャンセル
+        };
+
     }, [username, user._id]);
 
     // 追加の投稿を取得
@@ -70,7 +85,8 @@ export default function Timeline({ username }) {
             }
         };
 
-        filterPosts(); // 非同期関数を呼び出す
+        setFilteredPosts([]);
+        filterPosts();
     }, [searchKeyword, posts]);
 
     return (
