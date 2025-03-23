@@ -1,7 +1,12 @@
 .sidebar {
-    flex: 2.5;
+    position: fixed;
+    width: 20%;
+    height: 100vh;
+    /* flex: 2.5; */
     background-color: #ffffff;
     box-shadow: 5px 0 5px rgba(0, 0, 0, 0.1);
+    z-index: 1000; /* 他の要素より前面に表示 */
+    overflow-y: auto;
 }
 
 .sidebarWrapper {
@@ -16,13 +21,16 @@
 
 .sidebarListItem {
     display: flex;
+    background-color: rgb(255, 255, 255);
     align-items: center;
-    margin-bottom: 10px;
     padding: 4px, 6px;
     cursor: pointer;
     box-shadow: 3px 7px 13px -7px #819fc5;
     border-radius: 5px;
     transition: all 0.2s ease;
+    margin-bottom: 10px;
+    border: 1px solid #d5d5d5;
+    height: 40px;
 }
 
 .sidebarListItem:hover {
@@ -32,12 +40,15 @@
 
 .sidebarIcon {
     font-size: 35px;
-    margin-right: 10px;
+    margin: 0 10px;
+    color: rgb(71, 64, 64);
 }
 
 .sidebarListItemText {
     font-size: 16px;
     padding-top: 3px;
+    font-weight: 600;
+    color: rgb(71, 64, 64);
 }
 
 .sidebarHr {

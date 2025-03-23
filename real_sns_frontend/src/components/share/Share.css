@@ -1,8 +1,10 @@
 .share {
-    width: 100%;
+    width: 95%;
     height: 200px;
-    box-shadow: 0px 0px 10px 0px rgb(72, 178, 194);
+    box-shadow: 5px 5px 15px 0px rgb(72, 178, 194);
     border-radius: 10px;
+    margin-bottom: 20px;
+    margin-left: 10px;
 }
 
 .shareWrapper {

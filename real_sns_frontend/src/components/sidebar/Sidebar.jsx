@@ -2,6 +2,7 @@ import React from 'react'
 import { useState, useEffect, useContext } from 'react';
 import "./Sidebar.css"
 import { Favorite, Home, Person, Search, Settings } from '@mui/icons-material';
+import BallotIcon from '@mui/icons-material/Ballot';
 import CloseFriend from '../closeFriend/CloseFriend'
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../states/AuthContext';
@@ -35,10 +36,16 @@ export default function Sidebar() {
         <div className="sidebar">
             <div className="sidebarWrapper">
                 <ul className="sidebarList">
+                    <Link to={`/profile/${loginUser.username}`} style={{ textDecoration: 'none', color: "black" }}>
+                        <li className="sidebarListItem">
+                            <Person className="sidebarIcon" />
+                            <span className="sidebarListItemText">マイページ</span>
+                        </li>
+                    </Link>
                     <Link to="/" style={{ textDecoration: 'none', color: "black" }}>
                         <li className="sidebarListItem">
-                            <Home className="sidebarIcon" />
-                            <span className="sidebarListItemText">ホーム</span>
+                            <BallotIcon className="sidebarIcon" />
+                            <span className="sidebarListItemText">タイムライン</span>
                         </li>
                     </Link>
                     <li className="sidebarListItem">
@@ -49,12 +56,6 @@ export default function Sidebar() {
                         <Favorite className="sidebarIcon" />
                         <span className="sidebarListItemText">お気に入り</span>
                     </li>
-                    <Link to={`/profile/${loginUser.username}`} style={{ textDecoration: 'none', color: "black" }}>
-                        <li className="sidebarListItem">
-                            <Person className="sidebarIcon" />
-                            <span className="sidebarListItemText">プロフィール</span>
-                        </li>
-                    </Link>
                     <li className="sidebarListItem">
                         <Settings className="sidebarIcon" />
                         <span className="sidebarListItemText">設定</span>

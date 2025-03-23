@@ -1,6 +1,6 @@
-
 .timeline {
-    flex: 6;
+    margin-left: 20%; /* サイドバーの幅と同じだけ左に余白を追加 */
+    width : 50%;
 }
 
 .timelineWrapper {

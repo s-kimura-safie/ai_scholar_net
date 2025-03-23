@@ -98,7 +98,7 @@ export default function Timeline({ username }) {
                     next={fetchMorePosts}
                     hasMore={hasMore} // 取得可能な投稿があるかどうか
                     loader={<h4>Loading...</h4>}
-                    endMessage={<h4>No more posts to show</h4>} // 全件読み込み完了時のメッセージ
+                    endMessage={<h4>No more posts ...</h4>} // 全件読み込み完了時のメッセージ
                 >
                     {filteredPosts.map((post) => (
                         <Post post={post} key={post._id} />

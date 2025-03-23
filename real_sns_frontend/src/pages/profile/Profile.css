@@ -2,6 +2,10 @@
     display: flex;
 }
 
+.profileRightTop {
+    margin-left: 20%;
+}
+
 .profileRight {
     flex: 10.5;
 }
@@ -123,6 +127,8 @@
 
 .profileRightBottom {
     display: flex;
+    /* margin-left: 50%; */
+
 }
 
 .userDetail {
