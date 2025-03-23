@@ -3,3 +3,18 @@
     width: 100%;
     background-color: rgb(240, 240, 240);
 }
+
+.sidebar {
+    padding: 20px;
+    background-color: white;
+}
+
+.timeline {
+    padding: 20px;
+    background-color: white;
+}
+
+.rightbar {
+    padding: 20px;
+    background-color: white;
+}

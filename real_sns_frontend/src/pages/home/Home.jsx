@@ -10,9 +10,9 @@ export default function Home() {
         <>
             <Topbar />
             <div className="homeContainer">
-                <Sidebar />
-                <Timeline />
-                <Rightbar />
+                <Sidebar className="sidebar"/>
+                <Timeline className="timeline"/>
+                <Rightbar className="rightbar"/>
             </div>
         </>
     )
