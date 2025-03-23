@@ -177,13 +177,65 @@
     color: #333;
 }
 
+
+.editInput,
+.editTextarea {
+    width: 100%;
+    padding: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.editInput {
+    font-size: 20px;
+}
+
+.editTextarea {
+    font-size: 15px;
+    height: 100px;
+}
+
+.modalButtons {
+    display: flex;
+    justify-content: right;
+}
+
+.saveButton,
+.cancelButton {
+    padding: 10px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    color: white;
+    font-weight: 600;
+    width: 120px;
+    height: 50px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 5px;
+}
+
+.saveButton {
+    background-color: orange;
+    font-size: 20px;
+    transition: all 0.3s ease;
+}
+
+.saveButton:hover {
+    opacity: 0.5;
+    border: 2px solid red;
+    cursor: pointer;
+}
+
+
 /* キャンセルボタン */
-.modalButton {
-    padding: 10px 20px;
+.cancelButton {
     border: none;
     border-radius: 8px;
     font-size: 16px;
-    margin-left: 50px;
+    margin-left: 20px;
     cursor: pointer;
     background-color: #4c4c4c;
     color: #ffffff;
@@ -191,56 +243,40 @@
     display: inline-flex
 }
 
-.modalButton:hover {
+.cancelButton:hover {
     font-weight: 600;
     color: #0b0b0b;
     background-color: #e0e0e0;
     opacity: 0.5;
-    /* 半透明 */
     border: 2px solid rgb(41, 39, 39);
-    /* 枠線(赤色) */
     cursor: pointer;
-    /* マウス形状(ポインタ) */
 }
 
 .filelabel {
     font-weight: 600;
     font-size: 20px;
-
     background-color: orange;
-    /* 背景色 */
     color: white;
-    /* 文字色 */
     border: 2px solid orange;
-    /* 枠線 */
     width: 80px;
-    /* 幅 */
     border-radius: 3em;
-    /* 角丸 */
     padding: 12px 50px;
-    /* 内側の余白 */
     display: inline-flex
 }
 
 .filelabel img {
     vertical-align: bottom;
-    /* 画像の垂直方向の配置 */
     margin-right: 8px;
-    /* 画像とラベルの間隔 */
 }
 
 .filelabel:hover {
     opacity: 0.5;
-    /* 半透明 */
     border: 2px solid red;
-    /* 枠線(赤色) */
     cursor: pointer;
-    /* マウス形状(ポインタ) */
 }
 
 #filesend {
     display: none;
-    /* 本来のファイル選択フォームは非表示に */
 }
 
 /* フェードインアニメーション */

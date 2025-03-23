@@ -21,8 +21,11 @@ const Profile = () => {
   const [user, setUser] = useState({});
   const [isFollowing, setIsFollowing] = useState(false);
   const [showModal, setShowModal] = useState(false); // モーダル表示状態
-  const [selectedImage, setSelectedImage] = useState(null); // 選択された画像
   const [imageType, setImageType] = useState(""); // 画像の種類 ("cover" または "profile")
+
+  const [editUsername, setEditUsername] = useState(loginUser.username || "");
+  const [editDesc, setEditDesc] = useState(loginUser.desc || "");
+  const [showEditModal, setShowEditModal] = useState(false);
 
 
   useEffect(() => {
@@ -31,7 +34,39 @@ const Profile = () => {
       setUser(response.data);
     }
     fetchUser();
-  }, [username]);
+  }, [username, loginUser.username, loginUser.desc]);
+
+  const handleEditUser = async () => {
+    try {
+      // サーバーに更新リクエストを送信
+      await axios.put(`/users/${user._id}`, {
+        userId: loginUser._id, // 自分のユーザーID
+        username: editUsername,
+        desc: editDesc,
+      });
+
+      // ローカルの状態を更新
+      const updatedUser = {
+        ...loginUser,
+        username: editUsername,
+        desc: editDesc,
+      };
+      dispatch({ type: "LOGIN_SUCCESS", payload: updatedUser });
+
+      setShowEditModal(false); // 編集モードを終了
+    } catch (err) {
+      console.error("Failed to update user:", err);
+    }
+  };
+
+  const openEditModal = () => {
+    setShowEditModal(true); // モーダルを表示
+  };
+
+  const closeEditModal = () => {
+    setShowEditModal(false); // モーダルを非表示
+  };
+
 
   // フォロワーかどうかの初期値を定める
   useEffect(() => {
@@ -81,7 +116,6 @@ const Profile = () => {
     const file = e.target.files[0];
 
     if (file) {
-      setSelectedImage(file);
       const data = new FormData(); // ファイルを送信するためのFormDataオブジェクトを作成
       const fileName = Date.now() + "_" + file.name;
       data.append("name", fileName);
@@ -133,11 +167,13 @@ const Profile = () => {
               />
               <div className="profileWrapper">
                 <div className="profileInfo">
-                  <div className='profileNameItems'>
-                    <span className='profileName'>{user.username}</span>
-                    {loginUser.username === username && <EditNoteIcon className="editNameIcon" onClick={() => { }} />}
+                  <div className="profileNameItems">
+                    <span className="profileName">{user.username}</span>
+                    {loginUser.username === username && (
+                      <EditNoteIcon className="editNameIcon" onClick={openEditModal} />
+                    )}
                   </div>
-                  <span className='profileInfoDesc'>{user.desc}</span>
+                  <span className="profileInfoDesc">{user.desc}</span>
                 </div>
                 {loginUser.username !== username && (
                   <button
@@ -165,10 +201,36 @@ const Profile = () => {
         </div>
       </div>
 
-      {/* モーダル */}
+      {/* プロフィール情報編集モーダル */}
+      {showEditModal && (
+        <div className="modal" onClick={() => setShowEditModal(false)}>
+          <div className="modalContent" onClick={(e) => e.stopPropagation()}>
+            <h3 className="modalTitle">プロフィールを編集</h3>
+            <input
+              type="text"
+              value={editUsername}
+              onChange={(e) => setEditUsername(e.target.value)}
+              placeholder="ユーザー名を入力"
+              className="editInput"
+            />
+            <textarea
+              value={editDesc}
+              onChange={(e) => setEditDesc(e.target.value)}
+              placeholder="自己紹介を入力"
+              className="editTextarea"
+            />
+            <div className="modalButtons">
+              <button onClick={handleEditUser} className="saveButton">保存</button>
+              <button onClick={closeEditModal} className="cancelButton">キャンセル</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 画像変更モーダル */}
       {showModal && (
-        <div className="modal">
-          <div className="modalContent">
+        <div className="modal" onClick={() => setShowModal(false)}>
+          <div className="modalContent" onClick={(e) => e.stopPropagation()}>
             <h3 className="modalTitle">
               {imageType === "cover" ? "カバー写真を選択してください" : "プロフィール写真を選択してください"}
             </h3>
@@ -180,7 +242,7 @@ const Profile = () => {
               <input type="file" onChange={handleImageChange} name="datafile" id="filesend"></input>
             </label>
             <button
-              className="modalButton cancelButton"
+              className="cancelButton"
               onClick={() => setShowModal(false)}
             >
               キャンセル
