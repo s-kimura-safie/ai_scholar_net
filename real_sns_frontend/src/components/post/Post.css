@@ -1,8 +1,9 @@
 .post {
-    width: 100%;
-    box-shadow: 3px 7px 13px -7px #819fc5;
+    width: 95%;
+    box-shadow: 0px 0px 5px 0px #819fc5;
     border-radius: 10px;
-    margin: 30px 0;
+    margin: 15px 0;
+    margin-left: 10px;
 }
 
 .postWrapper {
