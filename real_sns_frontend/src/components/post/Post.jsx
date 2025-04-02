@@ -3,6 +3,7 @@ import { MoreVert } from '@mui/icons-material';
 import { Menu, MenuItem, Modal, Box, TextField, Button } from '@mui/material';
 import { format } from 'timeago.js';
 import axios from 'axios'
+import CommentBar from "../commentbar/CommentBar";
 import './Post.css'
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../states/AuthContext';
@@ -17,15 +18,11 @@ export default function Post({ post }) {
     const [like, setLike] = useState(post.likes.length);
     const [heartImgPath, setPath] = useState(PUBLIC_FOLDER + "/heart_off.png");
     const [numComments, setNumComments] = useState(0);
-    const [isLiked, setIsLiked] = useState(false);
+    const [isLiked, setIsLiked] = useState(false); // FIXME: データベースのいいねの状態を取得する必要がある。
     const [postUser, setUser] = useState({});
+    const [selectedPostId, setSelectedPostId] = useState(null); // コメント表示用のPostID
 
-    // 編集・削除機能
-    const [anchorEl, setAnchorEl] = useState(null);
-    const [openEditModal, setOpenEditModal] = useState(false);
-    const [newDesc, setNewDesc] = useState(post.desc);
-
-
+    // ユーザー情報取得
     useEffect(() => {
         const controller = new AbortController(); // AbortController を作成
 
@@ -46,13 +43,22 @@ export default function Post({ post }) {
 
         fetchUser();
 
-        setNumComments(post.comments.length);
-
         return () => {
             controller.abort(); // リクエストを中断するクリーンアップ関数を返す
         };
     }, [post]);
 
+    // コメント数を更新
+    useEffect(() => {
+        setNumComments(post.comments.length);
+    }, [post.comments]);
+
+    // コメントを表示する投稿のIDを設定
+    const handleCommentClick = () => {
+        setSelectedPostId(post._id); // コメント表示用にPost IDを設定
+    };
+
+    // いいねの状態を変更する関数
     const handleLike = async () => {
         try {
             await axios.put(`/posts/${post._id}/like`, // request URL: いいねを押す投稿のID
@@ -64,7 +70,7 @@ export default function Post({ post }) {
         }
 
         if (isLiked) {
-            setLike(like - 1);
+            setLike(like - 1); // データベースの値をとる
             setPath(PUBLIC_FOLDER + "/heart_off.png");
         } else {
             setLike(like + 1);
@@ -72,6 +78,11 @@ export default function Post({ post }) {
         }
         setIsLiked(!isLiked);
     }
+
+    // 投稿の編集・削除機能
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [openEditModal, setOpenEditModal] = useState(false);
+    const [newDesc, setNewDesc] = useState(post.desc);
 
     const handleMenuOpen = (event) => {
         setAnchorEl(event.currentTarget); // クリックした要素(MoreVert)の位置を取得
@@ -151,10 +162,14 @@ export default function Post({ post }) {
                         <span className="postLikeCounter">{like}人がいいねを押しました。</span>
                     </div>
                     <div className="postBottomRight">
-                        <span onClick={() => { }} className="postCommentText">{numComments}:comments</span>
+                        <span onClick={handleCommentClick} className="postCommentText">{numComments}:件のコメント</span>
                     </div>
                 </div>
             </div>
+
+            {selectedPostId && (
+                <CommentBar postId={selectedPostId} loginUser={loginUser} setSelectedPostId={setSelectedPostId} setNumComments={setNumComments} />
+            )}
 
             <Modal open={openEditModal} onClose={handleEditClose}>
                 <Box sx={{
