@@ -104,6 +104,16 @@ router.put("/:id/like", async (req, res) => {
     }
 });
 
+// Get likes
+router.get("/:id/likes", async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id);
+        return res.status(200).json(post.likes);
+    } catch (err) {
+        return res.status(500).json(err);
+    }
+});
+
 // Put a comment
 router.put("/:id/comment", async (req, res) => {
     try {

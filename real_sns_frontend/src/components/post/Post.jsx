@@ -18,7 +18,7 @@ export default function Post({ post }) {
     const [like, setLike] = useState(post.likes.length);
     const [heartImgPath, setPath] = useState(PUBLIC_FOLDER + "/heart_off.png");
     const [numComments, setNumComments] = useState(0);
-    const [isLiked, setIsLiked] = useState(false); // FIXME: データベースのいいねの状態を取得する必要がある。
+    const [isLiked, setIsLiked] = useState(false);
     const [postUser, setUser] = useState({});
     const [selectedPostId, setSelectedPostId] = useState(null); // コメント表示用のPostID
 
@@ -58,7 +58,7 @@ export default function Post({ post }) {
         setSelectedPostId(post._id); // コメント表示用にPost IDを設定
     };
 
-    // いいねの状態を変更する関数
+    // 投稿のいいね数を更新する関数
     const handleLike = async () => {
         try {
             await axios.put(`/posts/${post._id}/like`, // request URL: いいねを押す投稿のID
@@ -69,15 +69,24 @@ export default function Post({ post }) {
             console.log(err);
         }
 
-        if (isLiked) {
-            setLike(like - 1); // データベースの値をとる
-            setPath(PUBLIC_FOLDER + "/heart_off.png");
-        } else {
-            setLike(like + 1);
-            setPath(PUBLIC_FOLDER + "/heart.png");
-        }
-        setIsLiked(!isLiked);
+        // いいね数を更新
+        setLike((prev) => prev + (isLiked ? -1 : 1)); // prevで前のいいね数を参照し、isLikeに応じて増減させる
     }
+
+    // 投稿のいいねの状態を更新
+    useEffect(() => {
+        const checkLikeStatus = async () => {
+            try {
+                const response = await axios.get(`/posts/${post._id}/likes`, { params: { userId: loginUser._id } });
+                setIsLiked(response.data.includes(loginUser._id));
+                setPath(response.data.includes(loginUser._id) ? PUBLIC_FOLDER + "/heart.png" : PUBLIC_FOLDER + "/heart_off.png");
+            } catch (err) {
+                console.error("Error fetching like status:", err);
+            }
+        };
+
+        checkLikeStatus();
+    }, [like, loginUser, post._id, PUBLIC_FOLDER]);
 
     // 投稿の編集・削除機能
     const [anchorEl, setAnchorEl] = useState(null);
