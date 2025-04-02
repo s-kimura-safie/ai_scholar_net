@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
+
 import Topbar from '../../components/topbar/Topbar'
 import Sidebar from '../../components/sidebar/Sidebar'
 import Timeline from '../../components/timeline/Timeline'
@@ -9,15 +11,14 @@ import EditNoteIcon from '@mui/icons-material/EditNote';
 import { AuthContext } from '../../states/AuthContext';
 
 
-import { useParams } from 'react-router-dom'
-
-
 const Profile = () => {
   const PUBLIC_FOLDER = process.env.REACT_APP_PUBLIC_FOLDER;
   const { user: loginUser } = useContext(AuthContext);
   const { dispatch } = useContext(AuthContext);
 
   const username = useParams().username; // URLのパラメータを取得
+  const navigate = useNavigate(); // ページ遷移用の関数
+
   const [user, setUser] = useState({});
   const [isFollowing, setIsFollowing] = useState(false);
   const [showModal, setShowModal] = useState(false); // モーダル表示状態
@@ -54,6 +55,11 @@ const Profile = () => {
       dispatch({ type: "LOGIN_SUCCESS", payload: updatedUser });
 
       setShowEditModal(false); // 編集モードを終了
+
+      // URL を新しいユーザー名にリダイレクト
+      navigate(`/profile/${editUsername}`);
+      window.location.reload();
+
     } catch (err) {
       console.error("Failed to update user:", err);
     }
@@ -137,6 +143,14 @@ const Profile = () => {
           ...prev,
           [imageType === "cover" ? "coverPicture" : "profilePicture"]: filePath,
         }));
+
+        // ローカル保存
+        // const updatedUser = {
+        //   ...loginUser,
+        //   [imageType === "cover" ? "coverPicture" : "profilePicture"]: filePath,
+        // };
+        // dispatch({ type: "LOGIN_SUCCESS", payload: updatedUser });
+
         setShowModal(false); // モーダルを閉じる
         window.location.reload(); // ページをリロード
       } catch (err) {

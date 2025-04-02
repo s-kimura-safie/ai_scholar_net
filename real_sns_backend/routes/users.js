@@ -39,11 +39,14 @@ router.get("/", async (req, res) => {
 
 // Update
 router.put("/:id", async (req, res) => {
-    if (req.body.userId === req.params.id || req.params.isAdmin) {
+    if (req.body.userId === req.params.id || req.body.isAdmin) {
+        const { username, desc } = req.body;
         try {
-            const user = await User.findByIdAndUpdate(req.params.id, {
-                $set: req.body, // $set: すべてのフィールドを更新する
-            });
+            const user = await User.findByIdAndUpdate(
+                req.params.id,
+                { $set: req.body }, // $set: 更新するフィールド
+                { new: true } // new: true で更新後のデータを取得
+            );
             res.status(200).json("Account has been updated");
         } catch (err) {
             return res.status(500).json(err);
