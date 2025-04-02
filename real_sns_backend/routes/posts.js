@@ -108,13 +108,32 @@ router.put("/:id/like", async (req, res) => {
 router.put("/:id/comment", async (req, res) => {
     try {
         const post = await Post.findById(req.params.id);
-        comment = req.body.comment;
-        await post.updateOne({ $push: { comments: comment } });
-        return res.status(200).json("Comment added");
+        const comment = {
+            userId: req.body.userId,
+            username: req.body.username,
+            text: req.body.text
+        };
+        await post.updateOne({
+            $push: {
+                comments: comment
+            }
+        });
+        return res.status(200).json(comment);
     } catch (err) {
         return res.status(500).json(err);
     }
 });
+
+// Get comments
+router.get("/:id/comments", async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id);
+        return res.status(200).json(post.comments);
+    } catch (err) {
+        return res.status(500).json(err);
+    }
+});
+
 
 // Get timeline posts
 router.get("/timeline/:userId", async (req, res) => {
