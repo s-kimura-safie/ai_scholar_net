@@ -16,7 +16,13 @@ export const AuthcontextProvider = ({ children }) => { // childrenはAppコン�
     const [state, dispatch] = useReducer(AuthReducer, initialState);
 
     useEffect(() => {
-        localStorage.setItem("user", JSON.stringify(state.user)); // ユーザー情報をローカルストレージに保存
+        if (state.user) {
+            // パスワードを除外して保存
+            const { password, ...userWithoutPassword } = state.user;
+            localStorage.setItem("user", JSON.stringify(userWithoutPassword));
+        } else {
+            localStorage.removeItem("user"); // ユーザーが null の場合はローカルストレージから削除
+        }
     }, [state.user]); // state.user が変更された時だけ実行
 
     return (
