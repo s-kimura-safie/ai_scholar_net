@@ -1,6 +1,6 @@
 import "./Topbar.css"
-import { Search, Chat, Notifications } from '@mui/icons-material'; //  SVG形式のアイコンをインポート
-import React, { useContext, useEffect } from 'react'
+import { Search, Chat, Notifications, Close } from '@mui/icons-material'; //  SVG形式のアイコンをインポート
+import React, { useContext, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../states/AuthContext';
 
@@ -8,6 +8,7 @@ export default function Topbar() {
     const PUBLIC_FOLDER = process.env.REACT_APP_PUBLIC_FOLDER;
     const { user } = useContext(AuthContext); // global state
     const { dispatch } = useContext(AuthContext);
+    const [searchKeyword, setSearchKeyword] = useState("");
 
     // ページが更新されたときに検索キーワードをリセット
     useEffect(() => {
@@ -16,7 +17,14 @@ export default function Topbar() {
 
 
     const handleSearchChange = (e) => {
-        dispatch({ type: "SET_SEARCH_KEYWORD", payload: e.target.value }); // 検索キーワードを更新
+        const value = e.target.value;
+        setSearchKeyword(value);
+        dispatch({ type: "SET_SEARCH_KEYWORD", payload: value }); // 検索キーワードを更新
+    };
+
+    const handleClearSearch = () => {
+        setSearchKeyword(""); // 検索キーワードをクリア
+        dispatch({ type: "SET_SEARCH_KEYWORD", payload: "" }); // グローバル状態をクリア
     };
 
     return (
@@ -32,9 +40,17 @@ export default function Topbar() {
                     <input
                         type="text"
                         placeholder="検索キーワードを入力..."
+                        value={searchKeyword}
                         onChange={handleSearchChange}
                         className="searchInput"
                     />
+                    {searchKeyword && ( // 検索キーワードがある場合のみクリアボタンを表示
+                        <Close
+                            className="clearSearchInput"
+                            onClick={handleClearSearch}
+                            style={{ cursor: "pointer" }}
+                        />
+                    )}
                 </div>
             </div>
             <div className="topbarRight">

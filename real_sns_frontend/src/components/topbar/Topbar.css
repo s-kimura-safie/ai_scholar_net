@@ -38,12 +38,20 @@
 
 .searchInput {
     border: none;
-    width: 80%;
+    width: 100%;
     margin-left: 10px;
+    margin-right: 10px;
 }
 
 .searchInput:focus {
     outline: none;
+}
+
+.clearSearchInput {
+    right: 10px;
+    cursor: pointer;
+    margin-right: 15px;
+    color: gray;
 }
 
 .topbarCenter {
