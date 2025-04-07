@@ -3,28 +3,33 @@ import { Search, Chat, Notifications, Close } from '@mui/icons-material'; //  SV
 import React, { useContext, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../states/AuthContext';
+import useDebounce from "../../utils/useDebounce";
 
 export default function Topbar() {
     const PUBLIC_FOLDER = process.env.REACT_APP_PUBLIC_FOLDER;
     const { user } = useContext(AuthContext); // global state
     const { dispatch } = useContext(AuthContext);
     const [searchKeyword, setSearchKeyword] = useState("");
+    const debouncedKeyword = useDebounce(searchKeyword, 500);
 
     // ページが更新されたときに検索キーワードをリセット
     useEffect(() => {
-        dispatch({ type: "SET_SEARCH_KEYWORD", payload: "" });
-    }, [dispatch]);
-
+        if (debouncedKeyword.trim() !== "") {
+            console.log("検索処理を実行:", debouncedKeyword);
+            dispatch({ type: "SET_SEARCH_KEYWORD", payload: debouncedKeyword });
+        } else {
+            console.log("検索キーワードが空です");
+            dispatch({ type: "SET_SEARCH_KEYWORD", payload: "" });
+        }
+    }, [debouncedKeyword, dispatch]);
 
     const handleSearchChange = (e) => {
-        const value = e.target.value;
-        setSearchKeyword(value);
-        dispatch({ type: "SET_SEARCH_KEYWORD", payload: value }); // 検索キーワードを更新
+        setSearchKeyword(e.target.value);
     };
 
     const handleClearSearch = () => {
-        setSearchKeyword(""); // 検索キーワードをクリア
-        dispatch({ type: "SET_SEARCH_KEYWORD", payload: "" }); // グローバル状態をクリア
+        setSearchKeyword("");
+        dispatch({ type: "SET_SEARCH_KEYWORD", payload: "" });
     };
 
     return (

@@ -72,6 +72,8 @@ export default function Timeline({ username }) {
     // 検索キーワードが変更されたときに投稿をフィルタリング
     useEffect(() => {
         const filterPosts = async () => {
+            if (!posts.length) return;
+
             if (searchKeyword?.trim()) {
                 // 検索キーワードがある場合、フィルタリングされた投稿を取得
                 const response = await axios.post(`/posts/search`, {
@@ -85,7 +87,6 @@ export default function Timeline({ username }) {
             }
         };
 
-        setFilteredPosts([]);
         filterPosts();
     }, [searchKeyword, posts]);
 
