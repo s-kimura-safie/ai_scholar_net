@@ -141,7 +141,10 @@ export default function Post({ post }) {
                 <div className="postTop">
                     <div className="postTopLeft">
                         <Link to={`/profile/${postUser.username}`}>
-                            <img src={PUBLIC_FOLDER + postUser.profilePicture || PUBLIC_FOLDER + "/person/noAvatar.png"} alt="" loading="lazy" className="postProfileImg" />
+                            <img src={postUser.profilePicture
+                                ? PUBLIC_FOLDER + postUser.profilePicture
+                                : PUBLIC_FOLDER + "/person/noAvatar.png"}
+                                alt="" loading="lazy" className="postProfileImg" />
                         </Link>
                         <span className="postUsername">{postUser.username}</span>
                         <span className="postDate">{format(post.createdAt)}</span>

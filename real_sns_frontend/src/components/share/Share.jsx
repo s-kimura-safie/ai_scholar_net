@@ -50,7 +50,10 @@ export default function Share() {
             <div className="shareWrapper">
                 <div className="shareTop">
                     <Link to={`/profile/${user.username}`}>
-                        <img src={PUBLIC_FOLDER + user.profilePicture || PUBLIC_FOLDER + "/person/noAvatar.png"} alt="" className="shareProfileImg" />
+                        <img src={user.profilePicture
+                            ? PUBLIC_FOLDER + user.profilePicture
+                            : PUBLIC_FOLDER + "/person/noAvatar.png"}
+                            alt="" className="shareProfileImg" />
                     </Link>
                     <textarea
                         className="shareInput"
