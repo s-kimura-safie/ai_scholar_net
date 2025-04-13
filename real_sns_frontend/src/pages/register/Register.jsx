@@ -45,7 +45,7 @@ function Register() {
             <div className="loginWrapper">
                 <div className="loginLeft">
 
-                    <h3 className='loginLogo'>Real SNS</h3>
+                    <h3 className='loginLogo'>AI SNS</h3>
                     <span className="loginDesc">本格的なSNSを自分の手で</span>
                 </div>
                 <div className="loginRight">
