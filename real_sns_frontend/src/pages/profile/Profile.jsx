@@ -8,7 +8,9 @@ import Rightbar from '../../components/rightbar/Rightbar'
 import axios from 'axios'
 import "./Profile.css"
 import EditNoteIcon from '@mui/icons-material/EditNote';
+import LogoutIcon from '@mui/icons-material/Logout';
 import { AuthContext } from '../../states/AuthContext';
+import { logoutCall } from '../../ActionCalls';
 
 
 const Profile = () => {
@@ -24,18 +26,22 @@ const Profile = () => {
   const [showModal, setShowModal] = useState(false); // モーダル表示状態
   const [imageType, setImageType] = useState(""); // 画像の種類 ("cover" または "profile")
 
-  const [editUsername, setEditUsername] = useState(loginUser.username || "");
-  const [editDesc, setEditDesc] = useState(loginUser.desc || "");
+  const [editUsername, setEditUsername] = useState(loginUser?.username || "");
+  const [editDesc, setEditDesc] = useState(loginUser?.desc || "");
   const [showEditModal, setShowEditModal] = useState(false);
 
 
   useEffect(() => {
     const fetchUser = async () => {
-      const response = await axios.get(`/users?username=${username}`);
-      setUser(response.data);
+      try {
+        const response = await axios.get(`/users?username=${username}`);
+        setUser(response.data);
+      } catch (err) {
+        console.error("ユーザー情報の取得に失敗しました", err);
+      }
     }
     fetchUser();
-  }, [username, loginUser.username, loginUser.desc]);
+  }, [username]); // loginUser.usernameとloginUser.descを依存配列から削除
 
   const handleEditUser = async () => {
     try {
@@ -73,14 +79,36 @@ const Profile = () => {
     setShowEditModal(false); // モーダルを非表示
   };
 
+  const handleLogout = () => {
+    try {
+      // まずナビゲーション処理を準備
+      const navigateToLogin = () => {
+        navigate("/login", { replace: true });
+      };
+
+      // ログアウト処理を実行
+      logoutCall(dispatch);
+
+      // タイムアウトを設定して状態更新が完了した後にナビゲーションを行う
+      setTimeout(() => {
+        navigateToLogin();
+      }, 0);
+    } catch (err) {
+      console.error("ログアウト処理中にエラーが発生しました:", err);
+    }
+  }
 
   // フォロワーかどうかの初期値を定める
   useEffect(() => {
-    setIsFollowing(loginUser.followings.includes(user._id));
-  }, [loginUser.followings, user._id]);
+    if (loginUser && loginUser.followings && user && user._id) {
+      setIsFollowing(loginUser.followings.includes(user._id));
+    }
+  }, [loginUser, user]);
 
   const handleFollow = async () => {
     try {
+      if (!user || !user._id || !loginUser) return;
+
       await axios.put(`/users/${user._id}/follow`, { userId: loginUser._id });
 
       // ローカルの状態を更新
@@ -98,6 +126,8 @@ const Profile = () => {
 
   const handleUnfollow = async () => {
     try {
+      if (!user || !user._id || !loginUser) return;
+
       await axios.put(`/users/${user._id}/unfollow`, { userId: loginUser._id });
 
       // ローカルの状態を更新
@@ -114,8 +144,11 @@ const Profile = () => {
   };
 
   const handleImageClick = (type) => {
-    setImageType(type); // 画像の種類を設定
-    setShowModal(true); // モーダルを表示
+    // 自分自身のプロフィールの場合のみ画像変更可能
+    if (loginUser && user && loginUser.username === user.username) {
+      setImageType(type);
+      setShowModal(true);
+    }
   };
 
   const handleImageChange = async (e) => {
@@ -168,13 +201,17 @@ const Profile = () => {
           <div className="profileRightTop">
             <div className="profileCover">
               <img
-                src={PUBLIC_FOLDER + user.coverPicture || PUBLIC_FOLDER + "/post/3.jpeg"}
+                src={user?.coverPicture
+                  ? PUBLIC_FOLDER + user.coverPicture
+                  : PUBLIC_FOLDER + "post/3.jpeg"}
                 alt=""
                 className="profileCoverImg"
                 onClick={() => handleImageClick("cover")} // クリックイベントを追加
               />
               <img
-                src={PUBLIC_FOLDER + user.profilePicture || PUBLIC_FOLDER + "/person/noAvatar.png"}
+                src={user?.profilePicture
+                  ? PUBLIC_FOLDER + user.profilePicture
+                  : PUBLIC_FOLDER + "/person/noAvatar.png"}
                 alt=""
                 className="profileUserImg"
                 onClick={() => handleImageClick("profile")} // クリックイベントを追加
@@ -183,13 +220,21 @@ const Profile = () => {
                 <div className="profileInfo">
                   <div className="profileNameItems">
                     <span className="profileName">{user.username}</span>
-                    {loginUser.username === username && (
+                    {loginUser && user && loginUser.username === user.username && (
                       <EditNoteIcon className="editNameIcon" onClick={openEditModal} />
                     )}
                   </div>
                   <span className="profileInfoDesc">{user.desc}</span>
                 </div>
-                {loginUser.username !== username && (
+                {loginUser && user && loginUser.username === user.username ? (
+                  <button
+                    className="logoutButton"
+                    onClick={handleLogout}
+                  >
+                    <LogoutIcon className="logoutIcon" />
+                    ログアウト
+                  </button>
+                ) : (
                   <button
                     className={`followButton ${isFollowing ? "unfollowButton" : "followButton"}`}
                     onClick={() => {

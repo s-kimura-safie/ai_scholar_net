@@ -19,7 +19,7 @@ export default function Sidebar() {
         const fetchFriends = async () => {
             // Promise.all: 複数のPromiseを並行して実行し、すべてのPromiseが解決されるのを待つためのメソッドです。
             // 引数として渡されたすべてのPromiseが解決されると、結果を配列として返します。
-            if (loginUser.followings) {
+            if (loginUser && loginUser.followings) {
                 const friendList = await Promise.all(
                     loginUser.followings.map(async (userId) => {
                         const response = await axios.get(`/users/${userId}`);
@@ -30,18 +30,27 @@ export default function Sidebar() {
             }
         };
         fetchFriends();
-    }, [loginUser.followings]);
+    }, [loginUser]);
 
     return (
         <div className="sidebar">
             <div className="sidebarWrapper">
                 <ul className="sidebarList">
-                    <Link to={`/profile/${loginUser.username}`} style={{ textDecoration: 'none', color: "black" }}>
-                        <li className="sidebarListItem">
-                            <Person className="sidebarIcon" />
-                            <span className="sidebarListItemText">マイページ</span>
-                        </li>
-                    </Link>
+                    {loginUser ? (
+                        <Link to={`/profile/${loginUser.username}`} style={{ textDecoration: 'none', color: "black" }}>
+                            <li className="sidebarListItem">
+                                <Person className="sidebarIcon" />
+                                <span className="sidebarListItemText">マイページ</span>
+                            </li>
+                        </Link>
+                    ) : (
+                        <Link to="/login" style={{ textDecoration: 'none', color: "black" }}>
+                            <li className="sidebarListItem">
+                                <Person className="sidebarIcon" />
+                                <span className="sidebarListItemText">ログイン</span>
+                            </li>
+                        </Link>
+                    )}
                     <Link to="/" style={{ textDecoration: 'none', color: "black" }}>
                         <li className="sidebarListItem">
                             <BallotIcon className="sidebarIcon" />
@@ -62,11 +71,13 @@ export default function Sidebar() {
                     </li>
                 </ul>
                 <hr className="sidebarHr" />
-                <ul className="sidebarFriendList">
-                    {friends.map((user) => (
-                        <CloseFriend user={user} key={user._id} />
-                    ))}
-                </ul>
+                {loginUser && (
+                    <ul className="sidebarFriendList">
+                        {friends.map((user) => (
+                            <CloseFriend user={user} key={user._id} />
+                        ))}
+                    </ul>
+                )}
             </div>
         </div>
     )

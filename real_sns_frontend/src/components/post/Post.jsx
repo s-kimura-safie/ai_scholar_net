@@ -60,6 +60,9 @@ export default function Post({ post }) {
 
     // 投稿のいいね数を更新する関数
     const handleLike = async () => {
+        // loginUserがnullの場合は処理をスキップ
+        if (!loginUser) return;
+
         try {
             await axios.put(`/posts/${post._id}/like`, // request URL: いいねを押す投稿のID
                 { userId: loginUser._id } // request body: いいねを押すユーザーのID
@@ -75,6 +78,9 @@ export default function Post({ post }) {
 
     // 投稿のいいねの状態を更新
     useEffect(() => {
+        // loginUserがnullの場合は処理をスキップ
+        if (!loginUser) return;
+
         const checkLikeStatus = async () => {
             try {
                 const response = await axios.get(`/posts/${post._id}/likes`, { params: { userId: loginUser._id } });
@@ -102,6 +108,9 @@ export default function Post({ post }) {
     };
 
     const handleDelete = async () => {
+        // loginUserがnullの場合は処理をスキップ
+        if (!loginUser) return;
+
         try {
             await axios.delete(`/posts/${post._id}`, { data: { userId: loginUser._id } });
             window.location.reload();
@@ -121,6 +130,9 @@ export default function Post({ post }) {
     };
 
     const editPost = async () => {
+        // loginUserがnullの場合は処理をスキップ
+        if (!loginUser) return;
+
         if (newDesc) {
             try {
                 await axios.put(`/posts/${post._id}`, {
@@ -150,7 +162,7 @@ export default function Post({ post }) {
                         <span className="postDate">{format(post.createdAt)}</span>
                     </div>
                     <div className="postTopRight">
-                        {loginUser._id === post.userId && (
+                        {loginUser && loginUser._id === post.userId && (
                             <>
                                 <MoreVert onClick={handleMenuOpen} />
                                 <Menu anchorEl={anchorEl}
@@ -179,7 +191,7 @@ export default function Post({ post }) {
                 </div>
             </div>
 
-            {selectedPostId && (
+            {selectedPostId && loginUser && (
                 <CommentBar postId={selectedPostId} loginUser={loginUser} setSelectedPostId={setSelectedPostId} setNumComments={setNumComments} />
             )}
 

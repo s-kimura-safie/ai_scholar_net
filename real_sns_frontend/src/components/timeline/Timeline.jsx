@@ -14,6 +14,9 @@ export default function Timeline({ username }) {
     const { user, searchKeyword } = useContext(AuthContext);
 
     useEffect(() => {
+        // userがnullの場合は処理をスキップ
+        if (!user) return;
+
         const controller = new AbortController();
 
         const fetchPosts = async () => {
@@ -44,10 +47,13 @@ export default function Timeline({ username }) {
             controller.abort(); // 古いリクエストをキャンセル
         };
 
-    }, [username, user._id]);
+    }, [username, user]);
 
     // 追加の投稿を取得
     const fetchMorePosts = async () => {
+        // userがnullの場合は処理をスキップ
+        if (!user) return;
+
         const nextPage = page + 1;
 
         try {
@@ -93,7 +99,7 @@ export default function Timeline({ username }) {
     return (
         <div className="timeline">
             <div className="timelineWrapper">
-                {user.username === username && <Shere />}
+                {user && user.username === username && <Shere />}
                 <InfiniteScroll
                     dataLength={filteredPosts.length}
                     next={fetchMorePosts}
