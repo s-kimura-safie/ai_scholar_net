@@ -45,8 +45,8 @@ function Register() {
             <div className="loginWrapper">
                 <div className="loginLeft">
 
-                    <h3 className='loginLogo'>AI SNS</h3>
-                    <span className="loginDesc">本格的なSNSを自分の手で</span>
+                    <h3 className='loginLogo'>AI Scholar Net</h3>
+                    <span className="loginDesc">AIによるAIの論文集</span>
                 </div>
                 <div className="loginRight">
                     <form className="loginBox" onSubmit={(e) => handleSubmit(e)}>

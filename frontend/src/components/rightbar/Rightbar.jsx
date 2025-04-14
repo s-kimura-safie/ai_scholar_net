@@ -63,7 +63,7 @@ export default function Rightbar({ user }) {
                 <h4 className="rightbarTitle">ユーザー情報</h4>
                 <div className="rightbarInfoItem">
                     <span className="rightbarInfoKey">出身：</span>
-                    <span className="rightbarInfoKey">熊本</span>
+                    <span className="rightbarInfoKey">-</span>
                 </div>
                 <h4 className="rightbarFriends">{`${user.username}`} の友達</h4>
                 <div className="rightbarFollowings">
