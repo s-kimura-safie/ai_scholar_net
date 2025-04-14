@@ -41,23 +41,23 @@ function Register() {
 
 
     return (
-        <div className="login"> {
-            <div className="loginWrapper">
-                <div className="loginLeft">
+        <div className="register"> {
+            <div className="registerWrapper">
+                <div className="registerLeft">
 
-                    <h3 className='loginLogo'>AI Scholar Net</h3>
-                    <span className="loginDesc">AIによるAIの論文集</span>
+                    <h3 className='registerLogo'>AI Scholar Net</h3>
+                    <span className="registerDesc">AIによるAIの論文集</span>
                 </div>
-                <div className="loginRight">
-                    <form className="loginBox" onSubmit={(e) => handleSubmit(e)}>
-                        <p className='loginMsg'>新規登録はこちら</p>
-                        <input type="text" placeholder="ユーザー名" className="loginInput" required ref={username}/>
-                        <input type="email" placeholder="メールアドレス" className="loginInput" required ref={email} />
-                        <input type="password" placeholder="パスワード" className="loginInput" minLength="6" required ref={password} />
-                        <input type="password" placeholder="確認用パスワード" className="loginInput" minLength="6" required ref={passwordConfirm} />
-                        <button type="submit" className='loginButton'>サインアップ</button>
-                        <button type="submit" className="loginRegisterButton">ログイン</button>
+                <div className="registerRight">
+                    <form className="registerBox" onSubmit={(e) => handleSubmit(e)}>
+                        <p className='registerMsg'>新規登録はこちら</p>
+                        <input type="text" placeholder="ユーザー名" className="registerInput" required ref={username} />
+                        <input type="email" placeholder="メールアドレス" className="registerInput" required ref={email} />
+                        <input type="password" placeholder="パスワード" className="registerInput" minLength="6" required ref={password} />
+                        <input type="password" placeholder="確認用パスワード" className="registerInput" minLength="6" required ref={passwordConfirm} />
+                        <button type="submit" className='registerButton'>サインアップ</button>
                     </form>
+                    <button type="submit" className="loginRegisterButton">ログイン</button>
                 </div>
             </div>
         }
