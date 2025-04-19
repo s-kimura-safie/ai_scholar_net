@@ -5,7 +5,8 @@
     /* flex: 2.5; */
     background-color: #ffffff;
     box-shadow: 5px 0 5px rgba(0, 0, 0, 0.1);
-    z-index: 1000; /* 他の要素より前面に表示 */
+    z-index: 1000;
+    /* 他の要素より前面に表示 */
     overflow-y: auto;
 }
 
@@ -52,9 +53,90 @@
 }
 
 .sidebarHr {
-    margin: 20px 0px;
+    margin: 20px 0;
+    border: 0.5px solid #b7b6b6;
 }
-.sidebarFriends{
+
+.sidebarTitle {
+    font-size: 16px;
+    font-weight: 600;
+    color: rgb(71, 64, 64);
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+.searchBar {
+    width: 100%;
+    height: 35px;
+    background-color: white;
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    position: relative; /* 相対位置を設定 */
+}
+
+.sidebarSearchInput {
+    width: 100%;
+    padding: 8px;
+    margin: 10px 0;
+    border: 1px solid #d5d5d5;
+    border-radius: 5px;
+    font-size: 18px;
+}
+
+.clearSearchInput {
+    position: absolute;
+    right: 0px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: gray;
+    cursor: pointer;
+}
+
+.sidebarSearchResults {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #d5d5d5;
+    border-radius: 5px;
+    background-color: #ffffff;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.sidebarSearchResultItem {
+    height: 15px;
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s ease;
+}
+
+.sidebarSearchResultItem:hover {
+    background-color: #f9f9f9;
+}
+
+.sidebarSearchResultItem img {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.sidebarSearchResultItem span {
+    font-size: 14px;
+    color: #333;
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 32px;
+}
+
+.sidebarFriends {
     margin-top: 10px;
     margin-bottom: 10px;
     padding: 5px;

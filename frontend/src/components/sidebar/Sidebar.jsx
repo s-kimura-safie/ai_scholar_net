@@ -1,7 +1,8 @@
 import React from 'react'
 import { useState, useEffect, useContext } from 'react';
 import "./Sidebar.css"
-import { Favorite, Home, Person, Search, Settings } from '@mui/icons-material';
+import { Favorite, Home, Person, Search, Settings, Close } from '@mui/icons-material';
+
 import BallotIcon from '@mui/icons-material/Ballot';
 import CloseFriend from '../closeFriend/CloseFriend'
 import { Link } from 'react-router-dom';
@@ -10,9 +11,17 @@ import axios from 'axios';
 
 
 export default function Sidebar() {
+    const PUBLIC_FOLDER = process.env.REACT_APP_PUBLIC_FOLDER;
+
     const { user: loginUser } = useContext(AuthContext); // user:loginUser => userをloginUserとして使用
 
     const [friends, setFriends] = useState([]);
+    const [searchKeyword, setSearchKeyword] = useState("");
+    const [searchResults, setSearchResults] = useState([]);
+
+    const handleClearSearch = () => {
+        setSearchKeyword("");
+    };
 
     // コンポーネントがレンダリングされた後、フォローしているユーザーの情報を取得
     useEffect(() => { // APIでフォロワー情報を取得し終えたら、setFriendsでfriendsを更新
@@ -31,6 +40,21 @@ export default function Sidebar() {
         };
         fetchFriends();
     }, [loginUser]);
+
+    const handleSearch = async (e) => {
+        const keyword = e.target.value;
+        setSearchKeyword(keyword);
+        if (keyword.trim() !== "") {
+            try {
+                const response = await axios.get(`/users/search?q=${keyword}`);
+                setSearchResults(response.data);
+            } catch (err) {
+                console.error("検索エラー:", err);
+            }
+        } else {
+            setSearchResults([]);
+        }
+    };
 
     return (
         <div className="sidebar">
@@ -71,8 +95,47 @@ export default function Sidebar() {
                     </li>
                 </ul>
                 <hr className="sidebarHr" />
+                <h4 className="sidebarTitle">ユーザーを探す</h4>
+                <div className="searchBar">
+                    <input
+                        type="text"
+                        placeholder="ユーザーを検索..."
+                        value={searchKeyword}
+                        onChange={handleSearch}
+                        className="sidebarSearchInput"
+                    />
+                    {searchKeyword && ( // 検索キーワードがある場合のみクリアボタンを表示
+                        <Close
+                            className="clearSearchInput"
+                            onClick={handleClearSearch}
+                            style={{ cursor: "pointer" }}
+                        />
+                    )}
+                </div>
+                {searchKeyword && searchResults.length > 0 && (
+                    <ul className="sidebarSearchResults">
+                        {searchResults.map((user) => (
+                            <Link
+                                to={`/profile/${user.username}`}
+                                key={user._id}
+                                style={{ textDecoration: 'none', color: 'black' }}
+                            >
+                                <li className="sidebarSearchResultItem" style={{ cursor: "pointer" }}>
+                                    <img
+                                        src={user.profilePicture
+                                            ? PUBLIC_FOLDER + user.profilePicture
+                                            : PUBLIC_FOLDER + "/person/noAvatar.png"}
+                                        alt=""
+                                    />
+                                    <span>{user.username}</span>
+                                </li>
+                            </Link>
+                        ))}
+                    </ul>
+                )}
+                <h4 className="sidebarTitle">フォローしているユーザー</h4>
                 {loginUser && (
-                    <div className="sidebarFriends">フォローしているユーザー
+                    <div className="sidebarFriends">
                         <ul className="sidebarFriendList">
                             {friends.map((user) => (
                                 <CloseFriend user={user} key={user._id} />

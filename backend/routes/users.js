@@ -2,24 +2,14 @@
 const router = require('express').Router();
 const User = require('../models/User');
 
-router.get("/profile", (req, res) => {
-    res.send("Plofile World");
-});
-
-// CRUD
-
-// Create
-router.post("/", (req, res) => {
-    res.send("Create World");
-});
-
-// Read
-router.get("/:id", async (req, res) => {
+// ユーザー検索API
+router.get("/search", async (req, res) => {
+    const query = req.query.q;
     try {
-        const user = await User.findById(req.params.id);
-        return res.status(200).json(user);
+        const users = await User.find({ username: { $regex: query, $options: "i" } }).select("-password -updatedAt");
+        res.status(200).json(users);
     } catch (err) {
-        return res.status(500).json(err);
+        res.status(500).json({ error: "検索に失敗しました" });
     }
 });
 
@@ -36,6 +26,15 @@ router.get("/", async (req, res) => {
     }
 });
 
+// Read
+router.get("/:id", async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        return res.status(200).json(user);
+    } catch (err) {
+        return res.status(500).json(err);
+    }
+});
 
 // Update
 router.put("/:id", async (req, res) => {
