@@ -77,6 +77,8 @@ export default function Timeline({ username }) {
         switch (order) {
             case 'likes':
                 return [...posts].sort((a, b) => b.likes.length - a.likes.length);
+            case 'comments':
+                return [...posts].sort((a, b) => b.comments.length - a.comments.length);
             case 'createdAt':
             default:
                 return [...posts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -110,6 +112,7 @@ export default function Timeline({ username }) {
                     <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}>
                         <option value="createdAt">投稿時間</option>
                         <option value="likes">いいね数</option>
+                        <option value="comments">コメント数</option>
                     </select>
                 </div>
                 <InfiniteScroll
