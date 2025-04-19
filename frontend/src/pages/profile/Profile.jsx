@@ -163,29 +163,27 @@ const Profile = () => {
       try {
         // 画像をアップロード
         const uploadResponse = await axios.post("/upload", data);
-        const filePath = uploadResponse.data.filePath;
+        if (uploadResponse.status !== 200) {
+          throw new Error("画像のアップロードに失敗しました");
+        }
 
-        // ユーザー情報を更新
+        // データベースのユーザー情報を更新
         await axios.put(`/users/${user._id}`, {
           userId: user._id, // 自分のユーザーID
-          [imageType === "cover" ? "coverPicture" : "profilePicture"]: fileName, // カバー写真またはプロフィール写真を更新
+          [imageType === "cover" ? "coverPicture" : "profilePicture"]: fileName,
         });
 
-        // 状態を更新
-        setUser((prev) => ({
-          ...prev,
-          [imageType === "cover" ? "coverPicture" : "profilePicture"]: filePath,
-        }));
+        // AuthContextのユーザー情報を更新
+        const updatedUser = {
+          ...loginUser,
+          [imageType === "cover" ? "coverPicture" : "profilePicture"]: fileName,
+        };
+        dispatch({ type: "LOGIN_SUCCESS", payload: updatedUser });
 
-        // ローカル保存
-        // const updatedUser = {
-        //   ...loginUser,
-        //   [imageType === "cover" ? "coverPicture" : "profilePicture"]: filePath,
-        // };
-        // dispatch({ type: "LOGIN_SUCCESS", payload: updatedUser });
+        // ローカルのユーザー状態を更新
+        setUser(updatedUser);
 
-        setShowModal(false); // モーダルを閉じる
-        window.location.reload(); // ページをリロード
+        setShowModal(false);
       } catch (err) {
         console.error(err);
       }
@@ -294,7 +292,7 @@ const Profile = () => {
               {imageType === "cover" ? "カバー写真を選択してください" : "プロフィール写真を選択してください"}
             </h3>
             <label>
-              <span class="filelabel" title="ファイルを選択">
+              <span className="filelabel" title="ファイルを選択">
                 <img src={PUBLIC_FOLDER + "/preset/camera-orange-rev.png"} width="32" height="26" alt="＋画像" />
                 選択
               </span>

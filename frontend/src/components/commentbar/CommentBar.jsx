@@ -54,7 +54,7 @@ export default function CommentBar({ postId, loginUser, setSelectedPostId, setNu
             <div className="commentsList">
                 {comments.map((comment, index) => (
                     <div key={comment._id || index} className="commentItem">
-                        <strong>{comment.username}</strong>: {comment.text}
+                        <strong>{comment.username}</strong> : {comment.text}
                     </div>
                 ))}
             </div>
