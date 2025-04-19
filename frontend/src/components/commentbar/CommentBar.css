@@ -87,3 +87,57 @@
 .commentCloseButton:hover {
     background-color: #afb9c5;
 }
+
+.commentTemplates {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.templateButton {
+    background-color: #f0f0f0;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    padding: 10px 15px;
+    margin: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    position: relative;
+    transition: background-color 0.3s;
+}
+
+.templateButton:hover {
+    background-color: #e0e0e0;
+}
+
+
+.templateButton::after {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%) scale(0); /* 初期状態で非表示 */
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 10px 10px 10px; /* 上向きの三角形 */
+    border-color: transparent transparent #e0e0e0 transparent; /* 三角形の色をボタンと同じに */
+    transition: transform 0.3s ease;  /* 三角形の出現アニメーション */
+}
+
+.templateButton:hover::after {
+    transform: translateX(-50%) scale(1.5);
+}
+
+.templateButton:active {
+    background-color: #d0d0d0;
+    transform: scale(0.95);
+}
+
+/* テンプレートボタンのコンテナ */
+.templateButtonContainer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
