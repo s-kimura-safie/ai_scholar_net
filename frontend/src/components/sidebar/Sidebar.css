@@ -54,6 +54,15 @@
 .sidebarHr {
     margin: 20px 0px;
 }
+.sidebarFriends{
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 5px;
+    font-size: large;
+    font-weight: 600;
+    line-height: 2.0;
+    color: rgb(71, 64, 64);
+}
 
 .sidebarFriendList {
     padding: 0%;

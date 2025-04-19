@@ -72,11 +72,13 @@ export default function Sidebar() {
                 </ul>
                 <hr className="sidebarHr" />
                 {loginUser && (
-                    <ul className="sidebarFriendList">
-                        {friends.map((user) => (
-                            <CloseFriend user={user} key={user._id} />
-                        ))}
-                    </ul>
+                    <div className="sidebarFriends">フォローしているユーザー
+                        <ul className="sidebarFriendList">
+                            {friends.map((user) => (
+                                <CloseFriend user={user} key={user._id} />
+                            ))}
+                        </ul>
+                    </div>
                 )}
             </div>
         </div>
