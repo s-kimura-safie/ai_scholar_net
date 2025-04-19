@@ -2,7 +2,7 @@ import React from 'react'
 import "./Register.css"
 import { useRef } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function Register() {
 
@@ -44,9 +44,8 @@ function Register() {
         <div className="register"> {
             <div className="registerWrapper">
                 <div className="registerLeft">
-
                     <h3 className='registerLogo'>AI Scholar Net</h3>
-                    <span className="registerDesc">AIによるAIの論文集</span>
+                    <span className="registerDesc">AIによるAI開発者のためのAIの論文集</span>
                 </div>
                 <div className="registerRight">
                     <form className="registerBox" onSubmit={(e) => handleSubmit(e)}>
@@ -57,7 +56,11 @@ function Register() {
                         <input type="password" placeholder="確認用パスワード" className="registerInput" minLength="6" required ref={passwordConfirm} />
                         <button type="submit" className='registerButton'>サインアップ</button>
                     </form>
-                    <button type="submit" className="loginRegisterButton">ログイン</button>
+                    <div className="toLoginPage">アカウントをお持ちの方は
+                        <Link to="/login" style={{ textDecoration: 'none' }}>
+                            <span className="pathLoginPage">こちら</span>
+                        </Link>
+                    </div>
                 </div>
             </div>
         }

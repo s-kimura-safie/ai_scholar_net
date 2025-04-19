@@ -14,7 +14,8 @@
     display: flex;
 }
 
-.registerLeft, .registerRight {
+.registerLeft,
+.registerRight {
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -30,6 +31,7 @@
 
 .registerDesc {
     font-size: 20px;
+    color: rgb(79, 104, 104);
 }
 
 .registerBox {
@@ -68,7 +70,7 @@
 
 .registerButton {
     height: 80px;
-    width: 60%;
+    width: 40%;
     align-self: center;
     border-radius: 10px;
     border: none;
@@ -91,16 +93,17 @@
     margin-top: 20px;
 }
 
-.loginRegisterButton {
-    height: 80px;
-    width: 60%;
+.toLoginPage {
     align-self: center;
-    border-radius: 10px;
-    border: none;
-    background-color: rgb(10, 200, 140);
-    color: white;
+    color: rgb(88, 88, 88);
     font-size: 20px;
     font-weight: 550;
     cursor: pointer;
     margin-top: 10px;
+}
+
+.pathLoginPage {
+    margin-left: 10px;
+    font-size: 25px;
+    color: rgb(255, 255, 255);
 }
