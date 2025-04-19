@@ -1,20 +1,20 @@
-import React, { useEffect, useState, useContext } from 'react'
-import "./Timeline.css"
-import Shere from '../share/Share'
-import Post from '../post/Post'
-import axios from 'axios'
-import { AuthContext } from '../../states/AuthContext'
+import React, { useEffect, useState, useContext } from 'react';
+import "./Timeline.css";
+import Shere from '../share/Share';
+import Post from '../post/Post';
+import axios from 'axios';
+import { AuthContext } from '../../states/AuthContext';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
 export default function Timeline({ username }) {
     const [posts, setPosts] = useState([]);
     const [filteredPosts, setFilteredPosts] = useState([]);
-    const [page, setPage] = useState(1); // 現在のページ番号
-    const [hasMore, setHasMore] = useState(true); // さらに投稿があるかどうか
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+    const [sortOrder, setSortOrder] = useState('createdAt'); // ソート順
     const { user, searchKeyword } = useContext(AuthContext);
 
     useEffect(() => {
-        // userがnullの場合は処理をスキップ
         if (!user) return;
 
         const controller = new AbortController();
@@ -26,13 +26,11 @@ export default function Timeline({ username }) {
                 const response = username
                     ? await axios.get(`/posts/profile/${username}?page=1`, { signal: controller.signal })
                     : await axios.get(`/posts/timeline/${user._id}?page=1`, { signal: controller.signal });
-                const sortedPosts = response.data.sort((post1, post2) => {
-                    return new Date(post2.createdAt) - new Date(post1.createdAt);
-                });
+                const sortedPosts = sortPosts(response.data, sortOrder);
                 setPosts(sortedPosts);
-                setFilteredPosts(sortedPosts); // フィルタリングされた投稿もリセット
-                setPage(1); // ページ番号をリセット
-                setHasMore(response.data.length > 0); // 初回取得で投稿があるか確認
+                setFilteredPosts(sortedPosts);
+                setPage(1);
+                setHasMore(response.data.length > 0);
             } catch (err) {
                 if (axios.isCancel(err)) {
                     console.log("Request canceled");
@@ -40,18 +38,17 @@ export default function Timeline({ username }) {
                     console.error(err);
                 }
             }
-        }
+        };
         fetchPosts();
 
         return () => {
-            controller.abort(); // 古いリクエストをキャンセル
+            controller.abort();
         };
 
-    }, [username, user]);
+    }, [username, user, sortOrder]);
 
     // 追加の投稿を取得
     const fetchMorePosts = async () => {
-        // userがnullの場合は処理をスキップ
         if (!user) return;
 
         const nextPage = page + 1;
@@ -62,50 +59,65 @@ export default function Timeline({ username }) {
                 : await axios.get(`/posts/timeline/${user._id}?page=${nextPage}`);
 
             if (response.data.length === 0) {
-                setHasMore(false); // 追加の投稿がない場合
+                setHasMore(false);
             } else {
                 const newPosts = response.data.filter(
                     (newPost) => !posts.some((post) => post._id === newPost._id)
-                ); // 重複を排除
-                setPosts((prevPosts) => [...prevPosts, ...newPosts]);
-                setPage(nextPage); // ページ番号を更新
+                );
+                const updatedPosts = sortPosts([...posts, ...newPosts], sortOrder);
+                setPosts(updatedPosts);
+                setPage(nextPage);
             }
         } catch (err) {
             console.error(err);
         }
     };
 
-    // 検索キーワードが変更されたときに投稿をフィルタリング
+    const sortPosts = (posts, order) => {
+        switch (order) {
+            case 'likes':
+                return [...posts].sort((a, b) => b.likes.length - a.likes.length);
+            case 'createdAt':
+            default:
+                return [...posts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        }
+    };
+
     useEffect(() => {
         const filterPosts = async () => {
             if (!posts.length) return;
 
             if (searchKeyword?.trim()) {
-                // 検索キーワードがある場合、フィルタリングされた投稿を取得
                 const response = await axios.post(`/posts/search`, {
                     keyword: searchKeyword,
                     posts: posts
                 });
-                setFilteredPosts(response.data); // フィルタリングされた投稿を設定
+                setFilteredPosts(sortPosts(response.data, sortOrder));
             } else {
-                // 検索キーワードがない場合、全投稿を表示
-                setFilteredPosts(posts);
+                setFilteredPosts(sortPosts(posts, sortOrder));
             }
         };
 
         filterPosts();
-    }, [searchKeyword, posts]);
+    }, [searchKeyword, posts, sortOrder]);
 
     return (
         <div className="timeline">
             <div className="timelineWrapper">
                 {user && user.username === username && <Shere />}
+                <div className="sortOptions">
+                    <label>表示順： </label>
+                    <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}>
+                        <option value="createdAt">投稿時間</option>
+                        <option value="likes">いいね数</option>
+                    </select>
+                </div>
                 <InfiniteScroll
                     dataLength={filteredPosts.length}
                     next={fetchMorePosts}
-                    hasMore={hasMore} // 取得可能な投稿があるかどうか
+                    hasMore={hasMore}
                     loader={<h4>Loading...</h4>}
-                    endMessage={<h4>No more posts ...</h4>} // 全件読み込み完了時のメッセージ
+                    endMessage={<h4>No more posts ...</h4>}
                 >
                     {filteredPosts.map((post) => (
                         <Post post={post} key={post._id} />

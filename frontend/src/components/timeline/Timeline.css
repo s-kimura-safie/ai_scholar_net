@@ -6,3 +6,30 @@
     padding: 0px 0px  0px 40px;
     width: 800px;
 }
+
+.sortOptions {
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sortOptions label {
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.sortOptions select {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    width: 120px;
+    cursor: pointer;
+}
+
+.sortOptions select:focus {
+    outline: none;
+    border-color: #0091b2;;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
