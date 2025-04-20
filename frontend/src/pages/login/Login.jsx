@@ -1,7 +1,7 @@
 import React from 'react'
 import "./Login.css"
 import { useContext, useRef } from 'react';
-import { loginCall } from '../../ActionCalls';
+import { loginCall } from '../../states/ActionCalls';
 import { AuthContext } from '../../states/AuthContext';
 import { Link } from 'react-router-dom';
 
@@ -34,16 +34,9 @@ function Login() {
                 <div className="loginRight">
                     <form className="loginBox" onSubmit={(e) => handleSubmit(e)}>
                         <p className='loginMsg'>アカウント情報を入力してください</p>
-                        <input type="email" placeholder="メールアドレス" className="loginInput" required ref={email} />
-                        <input type="password" placeholder="パスワード" className="loginInput" minLength="6" ref={password} />
+                        <input type="email" placeholder="メールアドレス" className="loginInput" required ref={email} autocomplete="email"/>
+                        <input type="password" placeholder="パスワード" className="loginInput" minLength="6" ref={password} autocomplete="current-password"/>
                         <button className='loginButton'>ログイン</button>
-                        {/* <span className="loginForgot">初めてご利用の方はこちら</span> */}
-                        {/* <button className="loginRegisterButton">アカウント作成</button> */}
-                        {/* <div className="toRegisterPage">
-                            <Link to="/" style={{ textDecoration: 'none' }}>
-                                <button className="pathRegisterPage">アカウント作成</button>
-                            </Link>
-                        </div> */}
                     </form>
                     <div className="toRegisterPage">初めてご利用の方は
                         <Link to="/" style={{ textDecoration: 'none' }}>

@@ -6,9 +6,15 @@ const User = require('../models/User');
 router.post("/login", async (req, res) => {
     try {
         const user = await User.findOne({ email: req.body.email });
-        !user && res.status(404).json("ユーザーが見つかりません");
+        if (!user) {
+            console.log("ユーザーが見つかりません");
+            return res.status(404).json("ユーザーが見つかりません");
+        }
         const validPassword = user.password === req.body.password;
-        if (!validPassword) return res.status(400).json("パスワードが間違っています");
+        if (!validPassword) {
+            console.log("パスワードが間違っています");
+            return res.status(400).json("パスワードが間違っています");
+        }
         return res.status(200).json(user);
     }
     catch (err) {

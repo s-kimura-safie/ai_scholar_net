@@ -10,7 +10,7 @@ import "./Profile.css"
 import EditNoteIcon from '@mui/icons-material/EditNote';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { AuthContext } from '../../states/AuthContext';
-import { logoutCall } from '../../ActionCalls';
+import { logoutCall } from '../../states/ActionCalls';
 
 
 const Profile = () => {

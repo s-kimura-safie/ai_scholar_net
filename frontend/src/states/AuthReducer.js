@@ -14,7 +14,7 @@ const AuthReducer = (state, action) => {
                 error: false,
                 searchKeyword: state.searchKeyword, // 検索キーワードは保持
             };
-        case "LOGIN ERROR":
+        case "LOGIN_ERROR":
             return {
                 user: null,
                 isFetching: false,
