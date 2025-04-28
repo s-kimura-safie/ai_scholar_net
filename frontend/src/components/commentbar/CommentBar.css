@@ -1,0 +1,143 @@
+.commentSection {
+    flex: 3;
+    padding: 20px;
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-height: 0px; /* 初期値を設定 */
+    overflow: hidden; /* アニメーション中に内容がはみ出さないようにする */
+    transition: padding 0.5s ease-in-out, max-height 0.5s ease-in-out, opacity 0.5s ease-in-out; /* 高さと透明度のアニメーション */
+    opacity: 0; /* 初期の透明度 */
+}
+
+.commentSection.expanded {
+    max-height: 500px; /* 展開時の高さ */
+    opacity: 1; /* 展開時の透明度 */
+    padding: 20px; /* 展開時の余白 */
+}
+
+.commentSection.collapsed {
+    max-height: 0; /* 折りたたまれた状態の高さ */
+    opacity: 0; /* 折りたたまれた状態で透明にする */
+    padding: 0; /* 折りたたまれた状態で余白をなくす */
+}
+.commentsList {
+    max-height: 300px; /* 高さを調整 */
+    overflow-y: auto;
+    margin-bottom: 20px;
+    margin-top: 10px;
+    padding: 10px;
+    background-color: white; /* コメントリストの背景を白に */
+    border-radius: 10px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.commentItem {
+    margin-bottom: 10px;
+    font-size: 14px;
+    padding: 10px;
+    background-color: #f9f9f9; /* コメントアイテムの背景色 */
+    border-radius: 5px;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
+}
+
+.addComment {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+
+}
+
+.commentInput {
+    flex: 1;
+    padding: 10px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.1);
+}
+
+.commentButton {
+    padding: 10px 20px;
+    background-color: #3ac806;
+    color: white;
+    border: none;
+    margin-right: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.commentButton:hover {
+    background-color: #85fc7a;
+}
+
+.commentCloseButton {
+    padding: 10px 20px;
+    background-color: #b0b4b9;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.commentCloseButton:hover {
+    background-color: #afb9c5;
+}
+
+.commentTemplates {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.templateButton {
+    background-color: #f0f0f0;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    padding: 10px 15px;
+    margin: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    position: relative;
+    transition: background-color 0.3s;
+}
+
+.templateButton:hover {
+    background-color: #e0e0e0;
+}
+
+
+.templateButton::after {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%) scale(0); /* 初期状態で非表示 */
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 10px 10px 10px; /* 上向きの三角形 */
+    border-color: transparent transparent #e0e0e0 transparent; /* 三角形の色をボタンと同じに */
+    transition: transform 0.3s ease;  /* 三角形の出現アニメーション */
+}
+
+.templateButton:hover::after {
+    transform: translateX(-50%) scale(1.5);
+}
+
+.templateButton:active {
+    background-color: #d0d0d0;
+    transform: scale(0.95);
+}
+
+/* テンプレートボタンのコンテナ */
+.templateButtonContainer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}

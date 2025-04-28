@@ -1,0 +1,336 @@
+.profile {
+    display: flex;
+}
+
+.profileRightTop {
+    margin-left: 20%;
+}
+
+.profileRight {
+    flex: 10.5;
+}
+
+.profileCover {
+    height: 320px;
+    position: relative;
+}
+
+.profileCoverImg {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+}
+
+.profileUserImg {
+    border: 1px solid rgb(1, 80, 75);
+    position: absolute;
+    left: 0;
+    right: 0;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    margin: auto;
+    top: 150px;
+    z-index: 10;
+}
+
+.profileWrapper {
+    display: flex;
+}
+
+.profileInfo {
+    position: absolute;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.profileNameItems {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    margin-top: 45px;
+}
+
+.profileName {
+    font-size: 35px;
+    font-weight: 550;
+    margin-right: 10px;
+}
+
+.editNameIcon.MuiSvgIcon-root {
+    cursor: pointer;
+    vertical-align: middle;
+    width: 35px;
+    height: 35px;
+}
+
+.followButton {
+    margin-left: auto;
+    margin-right: 20px;
+    margin-top: 50px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #02a0ab;
+    color: #ffffff;
+    font-family: 'Arial', sans-serif;
+    font-weight: 600;
+    transition: background-color 0.3s ease, color 0.3s ease;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    position: relative;
+    z-index: 10;
+}
+
+.followButton:hover {
+    font-weight: 600;
+    color: #012c32;
+    background-color: #60f7fac7;
+    opacity: 0.5;
+    border: 2px solid #02a0ab;
+    border-width: 2px;
+    cursor: pointer;
+}
+
+/* フォロー中のボタン */
+.unfollowButton {
+    background-color: #ff4d4d;
+    color: #ffffff;
+    border: 1px solid #ff4d4d;
+}
+
+.unfollowButton:hover {
+    font-weight: 600;
+    color: #270000;
+    background-color: #f99494;
+    opacity: 0.5;
+    border: 2px solid #ff4d4d;
+    border-width: 2px;
+    cursor: pointer;
+}
+
+/* ログアウトボタン */
+.logoutButton {
+    margin-left: auto;
+    margin-right: 20px;
+    margin-top: 50px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #ff4d4d;
+    color: #ffffff;
+    font-family: 'Arial', sans-serif;
+    font-weight: 600;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    z-index: 10;
+}
+
+.logoutButton:hover {
+    font-weight: 600;
+    color: #270000;
+    background-color: #f99494;
+    opacity: 0.5;
+    border: 2px solid #ff4d4d;
+    border-width: 2px;
+    cursor: pointer;
+}
+
+.logoutIcon {
+    margin-right: 5px;
+}
+
+.profileRightTop {
+    margin-bottom: 20px;
+    background: linear-gradient(to bottom, #02a0ab, #ffffff);
+    padding-bottom: 40px;
+}
+
+.profileRightBottom {
+    display: flex;
+}
+
+.userDetail {
+    flex: 3;
+    margin-top: 30px;
+}
+
+/* モーダル全体の背景 */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    /* 背景を少し濃く */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    animation: fadeIn 0.3s forwards;
+    /* フェードインアニメーション */
+}
+
+/* モーダルのコンテンツ */
+.modalContent {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    /* 立体感のあるシャドウ */
+    max-width: 500px;
+    width: 90%;
+    transform: scale(0.8);
+    animation: scaleUp 0.3s forwards;
+    /* 拡大アニメーション */
+    font-family: 'Arial', sans-serif;
+}
+
+/* モーダルのタイトル */
+.modalTitle {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+
+.editInput,
+.editTextarea {
+    width: 100%;
+    padding: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.editInput {
+    font-size: 20px;
+}
+
+.editTextarea {
+    font-size: 15px;
+    height: 100px;
+}
+
+.modalButtons {
+    display: flex;
+    justify-content: right;
+}
+
+.saveButton,
+.cancelButton {
+    padding: 10px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    color: white;
+    font-weight: 600;
+    width: 120px;
+    height: 50px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 5px;
+}
+
+.saveButton {
+    background-color: orange;
+    font-size: 20px;
+    transition: all 0.3s ease;
+}
+
+.saveButton:hover {
+    opacity: 0.5;
+    border: 2px solid red;
+    cursor: pointer;
+}
+
+
+/* キャンセルボタン */
+.cancelButton {
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    margin-left: 20px;
+    cursor: pointer;
+    background-color: #4c4c4c;
+    color: #ffffff;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    display: inline-flex
+}
+
+.cancelButton:hover {
+    font-weight: 600;
+    color: #0b0b0b;
+    background-color: #e0e0e0;
+    opacity: 0.5;
+    border: 2px solid rgb(41, 39, 39);
+    cursor: pointer;
+}
+
+.filelabel {
+    font-weight: 600;
+    font-size: 20px;
+    background-color: orange;
+    color: white;
+    border: 2px solid orange;
+    width: 80px;
+    border-radius: 3em;
+    padding: 12px 50px;
+    display: inline-flex
+}
+
+.filelabel img {
+    vertical-align: bottom;
+    margin-right: 8px;
+}
+
+.filelabel:hover {
+    opacity: 0.5;
+    border: 2px solid red;
+    cursor: pointer;
+}
+
+#filesend {
+    display: none;
+}
+
+/* フェードインアニメーション */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* 拡大アニメーション */
+@keyframes scaleUp {
+    from {
+        transform: scale(0.8);
+    }
+
+    to {
+        transform: scale(1);
+    }
+}

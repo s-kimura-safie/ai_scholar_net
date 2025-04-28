@@ -1,0 +1,93 @@
+.share {
+    width: 95%;
+    height: 200px;
+    box-shadow: 5px 5px 15px 0px rgb(72, 178, 194);
+    border-radius: 10px;
+    margin-bottom: 20px;
+    margin-left: 10px;
+}
+
+.shareWrapper {
+    padding: 10px;
+
+}
+
+.shareTop {
+    display: flex;
+    align-items: center;
+}
+
+.shareProfileImg {
+    border: 1px solid rgb(1, 80, 75);
+    width: 50px;
+    height: 50px;
+    border-radius:20%;
+    object-fit: cover;
+    margin-right: 10px;
+    margin-left: 10px;
+    margin-bottom: 40px;
+}
+
+.shareInput {
+    border-color: rgb(145, 205, 215);
+    width: 100%;
+    height: 80px;
+    border-radius: 5px;
+    margin: 10px;
+    padding: 10px;  /* 上下左右均等にパディングを設定 */
+    white-space: pre-wrap;
+    vertical-align: top;
+    resize: none;  /* リサイズハンドルを非表示にする（必要に応じて） */
+    font-family: inherit;  /* フォントを親要素から継承 */
+}
+
+.shareInput:focus {
+    outline: 1px solid rgb(72, 178, 194);
+}
+
+.shareButtons {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.shareOptions {
+    display: flex;
+    margin-left: 20px;
+}
+
+.shareOption {
+    display: flex;
+    align-items: center;
+    color: rgb(50, 128, 140);
+    cursor: pointer;
+    margin-right: 15px;
+}
+
+.shareIcon {
+    margin-right: 3px;
+}
+
+.shareOptionText {
+    font-size: px;
+    font-weight: 600;
+}
+
+.shareButton {
+    border: none;
+    padding: 0px 12px;
+    padding-top: 6px;
+    padding-bottom: 3px;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: rgb(41, 95, 127);
+    color: white;
+    font-weight: 550;
+    transition: all 0.3s;
+    margin-right: 20px;
+    font-size: 20px;
+}
+
+.shareButton:hover {
+    background-color: rgb(72, 178, 194);
+}
