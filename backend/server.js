@@ -1,14 +1,17 @@
+const mongoose = require("mongoose");
+const path = require("path");
+require("dotenv").config();
 const express = require("express");
-const app = express();
+
 const userRoute = require("./routes/users");
 const authRoute = require("./routes/auth");
 const postRoute = require("./routes/posts");
 const uploadRoute = require("./routes/upload");
-const searchScholarRoute = require("./searcher/searchScholar");
-const POST = 5002;
-const mongoose = require("mongoose");
-const path = require("path");
-require("dotenv").config();
+const searchScholarRoute = require("./routes/scholar");
+const initializeScheduler = require('./searcher/scheduler');
+
+const app = express();
+const POST = 5000;
 
 // connect to MongoDB
 mongoose
@@ -39,6 +42,9 @@ app.use("/api/auth", authRoute); // /api/authにアクセスしたら、authRout
 app.use("/api/posts", postRoute); // /api/postsにアクセスしたら、postRouteを使う
 app.use("/api/upload", uploadRoute); // /api/uploadにアクセスしたら、uploadRouteを使う
 app.use("/api/search", searchScholarRoute); // /api/searchにアクセスしたら、searchScholarRouteを使う
+
+// ボットの論文投稿スケジュールを初期化
+initializeScheduler();
 
 app.get("/", (req, res) => {
     res.send("Hello World");
