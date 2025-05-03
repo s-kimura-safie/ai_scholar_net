@@ -12,6 +12,9 @@ function sanitizeFileName(name) {
     return sanitize_name;
 }
 
+// 既にサーチした論文のIDを保持するセット
+const searchedPaperIds = new Set();
+
 router.post('/', async (req, res) => {
     const { query } = req.body;
 
@@ -20,73 +23,90 @@ router.post('/', async (req, res) => {
     }
 
     try {
-        const response = await axios.get('https://api.semanticscholar.org/graph/v1/paper/search', {
-            params: {
-                query,
-                fields: 'paperId,title,authors,year,abstract,fieldsOfStudy,venue,citationCount,referenceCount,url,openAccessPdf',
-                limit: 5,
-                year: '2023-2025',
-                openAccessPdf: true,
-                venue: "CVPR",
-                minCitationCount: 50,
-                sort: 'citationCount:desc'
+        let results = [];
+        let attempts = 0;
+        const maxAttempts = 5; // 最大試行回数
+
+        while (results.length === 0 && attempts < maxAttempts) {
+            attempts++;
+
+            const response = await axios.get('https://api.semanticscholar.org/graph/v1/paper/search', {
+                params: {
+                    query,
+                    fields: 'paperId,title,authors,year,abstract,fieldsOfStudy,venue,citationCount,referenceCount,url,openAccessPdf',
+                    limit: 5,
+                    offset: attempts * 5,
+                    year: '2023-2025',
+                    openAccessPdf: true,
+                    venue: "CVPR",
+                    minCitationCount: 50,
+                    sort: 'citationCount:desc'
+                }
+            });
+
+            const papers = response.data.data;
+
+            // ./public/pdfsディレクトリを作成（存在しない場合）
+            const pdfDir = path.resolve(__dirname, '../public/pdfs');
+            if (!fs.existsSync(pdfDir)) {
+                fs.mkdirSync(pdfDir, { recursive: true });
             }
-        });
 
-        const papers = response.data.data;
+            for (const [index, paper] of papers.entries()) {
+                if (searchedPaperIds.has(paper.paperId)) {
+                    console.log(`Skipping already searched paper: ${paper.title}`);
+                    continue;
+                }
 
-        // ./public/pdfsディレクトリを作成（存在しない場合）
-        const pdfDir = path.resolve(__dirname, '../public/pdfs');
-        if (!fs.existsSync(pdfDir)) {
-            fs.mkdirSync(pdfDir, { recursive: true });
+                console.log(`${index + 1}. ${paper.title} (${paper.year})`);
+                if (paper.openAccessPdf && paper.openAccessPdf.url) {
+
+                    // 論文タイトルをファイル名として使用（サニタイズ済み）
+                    const sanitizedTitle = sanitizeFileName(paper.title);
+                    const pdfPath = path.resolve(pdfDir, `${sanitizedTitle}.pdf`);
+
+                    // PDFをダウンロードして保存
+                    const pdfResponse = await axios.get(paper.openAccessPdf.url, { responseType: 'stream' });
+                    const writer = fs.createWriteStream(pdfPath);
+                    pdfResponse.data.pipe(writer);
+
+                    // ダウンロード完了を待つ
+                    await new Promise((resolve, reject) => {
+                        writer.on('finish', resolve);
+                        writer.on('error', reject);
+                    });
+
+                    // MongoDBに保存
+                    const paperData = {
+                        paperId: paper.paperId,
+                        title: paper.title,
+                        authors: paper.authors.map(author => author.name),
+                        year: paper.year,
+                        abstract: paper.abstract,
+                        fieldsOfStudy: paper.fieldsOfStudy,
+                        venue: paper.venue,
+                        citationCount: paper.citationCount,
+                        referenceCount: paper.referenceCount,
+                        url: paper.url,
+                        pdfPath,
+                    };
+
+                    await Paper.findOneAndUpdate(
+                        { paperId: paper.paperId },
+                        paperData,
+                        { upsert: true, new: true }
+                    );
+
+                    results.push({ ...paperData });
+                    searchedPaperIds.add(paper.paperId); // 検索済みIDを記録
+                } else {
+                    console.log('   No open access PDF available.');
+                }
+            }
         }
 
-        const results = [];
-
-        for (const [index, paper] of papers.entries()) {
-            console.log(`${index + 1}. ${paper.title} (${paper.year})`);
-            if (paper.openAccessPdf && paper.openAccessPdf.url) {
-
-                // 論文タイトルをファイル名として使用（サニタイズ済み）
-                const sanitizedTitle = sanitizeFileName(paper.title);
-                const pdfPath = path.resolve(pdfDir, `${sanitizedTitle}.pdf`);
-
-                // PDFをダウンロードして保存
-                const pdfResponse = await axios.get(paper.openAccessPdf.url, { responseType: 'stream' });
-                const writer = fs.createWriteStream(pdfPath);
-                pdfResponse.data.pipe(writer);
-
-                // ダウンロード完了を待つ
-                await new Promise((resolve, reject) => {
-                    writer.on('finish', resolve);
-                    writer.on('error', reject);
-                });
-
-                // MongoDBに保存
-                const paperData = {
-                    paperId: paper.paperId,
-                    title: paper.title,
-                    authors: paper.authors.map(author => author.name),
-                    year: paper.year,
-                    abstract: paper.abstract,
-                    fieldsOfStudy: paper.fieldsOfStudy,
-                    venue: paper.venue,
-                    citationCount: paper.citationCount,
-                    referenceCount: paper.referenceCount,
-                    url: paper.url,
-                    pdfPath,
-                };
-
-                await Paper.findOneAndUpdate(
-                    { paperId: paper.paperId },
-                    paperData,
-                    { upsert: true, new: true }
-                );
-
-                results.push({ ...paperData });
-            } else {
-                console.log('   No open access PDF available.');
-            }
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'No new papers found today' });
         }
 
         res.json({ "results": results });
