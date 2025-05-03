@@ -4,7 +4,8 @@ const userRoute = require("./routes/users");
 const authRoute = require("./routes/auth");
 const postRoute = require("./routes/posts");
 const uploadRoute = require("./routes/upload");
-const POST = 5000;
+const searchScholarRoute = require("./searcher/searchScholar");
+const POST = 5002;
 const mongoose = require("mongoose");
 const path = require("path");
 require("dotenv").config();
@@ -37,6 +38,7 @@ app.use("/api/users", userRoute); // /api/usersにアクセスしたら、userRo
 app.use("/api/auth", authRoute); // /api/authにアクセスしたら、authRouteを使う
 app.use("/api/posts", postRoute); // /api/postsにアクセスしたら、postRouteを使う
 app.use("/api/upload", uploadRoute); // /api/uploadにアクセスしたら、uploadRouteを使う
+app.use("/api/search", searchScholarRoute); // /api/searchにアクセスしたら、searchScholarRouteを使う
 
 app.get("/", (req, res) => {
     res.send("Hello World");
