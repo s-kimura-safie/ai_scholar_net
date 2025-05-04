@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
 const PaperSchema = new mongoose.Schema({
     paperId: { type: String, required: true, unique: true },
@@ -14,4 +14,4 @@ const PaperSchema = new mongoose.Schema({
     pdfPath: { type: String },
 });
 
-module.exports = mongoose.model('Paper', PaperSchema);
+export default PaperSchema;

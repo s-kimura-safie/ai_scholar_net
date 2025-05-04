@@ -1,10 +1,16 @@
-const express = require('express');
+import express from "express";
+import axios from "axios";
+import { searchPapers } from "../searcher/searchScholar.js";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+import Paper from "../models/Paper.js";
+
 const router = express.Router();
-const axios = require('axios');
-const { searchPapers } = require('../searcher/searchScholar');
-const fs = require('fs');
-const path = require('path');
-const Paper = require('../models/Paper');
+
+// __dirname の代替設定
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // 既にサーチした論文のIDを保持するセット
 const searchedPaperIds = new Set();
@@ -33,7 +39,7 @@ async function savePdf(paper, pdfDir) {
     return pdfPath;
 }
 
-router.post('/', async (req, res) => {
+router.post("/", async (req, res) => {
     const { query } = req.body;
 
     if (!query) {
@@ -71,4 +77,4 @@ router.post('/', async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

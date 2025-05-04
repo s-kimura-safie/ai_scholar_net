@@ -21,7 +21,7 @@ const __dirname = dirname(__filename);
 const PDF_PATH = path.resolve(__dirname, "../public/pdfs/FFCV_Accelerating_Training_by_Removing_Data_Bottlenecks.pdf");
 
 // PDFからテキストを抽出する関数
-async function extractPdfText(filePath) {
+export async function extractPdfText(filePath) {
     if (!fs.existsSync(filePath)) {
         throw new Error(`指定されたPDFファイルが見つかりません: ${filePath}`);
     }
@@ -32,7 +32,7 @@ async function extractPdfText(filePath) {
 }
 
 // Cohere APIを使用して要約を生成する関数
-async function summarizeWithCohere(text) {
+export async function summarizeWithCohere(text) {
     const prompt = `
 次の論文の内容を以下の形式で要約してください：
 
@@ -64,6 +64,9 @@ ${text.slice(0, 5000)}
 
     return response.data.generations[0].text.trim();
 }
+
+// デフォルトエクスポート
+export default { extractPdfText, summarizeWithCohere };
 
 // メイン処理
 (async () => {

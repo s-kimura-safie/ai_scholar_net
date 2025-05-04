@@ -1,8 +1,13 @@
-const express = require('express');
-const axios = require('axios');
-const fs = require('fs');
-const path = require('path');
-const Paper = require('../models/Paper');
+import axios from "axios";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+import Paper from "../models/Paper.js";
+import summarizer from "./summarizer.js"; // summarizer.jsをインポート
+
+// __dirname の代替設定
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // 既にサーチした論文のIDを保持するセット
 const searchedPaperIds = new Set();
@@ -25,8 +30,25 @@ async function excuteSemanticScholarAPI(query, offset, limit) {
     return response.data.data;
 }
 
+// PDFを保存する関数
+async function savePdf(paperData, outputDir) {
+    const pdfUrl = paperData.pdfPath;
+    const pdfFileName = `${paperData.paperId}.pdf`;
+    const pdfFilePath = path.join(outputDir, pdfFileName);
+
+    const response = await axios.get(pdfUrl, { responseType: 'stream' });
+    await new Promise((resolve, reject) => {
+        const writer = fs.createWriteStream(pdfFilePath);
+        response.data.pipe(writer);
+        writer.on('finish', resolve);
+        writer.on('error', reject);
+    });
+
+    return pdfFilePath;
+}
+
 // 論文を検索する
-async function searchPapers(query) {
+export async function searchPapers(query) {
     let results = [];
     let attempts = 0;
     const maxAttempts = 5; // 最大試行回数
@@ -57,6 +79,16 @@ async function searchPapers(query) {
                     pdfPath: paper.openAccessPdf.url,
                 };
 
+                // PDFを保存し、要約を生成
+                try {
+                    const pdfPath = await savePdf(paperData, path.resolve(__dirname, '../public/pdfs'));
+                    const summary = await summarizer.summarizeWithCohere(pdfPath);
+                    paperData.summary = summary;
+                } catch (error) {
+                    console.error(`Error processing paper ${paper.title}:`, error);
+                    continue;
+                }
+
                 results.push(paperData);
                 searchedPaperIds.add(paper.paperId);
             }
@@ -65,5 +97,3 @@ async function searchPapers(query) {
 
     return results;
 }
-
-module.exports = searchPapers;

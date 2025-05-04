@@ -1,14 +1,20 @@
-const mongoose = require("mongoose");
-const path = require("path");
-require("dotenv").config();
-const express = require("express");
+import mongoose from "mongoose";
+import path from "path";
+import dotenv from "dotenv";
+import express from "express";
+import { fileURLToPath } from "url";
 
-const userRoute = require("./routes/users");
-const authRoute = require("./routes/auth");
-const postRoute = require("./routes/posts");
-const uploadRoute = require("./routes/upload");
-const searchScholarRoute = require("./routes/scholar");
-const initializeScheduler = require('./searcher/scheduler');
+import userRoute from "./routes/users.js";
+import authRoute from "./routes/auth.js";
+import postRoute from "./routes/posts.js";
+import uploadRoute from "./routes/upload.js";
+import searchScholarRoute from "./routes/scholar.js";
+import initializeScheduler from "./searcher/scheduler.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: '.env' });
 
 const app = express();
 const POST = 5000;

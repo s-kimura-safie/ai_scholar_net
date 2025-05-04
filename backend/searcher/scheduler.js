@@ -1,10 +1,10 @@
-const schedule = require('node-schedule');
-const Post = require('../models/Post');
-const searchScholar = require('../searcher/searchScholar');
+import schedule from "node-schedule";
+import Post from "../models/Post.js";
+import { searchPapers } from "../searcher/searchScholar.js";
 
 // スケジュールタスクを設定
 function initializeScheduler() {
-    schedule.scheduleJob('0 0 * * 1-5', async () => { // 月~金の0時に投稿
+    schedule.scheduleJob('35 3 * * 1-5', async () => { // 月~金の0時に投稿
         console.log('Bot is running to post papers');
 
         try {
@@ -12,12 +12,12 @@ function initializeScheduler() {
             const botUserId = '6803c93270fbdf7e2ea0bcc7'; // ボットアカウントのユーザーID
 
             // 論文を検索
-            const results = await searchScholar.searchPapers(query);
+            const results = await searchPapers(query);
 
             for (const paper of results) {
                 const newPost = new Post({
                     userId: botUserId,
-                    desc: `${paper.title.toUpperCase()}\n\n${paper.abstract}`,
+                    desc: `${paper.title.toUpperCase()}\n\n${paper.summary}`,
                     createdAt: new Date(),
                 });
 
@@ -31,4 +31,4 @@ function initializeScheduler() {
     });
 }
 
-module.exports = initializeScheduler;
+export default initializeScheduler;

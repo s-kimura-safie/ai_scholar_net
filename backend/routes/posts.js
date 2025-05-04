@@ -1,7 +1,7 @@
-// Router:express.Router()は、Express.jsのルーティング機能をモジュール化するためのミドルウェア
-const router = require('express').Router();
-const Post = require('../models/Post');
-const User = require('../models/User');
+import { Router } from "express";
+const router = Router();
+import Post from "../models/Post.js";
+import User from "../models/User.js";
 
 // Create a Post
 router.post("/", async (req, res) => {
@@ -205,4 +205,4 @@ router.get("/profile/:username", async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

@@ -1,9 +1,15 @@
-// Router:express.Router()は、Express.jsのルーティング機能をモジュール化するためのミドルウェア
-const router = require('express').Router();
-const multer = require('multer');
-const sharp = require('sharp');
-const path = require('path');
-const fs = require('fs');
+import { Router } from "express";
+import multer from "multer";
+import sharp from "sharp";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
+
+const router = Router();
+
+// __dirname の代替設定
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // アップロード先ディレクトリ
 const uploadPath = path.join(__dirname, "../public/images");
@@ -39,4 +45,4 @@ router.post("/", upload.single("file"), async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;
