@@ -10,7 +10,7 @@ import dotenv from 'dotenv';
 
 
 // 環境変数の読み込み
-dotenv.config({ path: '../.env' });
+dotenv.config({ path: '.env' });
 console.log('Cohere API Key:', process.env.COHERE_API_KEY);
 
 // __dirnameの代替
@@ -34,13 +34,13 @@ export async function extractPdfText(filePath) {
 // Cohere APIを使用して要約を生成する関数
 export async function summarizeWithCohere(text) {
     const prompt = `
-次の論文の内容を以下の形式で要約してください：
+次の論文の内容を以下の形式でそれぞれ200文字以内で要約してください：
 
-## どんなもの？
+● どんなもの？
 
-## 先行研究と比べてどこがすごい？
+● 先行研究と比べてどこがすごい？
 
-## 技術や手法のキモはどこ？
+● 技術や手法のキモはどこ？
 
 --- 論文の内容 ---
 ${text.slice(0, 5000)}
@@ -65,18 +65,18 @@ ${text.slice(0, 5000)}
     return response.data.generations[0].text.trim();
 }
 
-// デフォルトエクスポート
-export default { extractPdfText, summarizeWithCohere };
-
-// メイン処理
-(async () => {
+// PDFを解析して要約を返す関数
+export async function summarizeScholar(pdfPath) {
     try {
-        const pdfText = await extractPdfText(PDF_PATH);
+        const pdfText = await extractPdfText(pdfPath);
         console.log('✅ PDFからテキストを抽出しました。');
         const summary = await summarizeWithCohere(pdfText);
-        console.log('\n📄 要約結果:\n');
-        console.log(summary);
+        return summary;
     } catch (err) {
         console.error('❌ エラー:', err.message);
+        throw err;
     }
-})();
+}
+
+// デフォルトエクスポート
+export default summarizeScholar;

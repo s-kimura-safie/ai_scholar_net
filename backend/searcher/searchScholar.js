@@ -82,7 +82,7 @@ export async function searchPapers(query) {
                 // PDFを保存し、要約を生成
                 try {
                     const pdfPath = await savePdf(paperData, path.resolve(__dirname, '../public/pdfs'));
-                    const summary = await summarizer.summarizeWithCohere(pdfPath);
+                    const summary = await summarizer(pdfPath); // 修正: デフォルトエクスポートを関数として呼び出す
                     paperData.summary = summary;
                 } catch (error) {
                     console.error(`Error processing paper ${paper.title}:`, error);
