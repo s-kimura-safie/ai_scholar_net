@@ -17,7 +17,7 @@ function initializeScheduler() {
             for (const paper of results) {
                 const newPost = new Post({
                     userId: botUserId,
-                    desc: `${paper.title.toUpperCase()}\n\n${paper.summary}`,
+                    desc: `${paper.title}\n\n${paper.summary}`,
                     createdAt: new Date(),
                 });
 
