@@ -81,6 +81,12 @@ export default function Sidebar() {
                             <span className="sidebarListItemText">タイムライン</span>
                         </li>
                     </Link>
+                    <Link to="/upload-paper" style={{ textDecoration: 'none', color: "black" }}>
+                        <li className="sidebarListItem">
+                            <BallotIcon className="sidebarIcon" />
+                            <span className="sidebarListItemText">論文投稿</span>
+                        </li>
+                    </Link>
                     <li className="sidebarListItem">
                         <Search className="sidebarIcon" />
                         <span className="sidebarListItemText">検索</span>

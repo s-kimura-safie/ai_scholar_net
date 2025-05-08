@@ -4,6 +4,7 @@
     "jsonwebtoken": "^9.0.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-spinners": "^0.17.0",
     "semanticscholarjs": "^1.0.4",
     "sharp": "^0.33.5",
     "use-debounce": "^7.0.0"
