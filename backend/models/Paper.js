@@ -14,4 +14,5 @@ const PaperSchema = new mongoose.Schema({
     pdfPath: { type: String },
 });
 
-export default PaperSchema;
+const Paper = mongoose.model("Paper", PaperSchema);
+export default Paper;

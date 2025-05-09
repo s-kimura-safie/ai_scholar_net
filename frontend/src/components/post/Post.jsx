@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom';
 import { AuthContext } from '../../states/AuthContext';
 
 
-export default function Post({ post }) {
+export default function Post({ post, onMetadataSelect }) {
 
     const PUBLIC_FOLDER = process.env.REACT_APP_PUBLIC_FOLDER;
 
@@ -147,6 +147,20 @@ export default function Post({ post }) {
         handleEditClose();
     };
 
+    const handleViewDetails = async () => {
+        if (!post.paperId) {
+            console.error("No paperId associated with this post.");
+            return;
+        }
+
+        try {
+            const response = await axios.get(`/scholar/${post.paperId}/metadata`);
+            onMetadataSelect(response.data); // 親コンポーネントにmetadataを渡す
+        } catch (err) {
+            console.error("Error fetching paper metadata:", err);
+        }
+    };
+
     return (
         <div className="post">
             <div className="postWrapper">
@@ -181,13 +195,19 @@ export default function Post({ post }) {
                     <img src={PUBLIC_FOLDER + post.img} alt="" className="postImg" />
                 </div>
                 <div className="postBottom">
-                    <div className="postBottomLike">
-                        <img src={heartImgPath} alt="" className="likeIcon" onClick={() => handleLike()} />
-                        <span className="postLikeCounter"> {like}</span>
+                    <div className="postBottomRight">
+                        <button onClick={handleViewDetails}>詳細を見る ▶</button>
                     </div>
-                    <div className="postBottomComment">
-                        <img src={PUBLIC_FOLDER + "/icons/comment.png"} alt="" className="commentIcon" onClick={() => handleCommentClick()} />
-                        <span className="postCommentText">{numComments} </span>
+
+                    <div className="postBottomRight">
+                        <div className="postBottomLike">
+                            <img src={heartImgPath} alt="" className="likeIcon" onClick={() => handleLike()} />
+                            <span className="postLikeCounter"> {like}</span>
+                        </div>
+                        <div className="postBottomComment">
+                            <img src={PUBLIC_FOLDER + "/icons/comment.png"} alt="" className="commentIcon" onClick={() => handleCommentClick()} />
+                            <span className="postCommentText">{numComments} </span>
+                        </div>
                     </div>
                 </div>
             </div>

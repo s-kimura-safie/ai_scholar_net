@@ -6,7 +6,7 @@ import axios from 'axios';
 import { AuthContext } from '../../states/AuthContext';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
-export default function Timeline({ username }) {
+export default function Timeline({ username, onMetadataSelect }) {
     const [posts, setPosts] = useState([]);
     const [filteredPosts, setFilteredPosts] = useState([]);
     const [page, setPage] = useState(1);
@@ -123,7 +123,7 @@ export default function Timeline({ username }) {
                     endMessage={<h4>No more posts ...</h4>}
                 >
                     {filteredPosts.map((post) => (
-                        <Post post={post} key={post._id} />
+                        <Post post={post} key={post._id} onMetadataSelect={onMetadataSelect} />
                     ))}
                 </InfiniteScroll>
             </div>

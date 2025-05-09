@@ -23,6 +23,10 @@ const PostSchema = new mongoose.Schema({
             text: { type: String, required: true },
         },
     ],
+    paperId: {
+        type: String,
+        required: false, // 論文が関連付けられていない投稿も許容
+    },
 }, { timestamps: true });
 
 export default mongoose.model("Post", PostSchema);

@@ -6,7 +6,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 
 
-export default function Rightbar({ user }) {
+export default function Rightbar({ user, metadata }) {
 
     const PUBLIC_FOLDER = process.env.REACT_APP_PUBLIC_FOLDER;
 
@@ -80,10 +80,44 @@ export default function Rightbar({ user }) {
         );
     }
 
+    const formatKey = (key) => {
+        return key
+            .replace(/([a-z])([A-Z])/g, '$1 $2') // キャメルケースをスペースで分割
+            .replace(/^./, (str) => str.toUpperCase()); // 最初の文字を大文字に
+    };
+
+    const MetadataRightbar = () => {
+        return (
+            <>
+                <h4 className="rightbarTitle">論文の詳細</h4>
+                <div className="rightbarInfo">
+                    {Object.entries(metadata).map(([key, value]) => (
+                        <div className="rightbarInfoItem" key={key}>
+                            <span className="rightbarInfoKey">{formatKey(key)}:</span>
+                            {key === 'url' ? (
+                                <a href={value} target="_blank" rel="noopener noreferrer" className="rightbarInfoValue">
+                                    {value}
+                                </a>
+                            ) : (
+                                <span className="rightbarInfoValue">{value}</span>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            </>
+        );
+    };
+
     return (
         <div className="rightbar">
             <div className="rightbarWrapper">
-                {user ? <ProfileRightbar /> : <HomeRightbar />}
+                {metadata ? (
+                    <MetadataRightbar />
+                ) : user ? (
+                    <ProfileRightbar />
+                ) : (
+                    <HomeRightbar />
+                )}
             </div>
         </div>
     );

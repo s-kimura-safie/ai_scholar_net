@@ -47,7 +47,7 @@ app.use("/api/users", userRoute); // /api/usersにアクセスしたら、userRo
 app.use("/api/auth", authRoute); // /api/authにアクセスしたら、authRouteを使う
 app.use("/api/posts", postRoute); // /api/postsにアクセスしたら、postRouteを使う
 app.use("/api/upload", uploadRoute); // /api/uploadにアクセスしたら、uploadRouteを使う
-app.use("/api/search", searchScholarRoute); // /api/searchにアクセスしたら、searchScholarRouteを使う
+app.use("/api/scholar", searchScholarRoute); // /api/searchにアクセスしたら、searchScholarRouteを使う
 
 // ボットの論文投稿スケジュールを初期化
 initializeScheduler();

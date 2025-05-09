@@ -48,13 +48,12 @@ async function savePdf(paperData, outputDir) {
 }
 
 // 論文を検索する
-export async function searchPapers(query) {
+export async function searchPapers(query, requestPaperNum) {
     let results = [];
     let attempts = 0;
     const maxAttempts = 5; // 最大試行回数
-    const requestPaperNum = 5; // 1回のリクエストで取得する論文数
 
-    while (results.length < 5 && attempts < maxAttempts) {
+    while (results.length < requestPaperNum && attempts < maxAttempts) {
         attempts++;
         const papers = await excuteSemanticScholarAPI(query, attempts, requestPaperNum);
 

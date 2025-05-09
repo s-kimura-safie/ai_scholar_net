@@ -35,7 +35,7 @@ export async function extractPdfText(filePath) {
 export async function summarizeWithCohere(text) {
     const prompt = `
 次の論文の内容を以下の形式でそれぞれ200文字以内で要約してください：
-Title: 論文のタイトル (rewrite into a natural, readable format with proper capitalization)
+Title: Paper title (rewrite into a natural, readable format in English with proper capitalization)
 
 ◇ どんなもの？
 
