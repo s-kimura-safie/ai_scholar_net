@@ -62,19 +62,32 @@
 
 .postBottom {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: flex-end;
 }
 
-.postBottomLeft {
+.postBottomLike {
+    display: flex;
+    align-items: center;
+    margin-right: 6px;
+}
+
+.likeIcon {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    cursor: pointer;
+}
+
+.postBottomComment {
     display: flex;
     align-items: center;
 }
 
-.likeIcon {
-    width: 24px;
-    height: 24px;
-    margin-right: 5px;
+.commentIcon {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
     cursor: pointer;
 }
 
@@ -84,6 +97,5 @@
 
 .postCommentText {
     cursor: pointer;
-    border-bottom: 1px solid gray;
     margin-right: 5px;
 }
