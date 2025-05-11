@@ -3,6 +3,7 @@ import axios from "axios";
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Topbar from "../../components/topbar/Topbar";
 import Sidebar from "../../components/sidebar/Sidebar";
+import RightBar from "../../components/rightbar/Rightbar";
 import Post from '../../components/post/Post';
 import "./LikedPosts.css";
 
@@ -59,10 +60,9 @@ function LikedPosts() {
     return (
         <>
             <Topbar />
-            <Sidebar />
             <div className="likedPostsContainer">
+                <Sidebar />
                 <div className="likedPostsContent">
-                    <h2 className="likedPostsTitle">お気に入りの投稿</h2>
                     <div className="sortOptions">
                         <label>表示順： </label>
                         <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}>
@@ -83,6 +83,7 @@ function LikedPosts() {
                         ))}
                     </InfiniteScroll>
                 </div>
+                <RightBar />
             </div>
         </>
     );
