@@ -144,6 +144,15 @@ router.get("/:id/comments", async (req, res) => {
     }
 });
 
+// Get posts liked by a user
+router.get("/liked-posts/:userId", async (req, res) => {
+    try {
+        const posts = await Post.find({ likes: req.params.userId });
+        return res.status(200).json(posts);
+    } catch (err) {
+        return res.status(500).json(err);
+    }
+});
 
 // Get timeline posts
 router.get("/timeline/:userId", async (req, res) => {

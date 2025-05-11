@@ -1,0 +1,55 @@
+.likedPostsContainer {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-left: 20%;
+}
+
+.likedPostsContent {
+    padding: 30px 0px;
+    margin-left: 30px;
+}
+
+.likedPostsTitle {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.sortOptions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.sortOptions label {
+    font-size: 16px;
+}
+
+.sortOptions select {
+    padding: 5px;
+    font-size: 16px;
+}
+
+.likedPostsList {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.likedPostItem {
+    border: 1px solid #ccc;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.likedPostItem h3 {
+    margin: 0 0 10px;
+}
+
+.likedPostItem p {
+    margin: 0;
+}

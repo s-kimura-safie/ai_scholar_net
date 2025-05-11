@@ -1,7 +1,7 @@
 import React from 'react'
 import { useState, useEffect, useContext } from 'react';
 import "./Sidebar.css"
-import { Favorite, Home, Person, Search, Settings, Close } from '@mui/icons-material';
+import { Favorite, Person, Search, Settings, Close } from '@mui/icons-material';
 
 import BallotIcon from '@mui/icons-material/Ballot';
 import CloseFriend from '../closeFriend/CloseFriend'
@@ -91,10 +91,12 @@ export default function Sidebar() {
                         <Search className="sidebarIcon" />
                         <span className="sidebarListItemText">検索</span>
                     </li>
-                    <li className="sidebarListItem">
-                        <Favorite className="sidebarIcon" />
-                        <span className="sidebarListItemText">お気に入り</span>
-                    </li>
+                    <Link to="/liked-posts" style={{ textDecoration: 'none', color: "black" }}>
+                        <li className="sidebarListItem">
+                            <Favorite className="sidebarIcon" />
+                            <span className="sidebarListItemText">お気に入り</span>
+                        </li>
+                    </Link>
                     <li className="sidebarListItem">
                         <Settings className="sidebarIcon" />
                         <span className="sidebarListItemText">設定</span>
