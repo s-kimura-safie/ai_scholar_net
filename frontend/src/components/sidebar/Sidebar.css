@@ -34,6 +34,12 @@
     height: 40px;
 }
 
+.sidebarListItem.active {
+    background-color: #f0f0f0;
+    font-weight: bold;
+    border-left: 4px solid #0096b2;
+}
+
 .sidebarListItem:hover {
     box-shadow: none;
     transform: translateY(5px);
