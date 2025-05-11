@@ -81,6 +81,12 @@ export default function Sidebar() {
                             <span className="sidebarListItemText">タイムライン</span>
                         </li>
                     </Link>
+                    <Link to="/liked-posts" style={{ textDecoration: 'none', color: "black" }}>
+                        <li className="sidebarListItem">
+                            <Favorite className="sidebarIcon" />
+                            <span className="sidebarListItemText">お気に入り</span>
+                        </li>
+                    </Link>
                     <Link to="/upload-paper" style={{ textDecoration: 'none', color: "black" }}>
                         <li className="sidebarListItem">
                             <BallotIcon className="sidebarIcon" />
@@ -91,12 +97,6 @@ export default function Sidebar() {
                         <Search className="sidebarIcon" />
                         <span className="sidebarListItemText">検索</span>
                     </li>
-                    <Link to="/liked-posts" style={{ textDecoration: 'none', color: "black" }}>
-                        <li className="sidebarListItem">
-                            <Favorite className="sidebarIcon" />
-                            <span className="sidebarListItemText">お気に入り</span>
-                        </li>
-                    </Link>
                     <li className="sidebarListItem">
                         <Settings className="sidebarIcon" />
                         <span className="sidebarListItemText">設定</span>
