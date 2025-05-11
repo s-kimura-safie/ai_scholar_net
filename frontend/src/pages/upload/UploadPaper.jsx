@@ -61,8 +61,8 @@ function UploadPaper() {
     return (
         <>
             <Topbar />
+            <Sidebar />
             <div className="uploadPaperContainer">
-                <Sidebar />
                 <div className="uploadPaperContent">
                     <h2 className="uploadPaperTitle">論文をアップロードして要約を投稿しよう！</h2>
                     <div className="uploadSection">
@@ -77,11 +77,11 @@ function UploadPaper() {
                     <button onClick={handleUpload} className="uploadButton">アップロード</button>
                     {loading && (
                         <div className="spinner-border text-primary" role="status">
-                            <RingLoader className="loadingSpinner" loading={loading} size={30} color="#0096b2"/>
+                            <RingLoader className="loadingSpinner" loading={loading} size={30} color="#0096b2" />
                         </div>
                     )}
                     <div className="summarySection">
-                    <h3 className="summaryTitle">要約結果</h3>
+                        <h3 className="summaryTitle">要約結果</h3>
                         <textarea
                             value={summary}
                             onChange={handleSummaryChange}
