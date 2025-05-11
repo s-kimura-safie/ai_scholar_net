@@ -195,8 +195,10 @@ export default function Post({ post, onMetadataSelect }) {
                     <img src={PUBLIC_FOLDER + post.img} alt="" className="postImg" />
                 </div>
                 <div className="postBottom">
-                    <div className="postBottomRight">
-                        <button onClick={handleViewDetails}>詳細を見る ▶</button>
+                    <div className="postBottomLeft">
+                        {post.paperId && (
+                            <button className="detailButton" onClick={handleViewDetails}>詳細を見る ▶</button>
+                        )}
                     </div>
 
                     <div className="postBottomRight">
