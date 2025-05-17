@@ -1,19 +1,20 @@
-import React from 'react'
-import { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import "./Sidebar.css"
-import { Favorite, Home, Person, Search, Settings, Close } from '@mui/icons-material';
+import { Favorite, Person, Search, Settings, Close } from '@mui/icons-material';
 
 import BallotIcon from '@mui/icons-material/Ballot';
 import CloseFriend from '../closeFriend/CloseFriend'
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../states/AuthContext';
-import axios from 'axios';
+import { ActiveItemContext } from '../../states/ActiveItemContext';
 
+import axios from 'axios';
 
 export default function Sidebar() {
     const PUBLIC_FOLDER = process.env.REACT_APP_PUBLIC_FOLDER;
 
     const { user: loginUser } = useContext(AuthContext); // user:loginUser => userをloginUserとして使用
+    const { activeItem, setActiveItem } = useContext(ActiveItemContext); // useContextでactiveItemを取得
 
     const [friends, setFriends] = useState([]);
     const [searchKeyword, setSearchKeyword] = useState("");
@@ -21,6 +22,10 @@ export default function Sidebar() {
 
     const handleClearSearch = () => {
         setSearchKeyword("");
+    };
+
+    const handleItemClick = (item) => {
+        setActiveItem(item);
     };
 
     // コンポーネントがレンダリングされた後、フォローしているユーザーの情報を取得
@@ -62,34 +67,63 @@ export default function Sidebar() {
                 <ul className="sidebarList">
                     {loginUser ? (
                         <Link to={`/profile/${loginUser.username}`} style={{ textDecoration: 'none', color: "black" }}>
-                            <li className="sidebarListItem">
+                            <li
+                                className={`sidebarListItem ${activeItem === 'profile' ? 'active' : ''}`}
+                                onClick={() => handleItemClick('profile')}
+                            >
                                 <Person className="sidebarIcon" />
                                 <span className="sidebarListItemText">マイページ</span>
                             </li>
                         </Link>
                     ) : (
                         <Link to="/login" style={{ textDecoration: 'none', color: "black" }}>
-                            <li className="sidebarListItem">
+                            <li
+                                className={`sidebarListItem ${activeItem === 'login' ? 'active' : ''}`}
+                                onClick={() => handleItemClick('login')}
+                            >
                                 <Person className="sidebarIcon" />
                                 <span className="sidebarListItemText">ログイン</span>
                             </li>
                         </Link>
                     )}
                     <Link to="/" style={{ textDecoration: 'none', color: "black" }}>
-                        <li className="sidebarListItem">
+                        <li
+                            className={`sidebarListItem ${activeItem === 'timeline' ? 'active' : ''}`}
+                            onClick={() => handleItemClick('timeline')}
+                        >
                             <BallotIcon className="sidebarIcon" />
                             <span className="sidebarListItemText">タイムライン</span>
                         </li>
                     </Link>
-                    <li className="sidebarListItem">
+                    <Link to="/liked-posts" style={{ textDecoration: 'none', color: "black" }}>
+                        <li
+                            className={`sidebarListItem ${activeItem === 'liked-posts' ? 'active' : ''}`}
+                            onClick={() => handleItemClick('liked-posts')}
+                        >
+                            <Favorite className="sidebarIcon" />
+                            <span className="sidebarListItemText">お気に入り</span>
+                        </li>
+                    </Link>
+                    <Link to="/upload-paper" style={{ textDecoration: 'none', color: "black" }}>
+                        <li
+                            className={`sidebarListItem ${activeItem === 'upload-paper' ? 'active' : ''}`}
+                            onClick={() => handleItemClick('upload-paper')}
+                        >
+                            <BallotIcon className="sidebarIcon" />
+                            <span className="sidebarListItemText">論文投稿</span>
+                        </li>
+                    </Link>
+                    <li
+                        className={`sidebarListItem ${activeItem === 'search' ? 'active' : ''}`}
+                        onClick={() => handleItemClick('search')}
+                    >
                         <Search className="sidebarIcon" />
                         <span className="sidebarListItemText">検索</span>
                     </li>
-                    <li className="sidebarListItem">
-                        <Favorite className="sidebarIcon" />
-                        <span className="sidebarListItemText">お気に入り</span>
-                    </li>
-                    <li className="sidebarListItem">
+                    <li
+                        className={`sidebarListItem ${activeItem === 'settings' ? 'active' : ''}`}
+                        onClick={() => handleItemClick('settings')}
+                    >
                         <Settings className="sidebarIcon" />
                         <span className="sidebarListItemText">設定</span>
                     </li>

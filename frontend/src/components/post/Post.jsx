@@ -9,14 +9,14 @@ import { Link } from 'react-router-dom';
 import { AuthContext } from '../../states/AuthContext';
 
 
-export default function Post({ post }) {
+export default function Post({ post, onMetadataSelect }) {
 
     const PUBLIC_FOLDER = process.env.REACT_APP_PUBLIC_FOLDER;
 
     const { user: loginUser } = useContext(AuthContext); // user:loginUser => userをloginUserとして使用
 
     const [like, setLike] = useState(post.likes.length);
-    const [heartImgPath, setPath] = useState(PUBLIC_FOLDER + "/heart_off.png");
+    const [heartImgPath, setPath] = useState(PUBLIC_FOLDER + "/icons/heart_off.png");
     const [numComments, setNumComments] = useState(0);
     const [isLiked, setIsLiked] = useState(false);
     const [postUser, setUser] = useState({});
@@ -85,7 +85,7 @@ export default function Post({ post }) {
             try {
                 const response = await axios.get(`/posts/${post._id}/likes`, { params: { userId: loginUser._id } });
                 setIsLiked(response.data.includes(loginUser._id));
-                setPath(response.data.includes(loginUser._id) ? PUBLIC_FOLDER + "/heart.png" : PUBLIC_FOLDER + "/heart_off.png");
+                setPath(response.data.includes(loginUser._id) ? PUBLIC_FOLDER + "/heart.png" : PUBLIC_FOLDER + "/icons/heart_off.png");
             } catch (err) {
                 console.error("Error fetching like status:", err);
             }
@@ -147,6 +147,20 @@ export default function Post({ post }) {
         handleEditClose();
     };
 
+    const handleViewDetails = async () => {
+        if (!post.paperId) {
+            console.error("No paperId associated with this post.");
+            return;
+        }
+
+        try {
+            const response = await axios.get(`/scholar/${post.paperId}/metadata`);
+            onMetadataSelect(response.data); // 親コンポーネントにmetadataを渡す
+        } catch (err) {
+            console.error("Error fetching paper metadata:", err);
+        }
+    };
+
     return (
         <div className="post">
             <div className="postWrapper">
@@ -177,16 +191,25 @@ export default function Post({ post }) {
                     </div>
                 </div>
                 <div className="postCenter">
-                    <span className="postText" style={{ whiteSpace: 'pre-line' }}>{post.desc}</span>
+                    <span className="postText">{post.desc}</span>
                     <img src={PUBLIC_FOLDER + post.img} alt="" className="postImg" />
                 </div>
                 <div className="postBottom">
                     <div className="postBottomLeft">
-                        <img src={heartImgPath} alt="" className="likeIcon" onClick={() => handleLike()} />
-                        <span className="postLikeCounter">{like}人がいいねを押しました。</span>
+                        {post.paperId && (
+                            <button className="detailButton" onClick={handleViewDetails}>詳細を見る ▶</button>
+                        )}
                     </div>
+
                     <div className="postBottomRight">
-                        <span onClick={handleCommentClick} className="postCommentText">{numComments}:件のコメント</span>
+                        <div className="postBottomLike">
+                            <img src={heartImgPath} alt="" className="likeIcon" onClick={() => handleLike()} />
+                            <span className="postLikeCounter"> {like}</span>
+                        </div>
+                        <div className="postBottomComment">
+                            <img src={PUBLIC_FOLDER + "/icons/comment.png"} alt="" className="commentIcon" onClick={() => handleCommentClick()} />
+                            <span className="postCommentText">{numComments} </span>
+                        </div>
                     </div>
                 </div>
             </div>

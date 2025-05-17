@@ -6,31 +6,30 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 
 
-export default function Rightbar({ user }) {
-
+export default function Rightbar({ user, metadata }) {
     const PUBLIC_FOLDER = process.env.REACT_APP_PUBLIC_FOLDER;
+
+    const [showMetadata, setShowMetadata] = useState(!!metadata);
+
+    useEffect(() => {
+        setShowMetadata(!!metadata);
+    }, [metadata]);
 
     const HomeRightbar = () => {
         return (
             <>
-                <div className="eventContainer">
-                    <img src={PUBLIC_FOLDER + "/star.png"} alt="" className="starImg" />
-                    <span className="eventText">
-                        <b>フォロワー限定</b>イベント開催中！
-                    </span>
-                </div>
-                <img src={PUBLIC_FOLDER + "/ad.jpeg"} alt="" className="eventImg" />
-                <h4 className="rightbartitle">オンラインの友達</h4>
-                <ul className="rightbarFriendList">
-                </ul>
-
-                <div className="promotionTitle">プロモーション広告
-                    <img src={PUBLIC_FOLDER + "/promotion/promotion1.jpeg"} alt="" className="promotionImg" />
-                    <p className="promotionName">ショッピング</p>
-                    <img src={PUBLIC_FOLDER + "/promotion/promotion2.jpeg"} alt="" className="promotionImg" />
-                    <p className="promotionName">カーショップ</p>
-                    <img src={PUBLIC_FOLDER + "/promotion/promotion3.jpeg"} alt="" className="promotionImg" />
-                    <p className="promotionName">Shunsuuuuuu .inc</p>
+                <div >
+                    <p className="promotionTitle">プロモーション広告</p>
+                    <a href="https://safie.co.jp/" target="_blank" rel="noopener noreferrer">
+                        <img src={PUBLIC_FOLDER + "/promotion/safie_logo2.png"} alt="" className="promotionSafieImg" />
+                    </a>
+                    <p className="promotionName">セーフィー株式会社</p>
+                    <a href="https://www.notion.so/safie/31292149a5f84e59be3ffb70ba71ce47" target="_blank" rel="noopener noreferrer">
+                        <img src={PUBLIC_FOLDER + "/promotion/AIV_doraemon.png"} alt="" className="promotionAivImg" />
+                    </a>
+                    <p className="promotionName">AI Vision</p>
+                    {/* <img src={PUBLIC_FOLDER + "/promotion/promotion3.jpeg"} alt="" className="promotionImg" /> */}
+                    {/* <p className="promotionName">Shunsuuuuuu .inc</p> */}
                 </div>
             </>
         );
@@ -42,8 +41,6 @@ export default function Rightbar({ user }) {
         // コンポーネントがレンダリングされた後、フォローしているユーザーの情報を取得
         useEffect(() => { // APIでフォロワー情報を取得し終えたら、setFriendsでfriendsを更新
             const fetchFriends = async () => {
-                // Promise.all: 複数のPromiseを並行して実行し、すべてのPromiseが解決されるのを待つためのメソッドです。
-                // 引数として渡されたすべてのPromiseが解決されると、結果を配列として返します。
                 if (user.followings) {
                     const friendList = await Promise.all(
                         user.followings.map(async (userId) => {
@@ -56,7 +53,6 @@ export default function Rightbar({ user }) {
             };
             fetchFriends();
         }, []);
-
 
         return (
             <>
@@ -80,10 +76,52 @@ export default function Rightbar({ user }) {
         );
     }
 
+    const formatKey = (key) => {
+        return key
+            .replace(/([a-z])([A-Z])/g, '$1 $2') // キャメルケースをスペースで分割
+            .replace(/^./, (str) => str.toUpperCase()); // 最初の文字を大文字に
+    };
+
+    const MetadataRightbar = () => {
+        return (
+            <>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h4 className="rightbarTitle">論文の詳細</h4>
+                    <button
+                        style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', lineHeight: 1 }}
+                        onClick={() => setShowMetadata(false)}
+                    >
+                        ×
+                    </button>
+                </div>
+                <div className="rightbarInfo">
+                    {Object.entries(metadata).map(([key, value]) => (
+                        <div className="rightbarInfoItem" key={key}>
+                            <span className="rightbarInfoKey">{formatKey(key)}:</span>
+                            {key === 'url' ? (
+                                <a href={value} target="_blank" rel="noopener noreferrer" className="rightbarInfoValue">
+                                    {value}
+                                </a>
+                            ) : (
+                                <span className="rightbarInfoValue">{value}</span>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            </>
+        );
+    };
+
     return (
         <div className="rightbar">
             <div className="rightbarWrapper">
-                {user ? <ProfileRightbar /> : <HomeRightbar />}
+                {showMetadata ? (
+                    <MetadataRightbar />
+                ) : user ? (
+                    <ProfileRightbar />
+                ) : (
+                    <HomeRightbar />
+                )}
             </div>
         </div>
     );

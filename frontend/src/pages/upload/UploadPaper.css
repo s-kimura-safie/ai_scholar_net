@@ -1,0 +1,125 @@
+/* filepath: /home/s-kimura/mytools/udemy_mern/frontend/src/pages/upload/UploadPaper.css */
+/* Styles for the UploadPaper component */
+
+/* General container for the UploadPaper page */
+.uploadPaperContainer {
+    display: flex;
+    background: #ffffff;
+    margin-left: 20%;
+}
+
+.uploadPaperContent {
+    flex: 4;
+    padding: 30px 0px;
+    margin-left: 50px;
+}
+
+.uploadPaperTitle {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+.uploadSection {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.uploadLabel {
+    display: inline-block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.uploadInput {
+    margin-bottom: 8px;
+    width: 40%;
+    font-size: 14px;
+
+}
+
+.uploadButton {
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    background-color: #0096b2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: block;
+}
+
+.loadingSpinner {
+    width: 20px;
+    height: 20px;
+    margin-left: 50px;
+}
+
+.uploadButton:hover {
+    background-color: #aeeef9;
+}
+
+.summarySection {
+    width: 50%;
+    margin-top: 30px;
+    margin-bottom: 10px;
+}
+
+.placeholder {
+    color: #aaa;
+    font-style: italic;
+}
+
+.summaryTitle {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.summaryContent {
+    margin-bottom: 20px;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #555;
+}
+
+.summaryTextarea {
+    width: 100%;
+    height: 350px; /* Set a minimum height */
+    border: 3px solid #0385a5;
+    border-radius: 4px;
+    padding: 10px;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #555;
+    background-color: #f9f9f9;
+    resize: vertical; /* Allow vertical resizing */
+    overflow-y: auto; /* Add scroll if content exceeds max height */
+    box-shadow: none; /* Remove additional shadow */
+    outline: none; /* Prevent double border on focus */
+}
+
+.summaryTextarea:focus {
+    border-color: #0096b2;
+    background-color: #ffffff;
+}
+
+.postButton {
+    padding: 10px 20px;
+    background-color: #0096b2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.postButton:hover {
+    background-color: #aff3ff;
+}

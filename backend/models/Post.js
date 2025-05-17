@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const PostSchema = new mongoose.Schema({
     userId: {
@@ -23,6 +23,10 @@ const PostSchema = new mongoose.Schema({
             text: { type: String, required: true },
         },
     ],
+    paperId: {
+        type: String,
+        required: false, // 論文が関連付けられていない投稿も許容
+    },
 }, { timestamps: true });
 
-module.exports = mongoose.model("Post", PostSchema);
+export default mongoose.model("Post", PostSchema);

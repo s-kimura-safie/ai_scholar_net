@@ -18,7 +18,6 @@ export default function Topbar() {
             console.log("検索処理を実行:", debouncedKeyword);
             dispatch({ type: "SET_SEARCH_KEYWORD", payload: debouncedKeyword });
         } else {
-            console.log("検索キーワードが空です");
             dispatch({ type: "SET_SEARCH_KEYWORD", payload: "" });
         }
     }, [debouncedKeyword, dispatch]);

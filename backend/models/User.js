@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema(
     {
@@ -51,8 +51,8 @@ const UserSchema = new mongoose.Schema(
         },
     },
 
-    { timestanps: true }
+    { timestamps: true }
 );
 
 
-module.exports = mongoose.model("User", UserSchema); // UserSchemaをUserという名前でモデル化し、どのファイルでも使えるようにする
+export default mongoose.model("User", UserSchema);

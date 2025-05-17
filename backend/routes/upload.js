@@ -1,9 +1,16 @@
-// Router:express.Router()は、Express.jsのルーティング機能をモジュール化するためのミドルウェア
-const router = require('express').Router();
-const multer = require('multer');
-const sharp = require('sharp');
-const path = require('path');
-const fs = require('fs');
+import { Router } from "express";
+import multer from "multer";
+import sharp from "sharp";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
+import summarizer from "../searcher/summarizer.js";
+
+const router = Router();
+
+// __dirname の代替設定
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // アップロード先ディレクトリ
 const uploadPath = path.join(__dirname, "../public/images");
@@ -39,4 +46,24 @@ router.post("/", upload.single("file"), async (req, res) => {
     }
 });
 
-module.exports = router;
+// PDF upload and summarize API
+const pdfUploadPath = path.join(__dirname, "../public/pdfs");
+const pdfUpload = multer({
+    storage: multer.diskStorage({
+        destination: pdfUploadPath,
+        filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`)
+    }),
+    fileFilter: (req, file, cb) => cb(null, path.extname(file.originalname).toLowerCase() === ".pdf")
+});
+
+router.post("/upload-paper", pdfUpload.single("file"), async (req, res) => {
+    try {
+        const summary = await summarizer(req.file.path);
+        res.status(200).json({ summary });
+    } catch (error) {
+        console.error("Error summarizing paper:", error);
+        res.status(500).json({ error: "Failed to summarize paper" });
+    }
+});
+
+export default router;

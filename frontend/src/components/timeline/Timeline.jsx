@@ -6,7 +6,7 @@ import axios from 'axios';
 import { AuthContext } from '../../states/AuthContext';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
-export default function Timeline({ username }) {
+export default function Timeline({ username, onMetadataSelect, showLikedPosts=false }) {
     const [posts, setPosts] = useState([]);
     const [filteredPosts, setFilteredPosts] = useState([]);
     const [page, setPage] = useState(1);
@@ -24,8 +24,10 @@ export default function Timeline({ username }) {
                 setPosts([]);
                 setFilteredPosts([]);
                 const response = username
-                    ? await axios.get(`/posts/profile/${username}?page=1`, { signal: controller.signal })
-                    : await axios.get(`/posts/timeline/${user._id}?page=1`, { signal: controller.signal });
+                        ? await axios.get(`/posts/profile/${username}?page=1`, { signal: controller.signal })
+                        : showLikedPosts
+                            ? await axios.get(`/posts/liked-posts/${user._id}?page=1`, { signal: controller.signal })
+                            : await axios.get(`/posts/timeline/${user._id}?page=1`, { signal: controller.signal });
                 const sortedPosts = sortPosts(response.data, sortOrder);
                 setPosts(sortedPosts);
                 setFilteredPosts(sortedPosts);
@@ -55,8 +57,10 @@ export default function Timeline({ username }) {
 
         try {
             const response = username
-                ? await axios.get(`/posts/profile/${username}?page=${nextPage}`)
-                : await axios.get(`/posts/timeline/${user._id}?page=${nextPage}`);
+                    ? await axios.get(`/posts/profile/${username}?page=${nextPage}`)
+                    : showLikedPosts
+                        ? await axios.get(`/posts/liked-posts/${user._id}?page=${nextPage}`)
+                        : await axios.get(`/posts/timeline/${user._id}?page=${nextPage}`);
 
             if (response.data.length === 0) {
                 setHasMore(false);
@@ -123,7 +127,7 @@ export default function Timeline({ username }) {
                     endMessage={<h4>No more posts ...</h4>}
                 >
                     {filteredPosts.map((post) => (
-                        <Post post={post} key={post._id} />
+                        <Post post={post} key={post._id} onMetadataSelect={onMetadataSelect} />
                     ))}
                 </InfiniteScroll>
             </div>

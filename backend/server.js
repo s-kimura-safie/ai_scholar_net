@@ -1,13 +1,23 @@
-const express = require("express");
+import mongoose from "mongoose";
+import path from "path";
+import dotenv from "dotenv";
+import express from "express";
+import { fileURLToPath } from "url";
+
+import userRoute from "./routes/users.js";
+import authRoute from "./routes/auth.js";
+import postRoute from "./routes/posts.js";
+import uploadRoute from "./routes/upload.js";
+import searchScholarRoute from "./routes/scholar.js";
+import initializeScheduler from "./searcher/scheduler.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: '.env' });
+
 const app = express();
-const userRoute = require("./routes/users");
-const authRoute = require("./routes/auth");
-const postRoute = require("./routes/posts");
-const uploadRoute = require("./routes/upload");
 const POST = 5000;
-const mongoose = require("mongoose");
-const path = require("path");
-require("dotenv").config();
 
 // connect to MongoDB
 mongoose
@@ -33,10 +43,14 @@ app.use(
 );
 
 app.use(express.json());
-app.use("/api/users", userRoute); // /api/usersにアクセスしたら、userRouteを使う
-app.use("/api/auth", authRoute); // /api/authにアクセスしたら、authRouteを使う
-app.use("/api/posts", postRoute); // /api/postsにアクセスしたら、postRouteを使う
-app.use("/api/upload", uploadRoute); // /api/uploadにアクセスしたら、uploadRouteを使う
+app.use("/api/users", userRoute); // /api/users にアクセスしたら、userRouteを使う
+app.use("/api/auth", authRoute); // /api/auth にアクセスしたら、authRouteを使う
+app.use("/api/posts", postRoute); // /api/posts にアクセスしたら、postRouteを使う
+app.use("/api/upload", uploadRoute); // /api/upload にアクセスしたら、uploadRouteを使う
+app.use("/api/scholar", searchScholarRoute); // /api/scholar にアクセスしたら、searchScholarRouteを使う
+
+// ボットの論文投稿スケジュールを初期化
+initializeScheduler();
 
 app.get("/", (req, res) => {
     res.send("Hello World");
