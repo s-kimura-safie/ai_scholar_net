@@ -159,6 +159,8 @@ const Profile = () => {
       const fileName = Date.now() + "_" + file.name;
       data.append("name", fileName);
       data.append("file", file);
+      // 画像種別
+      data.append("type", imageType === "cover" ? "cover" : "profile");
 
       try {
         // 画像をアップロード
@@ -200,16 +202,16 @@ const Profile = () => {
             <div className="profileCover">
               <img
                 src={user?.coverPicture
-                  ? PUBLIC_FOLDER + user.coverPicture
-                  : PUBLIC_FOLDER + "post/3.jpeg"}
+                  ? PUBLIC_FOLDER + "profile/" + user.coverPicture
+                  : PUBLIC_FOLDER + "defaultProfile/noCover.jpeg"}
                 alt=""
                 className="profileCoverImg"
                 onClick={() => handleImageClick("cover")} // クリックイベントを追加
               />
               <img
                 src={user?.profilePicture
-                  ? PUBLIC_FOLDER + user.profilePicture
-                  : PUBLIC_FOLDER + "/person/noAvatar.png"}
+                  ? PUBLIC_FOLDER + "profile/" + user.profilePicture
+                  : PUBLIC_FOLDER + "defaultProfile/noAvatar.png"}
                 alt=""
                 className="profileUserImg"
                 onClick={() => handleImageClick("profile")} // クリックイベントを追加
@@ -293,7 +295,7 @@ const Profile = () => {
             </h3>
             <label>
               <span className="filelabel" title="ファイルを選択">
-                <img src={PUBLIC_FOLDER + "/preset/camera-orange-rev.png"} width="32" height="26" alt="＋画像" />
+                <img src={PUBLIC_FOLDER + "/icons/camera.png"} width="32" height="26" alt="＋画像" />
                 選択
               </span>
               <input type="file" onChange={handleImageChange} name="datafile" id="filesend"></input>
