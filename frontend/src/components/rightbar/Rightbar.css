@@ -1,21 +1,24 @@
-.rightbar{
+.rightbar {
     width: 25%;
-    min-width: 25vw; /* 最小幅を設定 */
+    min-width: 25vw;
+    /* 最小幅を設定 */
     background-color: #ffffff;
     box-shadow: -5px 0px 5px rgba(0, 0, 0, 0.1);
     position: sticky;
-    top: 60px; /* Topbarの高さ分だけ下げる */
-    height: calc(100vh - 60px); /* Topbarの高さを引いた分の高さを設定 */
+    top: 60px;
+    /* Topbarの高さ分だけ下げる */
+    height: calc(100vh - 60px);
+    /* Topbarの高さを引いた分の高さを設定 */
     overflow-y: auto;
 }
 
-.eventContainer{
+.eventContainer {
     display: flex;
     align-items: center;
 
 }
 
-.starImg{
+.starImg {
     width: 25px;
     height: 25px;
     margin-right: 5px;
@@ -26,7 +29,7 @@
     font-weight: 300;
 }
 
-.eventImg{
+.eventImg {
     width: 100%;
     border-radius: 10px;
     margin: 25px 0;
@@ -68,20 +71,31 @@
 .promotionTitle {
     font-size: 18px;
     font-weight: 550;
-    margin-top: 50px;
-    margin-bottom: -10px;
+    margin: 10px 0px;
+
 }
 
-.promotionImg {
-    width: 85%;
+.promotionSafieImg {
+    width: 100%;
     border-radius: 10px;
-    margin: 25px 0;
+    /* margin: 15px 0; */
+    border: 1px solid #e0e0e0;
+}
+
+.promotionAivImg {
+    width: 100%;
+    border-radius: 10px;
+    height: 200px;
+    object-fit: cover;
+    object-position: center;
+    /* margin: 15px 0; */
+    border: 1px solid #e0e0e0;
 }
 
 .promotionName {
     font-size: 16px;
     color: gray;
-    margin-top: -20px;
+    margin-bottom: 15px;
 }
 
 .rightbarTitle {
@@ -109,7 +123,8 @@
 
 .rightbarInfoItem {
     display: flex;
-    flex-direction: column; /* 縦に並べる */
+    flex-direction: column;
+    /* 縦に並べる */
     align-items: flex-start;
     padding: 5px 5px;
     border-bottom: 1px solid #e0e0e0;
@@ -118,13 +133,16 @@
 .rightbarInfoKey {
     font-weight: bold;
     color: #333;
-    margin-bottom: 5px; /* キーと値の間に余白を追加 */
+    margin-bottom: 5px;
+    /* キーと値の間に余白を追加 */
 }
 
 .rightbarInfoValue {
     color: #555;
-    font-size: 16px; /* 値を少し大きく */
-    line-height: 1.5; /* 行間を広げて見やすく */
+    font-size: 16px;
+    /* 値を少し大きく */
+    line-height: 1.5;
+    /* 行間を広げて見やすく */
 }
 
 .rightbarFollowings {
