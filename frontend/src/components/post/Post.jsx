@@ -85,7 +85,7 @@ export default function Post({ post, onMetadataSelect }) {
             try {
                 const response = await axios.get(`/posts/${post._id}/likes`, { params: { userId: loginUser._id } });
                 setIsLiked(response.data.includes(loginUser._id));
-                setPath(response.data.includes(loginUser._id) ? PUBLIC_FOLDER + "/heart.png" : PUBLIC_FOLDER + "/icons/heart_off.png");
+                setPath(response.data.includes(loginUser._id) ? PUBLIC_FOLDER + "icon/heart.png" : PUBLIC_FOLDER + "/icons/heart_off.png");
             } catch (err) {
                 console.error("Error fetching like status:", err);
             }
@@ -168,8 +168,8 @@ export default function Post({ post, onMetadataSelect }) {
                     <div className="postTopLeft">
                         <Link to={`/profile/${postUser.username}`}>
                             <img src={postUser.profilePicture
-                                ? PUBLIC_FOLDER + postUser.profilePicture
-                                : PUBLIC_FOLDER + "/person/noAvatar.png"}
+                                ? PUBLIC_FOLDER + "profile/" + postUser.profilePicture
+                                : PUBLIC_FOLDER + "profile/noAvatar.png"}
                                 alt="" loading="lazy" className="postProfileImg" />
                         </Link>
                         <span className="postUsername">{postUser.username}</span>
@@ -192,7 +192,7 @@ export default function Post({ post, onMetadataSelect }) {
                 </div>
                 <div className="postCenter">
                     <span className="postText">{post.desc}</span>
-                    <img src={PUBLIC_FOLDER + post.img} alt="" className="postImg" />
+                    <img src={PUBLIC_FOLDER + "post/" + post.img} alt="" className="postImg" />
                 </div>
                 <div className="postBottom">
                     <div className="postBottomLeft">

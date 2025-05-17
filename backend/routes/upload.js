@@ -12,10 +12,14 @@ const router = Router();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// アップロード先ディレクトリ
-const uploadPath = path.join(__dirname, "../public/images");
-if (!fs.existsSync(uploadPath)) {
-    fs.mkdirSync(uploadPath, { recursive: true });
+// 保存先ディレクトリを用途ごとに分岐
+const profilePath = path.join(__dirname, "../public/images/profile");
+const postPath = path.join(__dirname, "../public/images/post");
+if (!fs.existsSync(profilePath)) {
+    fs.mkdirSync(profilePath, { recursive: true });
+}
+if (!fs.existsSync(postPath)) {
+    fs.mkdirSync(postPath, { recursive: true });
 }
 
 // Multerの設定（メモリに一時保存）
@@ -30,16 +34,27 @@ router.post("/", upload.single("file"), async (req, res) => {
         }
 
         const filename = req.body.name || `${Date.now()}-${req.file.originalname}`;
-        const outputPath = path.join(uploadPath, filename);
+        // 用途判定: req.body.type で "profile" or "cover" or "post" を受け取る想定
+        let outputDir;
+        if (req.body.type === "profile" || req.body.type === "cover") {
+            outputDir = profilePath;
+        } else if (req.body.type === "post") {
+            outputDir = postPath;
+        } else {
+            // デフォルトはpost画像
+            outputDir = postPath;
+        }
+        const outputPath = path.join(outputDir, filename);
 
         // Sharpで画像を圧縮・リサイズ
         await sharp(req.file.buffer)
-            .resize({ width: 800 }) // 幅を800pxにリサイズ（高さは自動調整）
+            .resize({ width: 800 })
             .flatten({ background: { r: 255, g: 255, b: 255 } })
-            .jpeg({ quality: 80 }) // JPEG形式で圧縮（品質80%）
+            .jpeg({ quality: 80 })
             .toFile(outputPath);
 
-        return res.status(200).json({ message: "Image uploaded successfully", filename });
+        // クライアントに保存先種別も返す
+        return res.status(200).json({ message: "Image uploaded successfully", filename, type: req.body.type });
     } catch (err) {
         console.error(err);
         return res.status(500).json({ error: "Failed to process image" });

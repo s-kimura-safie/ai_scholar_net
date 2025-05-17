@@ -63,12 +63,12 @@ export default function Rightbar({ user, metadata }) {
                 </div>
                 <h4 className="rightbarFriends">{`${user.username}`} の友達</h4>
                 <div className="rightbarFollowings">
-                    {friends.map((user) => (
-                        <div className="rightbarFollowing" key={user._id}>
-                            <Link to={`/profile/${user.username}`}>
-                                <img src={PUBLIC_FOLDER + user.profilePicture || PUBLIC_FOLDER + "/person/noAvatar.png"} alt="" className="rightbarFollowingImg" loading="lazy" />
+                    {friends.map((friend) => (
+                        <div className="rightbarFollowing" key={friend._id}>
+                            <Link to={`/profile/${friend.username}`}>
+                                <img src={PUBLIC_FOLDER + "profile/" + friend.profilePicture || PUBLIC_FOLDER + "profile/noAvatar.png"} alt="" className="rightbarFollowingImg" loading="lazy" />
                             </Link>
-                            <span className="rightbarFollowingName">{user.username}</span>
+                            <span className="rightbarFollowingName">{friend.username}</span>
                         </div>
                     ))}
                 </div>

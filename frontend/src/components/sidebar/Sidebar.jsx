@@ -157,8 +157,8 @@ export default function Sidebar() {
                                 <li className="sidebarSearchResultItem" style={{ cursor: "pointer" }}>
                                     <img
                                         src={user.profilePicture
-                                            ? PUBLIC_FOLDER + user.profilePicture
-                                            : PUBLIC_FOLDER + "/person/noAvatar.png"}
+                                            ? PUBLIC_FOLDER + "profile/" + user.profilePicture
+                                            : PUBLIC_FOLDER + "profile/noAvatar.png"}
                                         alt=""
                                     />
                                     <span>{user.username}</span>
