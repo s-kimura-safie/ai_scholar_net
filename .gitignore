@@ -9,3 +9,7 @@ node_modules
 *.jpg
 *.png
 *.pdf
+
+#package
+package-lock.json
+package.json
