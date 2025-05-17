@@ -70,7 +70,7 @@ export default function CommentBar({ postId, loginUser, setSelectedPostId, setNu
                 <button onClick={handleCommentClose} className="commentCloseButton">閉じる</button>
             </div>
             <div className="commentTemplates">
-                {['素晴らしい！', 'いいですね！', '共感しました！', '応援しています！'].map((template, index) => (
+                {['おもしろい！', '興味深い！', '参考になる！', '読んでみたい！'].map((template, index) => (
                     <button
                         key={index}
                         className="templateButton"
