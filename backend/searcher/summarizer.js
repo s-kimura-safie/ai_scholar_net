@@ -11,7 +11,6 @@ import dotenv from 'dotenv';
 
 // 環境変数の読み込み
 dotenv.config({ path: '.env' });
-console.log('Cohere API Key:', process.env.COHERE_API_KEY);
 
 // __dirnameの代替
 const __filename = fileURLToPath(import.meta.url);

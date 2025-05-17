@@ -43,11 +43,11 @@ app.use(
 );
 
 app.use(express.json());
-app.use("/api/users", userRoute); // /api/usersにアクセスしたら、userRouteを使う
-app.use("/api/auth", authRoute); // /api/authにアクセスしたら、authRouteを使う
-app.use("/api/posts", postRoute); // /api/postsにアクセスしたら、postRouteを使う
-app.use("/api/upload", uploadRoute); // /api/uploadにアクセスしたら、uploadRouteを使う
-app.use("/api/scholar", searchScholarRoute); // /api/searchにアクセスしたら、searchScholarRouteを使う
+app.use("/api/users", userRoute); // /api/users にアクセスしたら、userRouteを使う
+app.use("/api/auth", authRoute); // /api/auth にアクセスしたら、authRouteを使う
+app.use("/api/posts", postRoute); // /api/posts にアクセスしたら、postRouteを使う
+app.use("/api/upload", uploadRoute); // /api/upload にアクセスしたら、uploadRouteを使う
+app.use("/api/scholar", searchScholarRoute); // /api/scholar にアクセスしたら、searchScholarRouteを使う
 
 // ボットの論文投稿スケジュールを初期化
 initializeScheduler();

@@ -4,7 +4,7 @@ import { searchPapers } from "../searcher/searchScholar.js";
 
 // スケジュールタスクを設定
 function initializeScheduler() {
-    schedule.scheduleJob('9 00 * * 1-5', async () => { // 月~金の0時に投稿
+    schedule.scheduleJob('00 09 * * 1-5', async () => { // 月~金の0時に投稿
         console.log('Bot is running to post papers');
 
         try {
