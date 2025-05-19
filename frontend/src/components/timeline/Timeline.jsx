@@ -29,7 +29,6 @@ export default function Timeline({ username, onMetadataSelect, showLikedPosts=fa
                             ? await axios.get(`/api/posts/liked-posts/${user._id}?page=1`, { signal: controller.signal })
                             : await axios.get(`/api/posts/timeline/${user._id}?page=1`, { signal: controller.signal });
                 const sortedPosts = sortPosts(response.data, sortOrder);
-                console.log("sortedPosts", sortedPosts);
                 setPosts(sortedPosts);
                 setFilteredPosts(sortedPosts);
                 setPage(1);
