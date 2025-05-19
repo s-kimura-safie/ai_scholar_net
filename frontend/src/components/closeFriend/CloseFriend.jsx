@@ -9,7 +9,7 @@ const CloseFriend = (props) => {
         <div>
             <Link to={`/profile/${user.username}`} style={{ textDecoration: 'none', color: "black" }}>
                 <li className="sidebarFriend">
-                    <img src={PUBLIC_FOLDER + "profile/" + user.profilePicture || PUBLIC_FOLDER + "profile/noAvatar.png"} alt="" className="sidebarFriendImg" />
+                    <img src={PUBLIC_FOLDER + "/profile/" + user.profilePicture || PUBLIC_FOLDER + "/profile/noAvatar.png"} alt="" className="sidebarFriendImg" />
                     <span className="sidebarFriendName">{user.username}</span>
                 </li>
             </Link>

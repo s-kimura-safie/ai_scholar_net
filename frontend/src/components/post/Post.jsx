@@ -15,9 +15,9 @@ export default function Post({ post, onMetadataSelect }) {
 
     const { user: loginUser } = useContext(AuthContext); // user:loginUser => userをloginUserとして使用
 
-    const [like, setLike] = useState(post.likes.length);
+    const [like, setLike] = useState((post.likes || []).length);
+    const [numComments, setNumComments] = useState((post.comments || []).length);
     const [heartImgPath, setPath] = useState(PUBLIC_FOLDER + "/icons/heart_off.png");
-    const [numComments, setNumComments] = useState(0);
     const [isLiked, setIsLiked] = useState(false);
     const [postUser, setUser] = useState({});
     const [selectedPostId, setSelectedPostId] = useState(null); // コメント表示用のPostID
@@ -28,7 +28,7 @@ export default function Post({ post, onMetadataSelect }) {
 
         const fetchUser = async () => {
             try {
-                const response = await axios.get(`/users?userId=${post.userId}`, {
+                const response = await axios.get(`/api/users?userId=${post.userId}`, {
                     signal: controller.signal, // AbortController の signal を設定
                 });
                 setUser(response.data);
@@ -50,7 +50,7 @@ export default function Post({ post, onMetadataSelect }) {
 
     // コメント数を更新
     useEffect(() => {
-        setNumComments(post.comments.length);
+        setNumComments((post.comments || []).length);
     }, [post.comments]);
 
     // コメントを表示する投稿のIDを設定
@@ -64,7 +64,7 @@ export default function Post({ post, onMetadataSelect }) {
         if (!loginUser) return;
 
         try {
-            await axios.put(`/posts/${post._id}/like`, // request URL: いいねを押す投稿のID
+            await axios.put(`/api/posts/${post._id}/like`, // request URL: いいねを押す投稿のID
                 { userId: loginUser._id } // request body: いいねを押すユーザーのID
             );
         }
@@ -83,9 +83,9 @@ export default function Post({ post, onMetadataSelect }) {
 
         const checkLikeStatus = async () => {
             try {
-                const response = await axios.get(`/posts/${post._id}/likes`, { params: { userId: loginUser._id } });
+                const response = await axios.get(`/api/posts/${post._id}/likes`, { params: { userId: loginUser._id } });
                 setIsLiked(response.data.includes(loginUser._id));
-                setPath(response.data.includes(loginUser._id) ? PUBLIC_FOLDER + "icon/heart.png" : PUBLIC_FOLDER + "/icons/heart_off.png");
+                setPath(response.data.includes(loginUser._id) ? PUBLIC_FOLDER + "/icons/heart.png" : PUBLIC_FOLDER + "/icons/heart_off.png");
             } catch (err) {
                 console.error("Error fetching like status:", err);
             }
@@ -112,7 +112,7 @@ export default function Post({ post, onMetadataSelect }) {
         if (!loginUser) return;
 
         try {
-            await axios.delete(`/posts/${post._id}`, { data: { userId: loginUser._id } });
+            await axios.delete(`/api/posts/${post._id}`, { data: { userId: loginUser._id } });
             window.location.reload();
         } catch (err) {
             console.log(err);
@@ -135,7 +135,7 @@ export default function Post({ post, onMetadataSelect }) {
 
         if (newDesc) {
             try {
-                await axios.put(`/posts/${post._id}`, {
+                await axios.put(`/api/posts/${post._id}`, {
                     userId: loginUser._id,
                     desc: newDesc
                 });
@@ -154,7 +154,7 @@ export default function Post({ post, onMetadataSelect }) {
         }
 
         try {
-            const response = await axios.get(`/scholar/${post.paperId}/metadata`);
+            const response = await axios.get(`/api/scholar/${post.paperId}/metadata`);
             onMetadataSelect(response.data); // 親コンポーネントにmetadataを渡す
         } catch (err) {
             console.error("Error fetching paper metadata:", err);
@@ -168,8 +168,8 @@ export default function Post({ post, onMetadataSelect }) {
                     <div className="postTopLeft">
                         <Link to={`/profile/${postUser.username}`}>
                             <img src={postUser.profilePicture
-                                ? PUBLIC_FOLDER + "profile/" + postUser.profilePicture
-                                : PUBLIC_FOLDER + "profile/noAvatar.png"}
+                                ? PUBLIC_FOLDER + "/profile/" + postUser.profilePicture
+                                : PUBLIC_FOLDER + "/profile/noAvatar.png"}
                                 alt="" loading="lazy" className="postProfileImg" />
                         </Link>
                         <span className="postUsername">{postUser.username}</span>
@@ -192,7 +192,7 @@ export default function Post({ post, onMetadataSelect }) {
                 </div>
                 <div className="postCenter">
                     <span className="postText">{post.desc}</span>
-                    <img src={PUBLIC_FOLDER + "post/" + post.img} alt="" className="postImg" />
+                    <img src={PUBLIC_FOLDER + "/post/" + post.img} alt="" className="postImg" />
                 </div>
                 <div className="postBottom">
                     <div className="postBottomLeft">

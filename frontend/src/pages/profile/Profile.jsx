@@ -34,7 +34,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await axios.get(`/users?username=${username}`);
+        const response = await axios.get(`/api/users?username=${username}`);
         setUser(response.data);
       } catch (err) {
         console.error("ユーザー情報の取得に失敗しました", err);
@@ -46,7 +46,7 @@ const Profile = () => {
   const handleEditUser = async () => {
     try {
       // サーバーに更新リクエストを送信
-      await axios.put(`/users/${user._id}`, {
+      await axios.put(`/api/users/${user._id}`, {
         userId: loginUser._id, // 自分のユーザーID
         username: editUsername,
         desc: editDesc,
@@ -108,8 +108,7 @@ const Profile = () => {
   const handleFollow = async () => {
     try {
       if (!user || !user._id || !loginUser) return;
-
-      await axios.put(`/users/${user._id}/follow`, { userId: loginUser._id });
+      await axios.put(`/api/users/${user._id}/follow`, { userId: loginUser._id });
 
       // ローカルの状態を更新
       const updatedUser = {
@@ -128,7 +127,7 @@ const Profile = () => {
     try {
       if (!user || !user._id || !loginUser) return;
 
-      await axios.put(`/users/${user._id}/unfollow`, { userId: loginUser._id });
+      await axios.put(`/api/users/${user._id}/unfollow`, { userId: loginUser._id });
 
       // ローカルの状態を更新
       const updatedUser = {
@@ -164,13 +163,13 @@ const Profile = () => {
 
       try {
         // 画像をアップロード
-        const uploadResponse = await axios.post("/upload", data);
+        const uploadResponse = await axios.post("/api/upload", data);
         if (uploadResponse.status !== 200) {
           throw new Error("画像のアップロードに失敗しました");
         }
 
         // データベースのユーザー情報を更新
-        await axios.put(`/users/${user._id}`, {
+        await axios.put(`/api/users/${user._id}`, {
           userId: user._id, // 自分のユーザーID
           [imageType === "cover" ? "coverPicture" : "profilePicture"]: fileName,
         });
@@ -202,16 +201,16 @@ const Profile = () => {
             <div className="profileCover">
               <img
                 src={user?.coverPicture
-                  ? PUBLIC_FOLDER + "profile/" + user.coverPicture
-                  : PUBLIC_FOLDER + "defaultProfile/noCover.jpeg"}
+                  ? PUBLIC_FOLDER + "/profile/" + user.coverPicture
+                  : PUBLIC_FOLDER + "/profile/noCover.jpeg"}
                 alt=""
                 className="profileCoverImg"
                 onClick={() => handleImageClick("cover")} // クリックイベントを追加
               />
               <img
                 src={user?.profilePicture
-                  ? PUBLIC_FOLDER + "profile/" + user.profilePicture
-                  : PUBLIC_FOLDER + "defaultProfile/noAvatar.png"}
+                  ? PUBLIC_FOLDER + "/profile/" + user.profilePicture
+                  : PUBLIC_FOLDER + "/profile/noAvatar.png"}
                 alt=""
                 className="profileUserImg"
                 onClick={() => handleImageClick("profile")} // クリックイベントを追加

@@ -25,7 +25,7 @@ function UploadPaper() {
 
         setLoading(true);
         try {
-            const response = await axios.post("/upload/upload-paper", formData, {
+            const response = await axios.post("/api/upload/upload-paper", formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
@@ -51,7 +51,7 @@ function UploadPaper() {
         };
 
         try {
-            await axios.post("/posts", newPost);
+            await axios.post("/api/posts", newPost);
             alert("投稿が完了しました！");
         } catch (error) {
             console.error("Error posting summary:", error);

@@ -36,7 +36,7 @@ export default function Sidebar() {
             if (loginUser && loginUser.followings) {
                 const friendList = await Promise.all(
                     loginUser.followings.map(async (userId) => {
-                        const response = await axios.get(`/users/${userId}`);
+                        const response = await axios.get(`/api/users/${userId}`);
                         return response.data;
                     })
                 );
@@ -51,7 +51,7 @@ export default function Sidebar() {
         setSearchKeyword(keyword);
         if (keyword.trim() !== "") {
             try {
-                const response = await axios.get(`/users/search?q=${keyword}`);
+                const response = await axios.get(`/api/users/search?q=${keyword}`);
                 setSearchResults(response.data);
             } catch (err) {
                 console.error("検索エラー:", err);
@@ -157,8 +157,8 @@ export default function Sidebar() {
                                 <li className="sidebarSearchResultItem" style={{ cursor: "pointer" }}>
                                     <img
                                         src={user.profilePicture
-                                            ? PUBLIC_FOLDER + "profile/" + user.profilePicture
-                                            : PUBLIC_FOLDER + "profile/noAvatar.png"}
+                                            ? PUBLIC_FOLDER + "/profile/" + user.profilePicture
+                                            : PUBLIC_FOLDER + "/profile/noAvatar.png"}
                                         alt=""
                                     />
                                     <span>{user.username}</span>
@@ -170,11 +170,11 @@ export default function Sidebar() {
                 <h4 className="sidebarTitle">フォローしているユーザー</h4>
                 {loginUser && (
                     <div className="sidebarFriends">
-                        <ul className="sidebarFriendList">
-                            {friends.map((user) => (
+                        {Array.isArray(friends) && friends.map((user, idx) =>
+                            user && user._id ? (
                                 <CloseFriend user={user} key={user._id} />
-                            ))}
-                        </ul>
+                            ) : null
+                        )}
                     </div>
                 )}
             </div>
