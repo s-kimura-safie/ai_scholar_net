@@ -9,7 +9,7 @@ function initializeScheduler() {
 
         try {
             const query = 'Computer vision'; // 検索クエリ
-            const requestPaperNum = 3; // 取得する論文の数
+            const requestPaperNum = 1; // 取得する論文の数
             const botUserId = '6803c93270fbdf7e2ea0bcc7'; // ボットアカウントのユーザーID
 
             // 論文を検索
