@@ -169,13 +169,13 @@ export default function Sidebar() {
                 )}
                 <h4 className="sidebarTitle">フォローしているユーザー</h4>
                 {loginUser && (
-                    <div className="sidebarFriends">
+                    <ul className="sidebarFriends">
                         {Array.isArray(friends) && friends.map((user, idx) =>
                             user && user._id ? (
                                 <CloseFriend user={user} key={user._id} />
                             ) : null
                         )}
-                    </div>
+                    </ul>
                 )}
             </div>
         </div>
