@@ -74,12 +74,12 @@ function UploadPaper() {
                             className="uploadInput"
                         />
                     </div>
-                    <button onClick={handleUpload} className="uploadButton">アップロード</button>
-                    {loading && (
-                        <div className="spinner-border text-primary" role="status">
+                    <div className="uploadButtonContainer">
+                        <button onClick={handleUpload} className="uploadButton">アップロード</button>
+                        {loading && (
                             <RingLoader className="loadingSpinner" loading={loading} size={30} color="#0096b2" />
-                        </div>
-                    )}
+                        )}
+                    </div>
                     <div className="summarySection">
                         <h3 className="summaryTitle">要約結果</h3>
                         <textarea
