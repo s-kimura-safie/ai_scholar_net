@@ -66,7 +66,7 @@ export default function Rightbar({ user, metadata }) {
                     {friends.map((friend) => (
                         <div className="rightbarFollowing" key={friend._id}>
                             <Link to={`/profile/${friend.username}`}>
-                                <img src={PUBLIC_FOLDER + "/profile/" + friend.profilePicture || PUBLIC_FOLDER + "/profile/noAvatar.png"} alt="" className="rightbarFollowingImg" loading="lazy" />
+                                <img src={friend.profilePicture ? PUBLIC_FOLDER + "/profile/" + friend.profilePicture : PUBLIC_FOLDER + "/profile/noAvatar.png"} alt="" className="rightbarFollowingImg" loading="lazy" />
                             </Link>
                             <span className="rightbarFollowingName">{friend.username}</span>
                         </div>
