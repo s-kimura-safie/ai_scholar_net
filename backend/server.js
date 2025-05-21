@@ -17,7 +17,10 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: '.env' });
 
 const app = express();
-const POST = 5000;
+const PORT = 8008;
+
+// ボットの論文投稿スケジュールを初期化
+initializeScheduler();
 
 // connect to MongoDB
 mongoose
@@ -49,12 +52,12 @@ app.use("/api/posts", postRoute); // /api/posts にアクセスしたら、postR
 app.use("/api/upload", uploadRoute); // /api/upload にアクセスしたら、uploadRouteを使う
 app.use("/api/scholar", searchScholarRoute); // /api/scholar にアクセスしたら、searchScholarRouteを使う
 
-// ボットの論文投稿スケジュールを初期化
-initializeScheduler();
+app.use(express.static(path.join(__dirname, '../frontend/build')));
 
-app.get("/", (req, res) => {
-    res.send("Hello World");
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/build/index.html'));
 });
-app.listen(POST, () => {
-    console.log("Backend server is running!");
+
+app.listen(PORT, () => {
+    console.log(`Server is running at http://localhost:${PORT}`);
 });

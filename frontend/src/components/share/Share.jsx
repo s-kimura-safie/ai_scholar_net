@@ -29,7 +29,7 @@ export default function Share() {
 
             // 画像をアップロード
             try {
-                await axios.post("/upload", data);
+                await axios.post("/api/upload", data);
             }
             catch (err) {
                 console.log(err);
@@ -37,7 +37,7 @@ export default function Share() {
         }
 
         try {
-            await axios.post("/posts", newPost);
+            await axios.post("/api/posts", newPost);
             window.location.reload();
         }
         catch (err) {
@@ -51,8 +51,8 @@ export default function Share() {
                 <div className="shareTop">
                     <Link to={`/profile/${user.username}`}>
                         <img src={user.profilePicture
-                            ? PUBLIC_FOLDER + "profile/" + user.profilePicture
-                            : PUBLIC_FOLDER + "profile/noAvatar.png"}
+                            ? PUBLIC_FOLDER + "/profile/" + user.profilePicture
+                            : PUBLIC_FOLDER + "/profile/noAvatar.png"}
                             alt="" className="shareProfileImg" />
                     </Link>
                     <textarea

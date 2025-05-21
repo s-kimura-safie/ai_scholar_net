@@ -24,10 +24,10 @@ export default function Timeline({ username, onMetadataSelect, showLikedPosts=fa
                 setPosts([]);
                 setFilteredPosts([]);
                 const response = username
-                        ? await axios.get(`/posts/profile/${username}?page=1`, { signal: controller.signal })
+                        ? await axios.get(`/api/posts/profile/${username}?page=1`, { signal: controller.signal })
                         : showLikedPosts
-                            ? await axios.get(`/posts/liked-posts/${user._id}?page=1`, { signal: controller.signal })
-                            : await axios.get(`/posts/timeline/${user._id}?page=1`, { signal: controller.signal });
+                            ? await axios.get(`/api/posts/liked-posts/${user._id}?page=1`, { signal: controller.signal })
+                            : await axios.get(`/api/posts/timeline/${user._id}?page=1`, { signal: controller.signal });
                 const sortedPosts = sortPosts(response.data, sortOrder);
                 setPosts(sortedPosts);
                 setFilteredPosts(sortedPosts);
@@ -57,10 +57,10 @@ export default function Timeline({ username, onMetadataSelect, showLikedPosts=fa
 
         try {
             const response = username
-                    ? await axios.get(`/posts/profile/${username}?page=${nextPage}`)
+                    ? await axios.get(`/api/posts/profile/${username}?page=${nextPage}`)
                     : showLikedPosts
-                        ? await axios.get(`/posts/liked-posts/${user._id}?page=${nextPage}`)
-                        : await axios.get(`/posts/timeline/${user._id}?page=${nextPage}`);
+                        ? await axios.get(`/api/posts/liked-posts/${user._id}?page=${nextPage}`)
+                        : await axios.get(`/api/posts/timeline/${user._id}?page=${nextPage}`);
 
             if (response.data.length === 0) {
                 setHasMore(false);
@@ -94,7 +94,7 @@ export default function Timeline({ username, onMetadataSelect, showLikedPosts=fa
             if (!posts.length) return;
 
             if (searchKeyword?.trim()) {
-                const response = await axios.post(`/posts/search`, {
+                const response = await axios.post(`/api/posts/search`, {
                     keyword: searchKeyword,
                     posts: posts
                 });

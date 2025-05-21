@@ -25,7 +25,7 @@ function UploadPaper() {
 
         setLoading(true);
         try {
-            const response = await axios.post("/upload/upload-paper", formData, {
+            const response = await axios.post("/api/upload/upload-paper", formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
@@ -51,7 +51,7 @@ function UploadPaper() {
         };
 
         try {
-            await axios.post("/posts", newPost);
+            await axios.post("/api/posts", newPost);
             alert("投稿が完了しました！");
         } catch (error) {
             console.error("Error posting summary:", error);
@@ -74,12 +74,12 @@ function UploadPaper() {
                             className="uploadInput"
                         />
                     </div>
-                    <button onClick={handleUpload} className="uploadButton">アップロード</button>
-                    {loading && (
-                        <div className="spinner-border text-primary" role="status">
+                    <div className="uploadButtonContainer">
+                        <button onClick={handleUpload} className="uploadButton">アップロード</button>
+                        {loading && (
                             <RingLoader className="loadingSpinner" loading={loading} size={30} color="#0096b2" />
-                        </div>
-                    )}
+                        )}
+                    </div>
                     <div className="summarySection">
                         <h3 className="summaryTitle">要約結果</h3>
                         <textarea

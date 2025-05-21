@@ -70,13 +70,13 @@ export default function Topbar() {
                     {user ? (
                         <Link to={`/profile/${user.username}`}>
                             <img src={user.profilePicture
-                                ? PUBLIC_FOLDER + "profile/" + user.profilePicture
-                                : PUBLIC_FOLDER + "profile/noAvatar.png"}
+                                ? PUBLIC_FOLDER + "/profile/" + user.profilePicture
+                                : PUBLIC_FOLDER + "/profile/noAvatar.png"}
                                 alt="" className="topbarImg" />
                         </Link>
                     ) : (
                         <Link to="/login">
-                            <img src={PUBLIC_FOLDER + "profile/noAvatar.png"}
+                            <img src={PUBLIC_FOLDER + "/profile/noAvatar.png"}
                                 alt="" className="topbarImg" />
                         </Link>
                     )}

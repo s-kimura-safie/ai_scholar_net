@@ -21,7 +21,7 @@ export default function Rightbar({ user, metadata }) {
                 <div >
                     <p className="promotionTitle">プロモーション広告</p>
                     <a href="https://safie.co.jp/" target="_blank" rel="noopener noreferrer">
-                        <img src={PUBLIC_FOLDER + "/promotion/safie_logo2.png"} alt="" className="promotionSafieImg" />
+                        <img src={PUBLIC_FOLDER + "/promotion/safie_logo.png"} alt="" className="promotionSafieImg" />
                     </a>
                     <p className="promotionName">セーフィー株式会社</p>
                     <a href="https://www.notion.so/safie/31292149a5f84e59be3ffb70ba71ce47" target="_blank" rel="noopener noreferrer">
@@ -44,7 +44,7 @@ export default function Rightbar({ user, metadata }) {
                 if (user.followings) {
                     const friendList = await Promise.all(
                         user.followings.map(async (userId) => {
-                            const response = await axios.get(`/users/${userId}`);
+                            const response = await axios.get(`/api/users/${userId}`);
                             return response.data;
                         })
                     );
@@ -66,7 +66,7 @@ export default function Rightbar({ user, metadata }) {
                     {friends.map((friend) => (
                         <div className="rightbarFollowing" key={friend._id}>
                             <Link to={`/profile/${friend.username}`}>
-                                <img src={PUBLIC_FOLDER + "profile/" + friend.profilePicture || PUBLIC_FOLDER + "profile/noAvatar.png"} alt="" className="rightbarFollowingImg" loading="lazy" />
+                                <img src={friend.profilePicture ? PUBLIC_FOLDER + "/profile/" + friend.profilePicture : PUBLIC_FOLDER + "/profile/noAvatar.png"} alt="" className="rightbarFollowingImg" loading="lazy" />
                             </Link>
                             <span className="rightbarFollowingName">{friend.username}</span>
                         </div>

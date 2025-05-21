@@ -11,7 +11,7 @@ export default function CommentBar({ postId, loginUser, setSelectedPostId, setNu
     useEffect(() => {
         const fetchComments = async () => {
             try {
-                const response = await axios.get(`/posts/${postId}/comments`);
+                const response = await axios.get(`/api/posts/${postId}/comments`);
                 setComments(response.data);
             } catch (err) {
                 console.error("Failed to fetch comments:", err);
@@ -25,7 +25,7 @@ export default function CommentBar({ postId, loginUser, setSelectedPostId, setNu
     const handleAddComment = async () => {
         if (!newComment.trim()) return;
         try {
-            const response = await axios.put(`/posts/${postId}/comment`, {
+            const response = await axios.put(`/api/posts/${postId}/comment`, {
                 userId: loginUser._id,
                 username: loginUser.username,
                 text: newComment,
