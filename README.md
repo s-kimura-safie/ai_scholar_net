@@ -28,5 +28,6 @@ npm run build
 
 `/backend` で
 ``` bash
-node server.js
+pm2 start server.js --name {app_name}
+pm2 save // サーバー再起動後も自動復旧する設定 
 ```
