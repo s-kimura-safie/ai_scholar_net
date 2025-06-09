@@ -8,31 +8,29 @@ import Sidebar from "../../components/sidebar/Sidebar";
 import "./UploadPaper.css";
 
 function UploadPaper() {
-    const [file, setFile] = useState(null);
     const [summary, setSummary] = useState("");
     const [loading, setLoading] = useState(false);
+    const [url, setUrl] = useState(""); // URL入力欄の状態を追加
     const { user: loginUser } = useContext(AuthContext);
 
-    const handleFileChange = (e) => {
-        setFile(e.target.files[0]);
+    const handleUrlChange = (e) => {
+        setUrl(e.target.value); // URL入力欄の変更を処理
     };
 
     const handleUpload = async () => {
-        if (!file) return;
-
-        const formData = new FormData();
-        formData.append("file", file);
+        if (!url) {
+            alert("URLを入力してください。");
+            return;
+        }
 
         setLoading(true);
         try {
-            const response = await axios.post("/api/upload/upload-paper", formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            });
+            const response = await axios.post("/api/upload/upload-paper-url", { url });
             setSummary(response.data.summary);
         } catch (error) {
-            console.error("Error uploading paper:", error);
+            console.error("Error summarizing paper:", error);
+            alert("論文の要約に失敗しました。URLが正しいか確認してください。");
+            setSummary(""); // エラー時は要約をクリア
         } finally {
             setLoading(false);
         }
@@ -67,11 +65,11 @@ function UploadPaper() {
                     <h2 className="uploadPaperTitle">論文をアップロードして要約を投稿しよう！</h2>
                     <div className="uploadSection">
                         <input
-                            id="fileInput"
-                            type="file"
-                            accept=".pdf"
-                            onChange={handleFileChange}
-                            className="uploadInput"
+                            type="text"
+                            value={url}
+                            onChange={handleUrlChange}
+                            className="uploadInputUrl"
+                            placeholder="arxiv の URL を入力してください"
                         />
                     </div>
                     <div className="uploadButtonContainer">
