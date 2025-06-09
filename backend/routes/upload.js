@@ -5,6 +5,7 @@ import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
 import summarizer from "../searcher/summarizer.js";
+import parcePdf from "../searcher/pdfParser.js";
 
 const router = Router();
 
@@ -73,7 +74,9 @@ const pdfUpload = multer({
 
 router.post("/upload-paper", pdfUpload.single("file"), async (req, res) => {
     try {
-        const summary = await summarizer(req.file.path);
+        const textScholar = await parcePdf(req.file.path);
+        console.log('✅ PDFからテキストを抽出しました。');
+        const summary = await summarizer(textScholar);
         res.status(200).json({ summary });
     } catch (error) {
         console.error("Error summarizing paper:", error);

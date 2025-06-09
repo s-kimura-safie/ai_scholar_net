@@ -43,7 +43,7 @@ function UploadPaper() {
     };
 
     const handlePost = async () => {
-        const updatedSummary = document.querySelector(".summaryTextarea").value;
+        const updatedSummary = document.querySelector(".summaryTextArea").value;
         if (!updatedSummary) return;
         const newPost = {
             userId: loginUser._id,
@@ -85,7 +85,7 @@ function UploadPaper() {
                         <textarea
                             value={summary}
                             onChange={handleSummaryChange}
-                            className="summaryTextarea"
+                            className="summaryTextArea"
                             placeholder="アップロードすると要約が表示されます。"
                         />
                     </div>

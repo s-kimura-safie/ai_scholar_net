@@ -1,16 +1,7 @@
-import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import { createRequire } from 'module'; // CommonJSモジュールを使用するためのrequire関数を作成
-const require = createRequire(import.meta.url);
-const pdfParse = require('pdf-parse');
 import axios from 'axios';
-import dotenv from 'dotenv';
-
-
-// 環境変数の読み込み
-dotenv.config({ path: '.env' });
 
 // __dirnameの代替
 const __filename = fileURLToPath(import.meta.url);
@@ -18,17 +9,6 @@ const __dirname = dirname(__filename);
 
 // PDFファイルの絶対パス
 const PDF_PATH = path.resolve(__dirname, "../public/pdfs/FFCV_Accelerating_Training_by_Removing_Data_Bottlenecks.pdf");
-
-// PDFからテキストを抽出する関数
-export async function extractPdfText(filePath) {
-    if (!fs.existsSync(filePath)) {
-        throw new Error(`指定されたPDFファイルが見つかりません: ${filePath}`);
-    }
-    const dataBuffer = fs.readFileSync(filePath);
-    const data = await pdfParse(dataBuffer);
-    console.log('PDFのテキストを抽出:' + data.text.length + '文字');
-    return data.text;
-}
 
 // Cohere APIを使用して要約を生成する関数
 export async function summarizeWithCohere(text) {
@@ -66,10 +46,8 @@ ${text.slice(0, 5000)}
 }
 
 // PDFを解析して要約を返す関数
-export async function summarizeScholar(pdfPath) {
+export async function summarizeScholar(pdfText) {
     try {
-        const pdfText = await extractPdfText(pdfPath);
-        console.log('✅ PDFからテキストを抽出しました。');
         const summary = await summarizeWithCohere(pdfText);
         return summary;
     } catch (err) {
