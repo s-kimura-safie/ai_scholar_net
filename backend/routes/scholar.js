@@ -1,44 +1,14 @@
 import express from "express";
-import axios from "axios";
-import { searchPapers } from "../searcher/searchScholar.js";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-import Paper from "../models/Paper.js";
 import mongoose from "mongoose";
+import axios from "axios";
+
+import Paper from "../models/Paper.js";
+import { searchPapers } from "../searcher/searchScholar.js";
+import summarizer from "../searcher/summarizer.js";
+import extractPdfText from "../searcher/pdfParser.js";
+
 
 const router = express.Router();
-
-// __dirname の代替設定
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// 既にサーチした論文のIDを保持するセット
-const searchedPaperIds = new Set();
-
-// ファイル名を安全にするためのサニタイズ関数
-function sanitizeFileName(name) {
-    sanitized_name = name.replace(/[^a-z0-9_\-]/gi, '_').substring(0, 100); // 不正な文字を置換し、長さを制限
-    sanitize_name = sanitized_name.replace(/__+/g, '_'); // 連続するアンダースコアを1つに
-    return sanitize_name;
-}
-
-// PDFをダウンロードして保存する
-async function savePdf(paper, pdfDir) {
-    const sanitizedTitle = sanitizeFileName(paper.title);
-    const pdfPath = path.resolve(pdfDir, `${sanitizedTitle}.pdf`);
-
-    const pdfResponse = await axios.get(paper.pdfPath, { responseType: 'stream' });
-    const writer = fs.createWriteStream(pdfPath);
-    pdfResponse.data.pipe(writer);
-
-    await new Promise((resolve, reject) => {
-        writer.on('finish', resolve);
-        writer.on('error', reject);
-    });
-
-    return pdfPath;
-}
 
 router.post("/", async (req, res) => {
     const { query, requestPaperNum } = req.body;
@@ -48,30 +18,35 @@ router.post("/", async (req, res) => {
     }
 
     try {
-        const pdfDir = path.resolve(__dirname, '../public/pdfs');
-        const results = await searchPapers(query, requestPaperNum);
+        console.log(`Searching for ${requestPaperNum} papers with query: ${query}`);
+        const searchedPapers = await searchPapers(query, requestPaperNum);
+        if (searchedPapers.length === 0) {
+            return res.status(404).json({ error: 'No new papers found today' });
+        }
+        else {
+            console.log(`Found ${searchedPapers.length} new papers`);
+        }
 
-        for (const paper of results) {
-            const pdfPath = await savePdf(paper, pdfDir);
+        for (const paper of searchedPapers) {
+            // 要約作成
+            try {
+                const pdfText = await extractPdfText(paper.pdfPath);
+                paper.summary = await summarizer(pdfText);
+            } catch (error) {
+                console.error(`Error in summarizeing paper: ${paper.title}:`, error);
+                continue;
+            }
 
-            const paperData = {
-                ...paper,
-                pdfPath,
-            };
-
+            // 検索した論文をデータベースに保存
             await Paper.findOneAndUpdate(
                 { paperId: paper.paperId },
-                paperData,
+                paper,
                 { upsert: true, new: true }
             );
         }
 
-        if (results.length === 0) {
-            return res.status(404).json({ error: 'No new papers found today' });
-        }
-
-        res.json({ results });
-        console.log(`Date: ${new Date().toISOString().split('T')[0]}, New papers: ${results.length}`);
+        res.json({ searchedPapers });
+        console.log(`Date: ${new Date().toISOString().split('T')[0]}, New papers: ${searchedPapers.length}`);
     } catch (error) {
         console.error('Error fetching papers:', error);
         res.status(500).json({ error: 'Failed to fetch papers' });

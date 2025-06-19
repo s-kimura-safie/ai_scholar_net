@@ -1,6 +1,7 @@
 import schedule from "node-schedule";
 import Post from "../models/Post.js";
-import { searchPapers } from "../searcher/searchScholar.js";
+import { searchPapers } from "./searchScholar.js";
+
 
 // スケジュールタスクを設定
 function initializeScheduler() {
@@ -9,15 +10,12 @@ function initializeScheduler() {
 
         try {
             const query = 'Computer vision'; // 検索クエリ
-            const requestPaperNum = 1; // 取得する論文の数
-            const botUserId = '6803c93270fbdf7e2ea0bcc7'; // ボットアカウントのユーザーID
-
-            // 論文を検索
-            const results = await searchPapers(query, requestPaperNum);
+            const postingPaperNum = 1; // 一度に投稿する論文の数
+            const results = await searchPapers(query, postingPaperNum); // 論文を検索
 
             for (const paper of results) {
                 const newPost = new Post({
-                    userId: botUserId,
+                    userId: '6803c93270fbdf7e2ea0bcc7', // ボットアカウントのユーザーID
                     desc: `${paper.summary}`,
                     createdAt: new Date(),
                     paperId: paper.paperId

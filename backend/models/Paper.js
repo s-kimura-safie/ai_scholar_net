@@ -12,6 +12,7 @@ const PaperSchema = new mongoose.Schema({
     referenceCount: { type: Number },
     url: { type: String, required: true },
     pdfPath: { type: String },
+    summary: { type: String }
 });
 
 const Paper = mongoose.model("Paper", PaperSchema);
