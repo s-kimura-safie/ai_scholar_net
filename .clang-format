@@ -1,0 +1,10 @@
+---
+Language: JavaScript
+BasedOnStyle: LLVM
+IndentWidth: 4
+TabWidth: 4
+ColumnLimit: 130
+UseTab: Never
+AllowShortIfStatementsOnASingleLine: WithoutElse
+SpacesInContainerLiterals: true
+...
