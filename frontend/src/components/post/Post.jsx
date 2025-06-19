@@ -202,13 +202,14 @@ export default function Post({ post, onMetadataSelect }) {
                     </div>
 
                     <div className="postBottomRight">
-                        <div className="postBottomLike">
-                            <img src={heartImgPath} alt="" className="likeIcon" onClick={() => handleLike()} />
-                            <span className="postLikeCounter"> {like}</span>
+                        <div className="reactionItem">
+                            <img src={heartImgPath} alt="" className="icon" onClick={() => handleLike()} />
+                            <span className="counter"> {like}</span>
+
                         </div>
-                        <div className="postBottomComment">
-                            <img src={PUBLIC_FOLDER + "/icons/comment.png"} alt="" className="commentIcon" onClick={() => handleCommentClick()} />
-                            <span className="postCommentText">{numComments} </span>
+                        <div className="reactionItem">
+                            <img src={PUBLIC_FOLDER + "/icons/comment.png"} alt="" className="icon" onClick={() => handleCommentClick()} />
+                            <span className="counter">{numComments} </span>
                         </div>
                     </div>
                 </div>
