@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-
 // Cohere APIを使用して要約を生成する関数
 export async function summarizeWithCohere(text) {
     const prompt = `
@@ -18,20 +17,18 @@ ${text}
 `;
     // API Documentation: https://docs.cohere.com/v1/reference/generate
     const response = await axios.post(
-        'https://api.cohere.ai/v1/generate',
-        {
-            model: 'command-r-plus',
+        'https://api.cohere.ai/v1/generate', {
+            model : 'command-r-plus',
             prompt,
-            max_tokens: 20000,
-            temperature: 0.5,
+            max_tokens : 20000,
+            temperature : 0.5,
         },
         {
-            headers: {
-                Authorization: `Bearer ${process.env.COHERE_API_KEY}`,
-                'Content-Type': 'application/json',
+            headers : {
+                Authorization : `Bearer ${process.env.COHERE_API_KEY}`,
+                'Content-Type' : 'application/json',
             },
-        }
-    );
+        });
 
     return response.data.generations[0].text.trim();
 }
