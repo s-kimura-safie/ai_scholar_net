@@ -157,6 +157,7 @@ export default function Post({ post, onMetadataSelect }) {
             const response = await axios.get(`/api/scholar/${post.paperId}/metadata`);
             onMetadataSelect(response.data); // 親コンポーネントにmetadataを渡す
         } catch (err) {
+            alert("論文の詳細データが見つかりませんでした。");
             console.error("Error fetching paper metadata:", err);
         }
     };
