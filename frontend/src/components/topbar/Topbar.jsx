@@ -34,8 +34,9 @@ export default function Topbar() {
     return (
         <div className="topbarContainer">
             <div className="topbarLeft">
-                <Link to="/" style={{ textDecoration: 'none' }}>
-                    <span className="logo">AI Scholar Net</span>
+                <Link to="/" className="logoLink" style={{ textDecoration: 'none' }}>
+                    <img src = {PUBLIC_FOLDER + "/icons/SchalAI_san.png"} alt="" className="logoImg"/>
+                    <span className="logo">ScholAI</span>
                 </Link>
             </div>
             <div className="topbarCenter">

@@ -5,7 +5,7 @@ import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 
 function Register() {
-
+    const PUBLIC_FOLDER = process.env.REACT_APP_PUBLIC_FOLDER;
     const username = useRef();
     const email = useRef(); // useRefを使ってemailの要素を監視する。
     const password = useRef();
@@ -38,14 +38,12 @@ function Register() {
         }
     }
 
-
-
     return (
         <div className="register"> {
             <div className="registerWrapper">
                 <div className="registerLeft">
-                    <h3 className='registerLogo'>AI Scholar Net</h3>
-                    <span className="registerDesc">AIによるAI開発者のためのAIの論文集</span>
+                    <img src = {PUBLIC_FOLDER + "/icons/SchalAI_san.png"} alt="" className="logoImg"/>
+                    <h3 className='registerLogo'>ScholAI</h3>
                 </div>
                 <div className="registerRight">
                     <form className="registerBox" onSubmit={(e) => handleSubmit(e)}>
