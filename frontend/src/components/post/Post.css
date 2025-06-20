@@ -1,9 +1,11 @@
 .post {
     width: 95%;
+    background-color: #ffffdd79;
     box-shadow: 0px 0px 5px 0px #819fc5;
     border-radius: 10px;
     margin: 15px 0;
     margin-left: 10px;
+    margin-bottom: 50px;
 }
 
 .postWrapper {
