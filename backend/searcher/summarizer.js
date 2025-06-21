@@ -19,7 +19,7 @@ Title:
 → 従来手法に比べての新規性・優位性・貢献点について（200文字程度の日本語で）
 
 ◇ 技術や手法のキモはどこ？
-→ この研究の中核となる技術的工夫・手法・アルゴリズムについて（200文字程度の日本で）
+→ この研究の中核となる技術的工夫・手法・アルゴリズムについて（200文字程度の日本語で）
 `;
     // API Documentation: https://docs.cohere.com/v1/reference/generate
     const response = await axios.post(
