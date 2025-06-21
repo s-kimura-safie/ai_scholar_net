@@ -41,11 +41,10 @@ function UploadPaper() {
     };
 
     const handlePost = async () => {
-        const updatedSummary = document.querySelector(".summaryTextArea").value;
-        if (!updatedSummary) return;
+        if (!summary) return;
         const newPost = {
             userId: loginUser._id,
-            desc: updatedSummary
+            desc: summary
         };
 
         try {
