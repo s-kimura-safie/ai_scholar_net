@@ -2,7 +2,8 @@
 node_modules
 
 # misc
-.env
+backend/.env
+frontend/.env
 
 # images
 *.jpeg
