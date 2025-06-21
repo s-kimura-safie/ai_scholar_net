@@ -1,97 +1,87 @@
-import axios from "axios";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-import Paper from "../models/Paper.js";
-import summarizer from "./summarizer.js"; // summarizer.jsをインポート
+import axios from 'axios';
 
-// __dirname の代替設定
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// 既にサーチした論文のIDを保持するセット
-const searchedPaperIds = new Set();
+import Paper from '../models/Paper.js';
 
 // 論文検索APIを呼び出す共通関数
 async function excuteSemanticScholarAPI(query, offset, limit) {
-    const response = await axios.get('https://api.semanticscholar.org/graph/v1/paper/search', {
-        params: {
-            query,
-            fields: 'paperId,title,authors,year,abstract,fieldsOfStudy,venue,citationCount,referenceCount,url,openAccessPdf',
-            limit: limit,
-            offset,
-            year: '2023-2025',
-            openAccessPdf: true,
-            venue: "CVPR",
-            minCitationCount: 50,
-            sort: 'citationCount:desc'
-        }
-    });
-    return response.data.data;
-}
-
-// PDFを保存する関数
-async function savePdf(paperData, outputDir) {
-    const pdfUrl = paperData.pdfPath;
-    const pdfFileName = `${paperData.paperId}.pdf`;
-    const pdfFilePath = path.join(outputDir, pdfFileName);
-
-    const response = await axios.get(pdfUrl, { responseType: 'stream' });
-    await new Promise((resolve, reject) => {
-        const writer = fs.createWriteStream(pdfFilePath);
-        response.data.pipe(writer);
-        writer.on('finish', resolve);
-        writer.on('error', reject);
-    });
-
-    return pdfFilePath;
+    try {
+        // 検索内容:
+        // https://www.semanticscholar.org/search?year%5B0%5D=2023&year%5B1%5D=2025&fos%5B0%5D=engineering&fos%5B1%5D=computer-science&q=conputer%20vision&sort=total-citations&pdf=true
+        const response = await axios.get('https://api.semanticscholar.org/graph/v1/paper/search', {
+            params : {
+                query,
+                fields :
+                    'paperId,title,authors,year,abstract,fieldsOfStudy,venue,citationCount,referenceCount,url,openAccessPdf',
+                limit : limit,
+                offset,
+                year : '2023-',
+                openAccessPdf : true,
+                fieldsOfStudy : 'Computer Science',
+                sort : 'citationCount:desc'
+            }
+        });
+        return response.data.data;
+    } catch (error) {
+        console.error('Error fetching data from Semantic Scholar API:', error);
+        // throw error;
+        return [];
+    }
 }
 
 // 論文を検索する
-export async function searchPapers(query, requestPaperNum) {
+export async function searchPapers(query, searchPaperNum) {
     let results = [];
     let attempts = 0;
-    const maxAttempts = 5; // 最大試行回数
+    const requestPaperNum = 10; // 一度のAPI呼び出しで取得する論文数
+    const maxAttempts = 5;      // 最大試行回数
+    const delay = 60000;        // 1分の待機時間
 
-    while (results.length < requestPaperNum && attempts < maxAttempts) {
-        attempts++;
-        const papers = await excuteSemanticScholarAPI(query, attempts, requestPaperNum);
+    while (results.length < searchPaperNum && attempts < maxAttempts) {
+        // API制限回避のため、呼び出し間に待機時間を挿入
+        if (attempts > 0) {
+            console.log(`Waiting for ${delay / 1000}sec before next attempt...`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+        }
+
+        // 乱数を使用して0~10でオフセットを計算
+        const offfsetPage = Math.floor(Math.random() * 10);
+        const papers = await excuteSemanticScholarAPI(query, offfsetPage, requestPaperNum);
 
         for (const paper of papers) {
-            if (searchedPaperIds.has(paper.paperId)) {
-                console.log(`Skipping already searched paper: ${paper.title}`);
+            // paperId で照合して既にデータベースにある場合はスキップ
+            const isExistingPaper = await Paper.findOne({paperId : paper.paperId});
+            if (isExistingPaper) {
+                console.log(`Skipping already posted paper: ${paper.title}`);
                 continue;
             }
 
-            if (paper.openAccessPdf && paper.openAccessPdf.url) {
-                const paperData = {
-                    paperId: paper.paperId,
-                    title: paper.title,
-                    authors: paper.authors.map(author => author.name),
-                    year: paper.year,
-                    abstract: paper.abstract,
-                    fieldsOfStudy: paper.fieldsOfStudy,
-                    venue: paper.venue,
-                    citationCount: paper.citationCount,
-                    referenceCount: paper.referenceCount,
-                    url: paper.url,
-                    pdfPath: paper.openAccessPdf.url,
-                };
+            if (paper.openAccessPdf.url === null) {
+                console.log(`Skipping paper without open access PDF: ${paper.title}`);
+                continue;
+            }
 
-                // PDFを保存し、要約を生成
-                try {
-                    const pdfPath = await savePdf(paperData, path.resolve(__dirname, '../public/pdfs'));
-                    const summary = await summarizer(pdfPath); // 修正: デフォルトエクスポートを関数として呼び出す
-                    paperData.summary = summary;
-                } catch (error) {
-                    console.error(`Error processing paper ${paper.title}:`, error);
-                    continue;
-                }
+            results.push({
+                paperId : paper.paperId,
+                title : paper.title,
+                authors : paper.authors.map(author => author.name),
+                year : paper.year,
+                abstract : paper.abstract,
+                fieldsOfStudy : paper.fieldsOfStudy,
+                venue : paper.venue,
+                citationCount : paper.citationCount,
+                referenceCount : paper.referenceCount,
+                url : paper.url,
+                pdfPath : paper.openAccessPdf.url
+            });
 
-                results.push(paperData);
-                searchedPaperIds.add(paper.paperId);
+            console.log(`Found paper: ${paper.title}`);
+
+            if (results.length >= searchPaperNum) {
+                break; // 必要な数の論文が見つかったらループを抜ける
             }
         }
+
+        attempts++;
     }
 
     return results;

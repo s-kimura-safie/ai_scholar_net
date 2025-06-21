@@ -1,75 +1,47 @@
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-import { createRequire } from 'module'; // CommonJSモジュールを使用するためのrequire関数を作成
-const require = createRequire(import.meta.url);
-const pdfParse = require('pdf-parse');
 import axios from 'axios';
-import dotenv from 'dotenv';
-
-
-// 環境変数の読み込み
-dotenv.config({ path: '.env' });
-
-// __dirnameの代替
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-// PDFファイルの絶対パス
-const PDF_PATH = path.resolve(__dirname, "../public/pdfs/FFCV_Accelerating_Training_by_Removing_Data_Bottlenecks.pdf");
-
-// PDFからテキストを抽出する関数
-export async function extractPdfText(filePath) {
-    if (!fs.existsSync(filePath)) {
-        throw new Error(`指定されたPDFファイルが見つかりません: ${filePath}`);
-    }
-    const dataBuffer = fs.readFileSync(filePath);
-    const data = await pdfParse(dataBuffer);
-    console.log('PDFのテキストを抽出:' + data.text.length + '文字');
-    return data.text;
-}
 
 // Cohere APIを使用して要約を生成する関数
 export async function summarizeWithCohere(text) {
     const prompt = `
-次の論文の内容を以下の形式でそれぞれ200文字以内で要約してください：
-Title: Paper title (rewrite into a natural, readable format in English with proper capitalization)
-
-◇ どんなもの？
-
-◇ 先行研究と比べてどこがすごい？
-
-◇ 技術や手法のキモはどこ？
+次の「論文の内容」を読み取り、以下の「フォーマット」に従って要約してください。
 
 --- 論文の内容 ---
-${text.slice(0, 5000)}
-`;
+${text}
 
+--- フォーマット ---
+Title:
+→ 英語タイトル（大文字化、小文字化を適切に行うが、基本的にタイトルそのままを記載）
+
+◇ どんなもの？
+→ 研究の背景と目的、全体像をざっくり説明（200文字程度の日本語で）
+
+◇ 先行研究と比べてどこがすごい？
+→ 従来手法に比べての新規性・優位性・貢献点について（200文字程度の日本語で）
+
+◇ 技術や手法のキモはどこ？
+→ この研究の中核となる技術的工夫・手法・アルゴリズムについて（200文字程度の日本語で）
+`;
+    // API Documentation: https://docs.cohere.com/v1/reference/generate
     const response = await axios.post(
-        'https://api.cohere.ai/v1/generate',
-        {
-            model: 'command-r-plus',
+        'https://api.cohere.ai/v1/generate', {
+            model : 'command-r-plus',
             prompt,
-            max_tokens: 800,
-            temperature: 0.3,
+            max_tokens : 20000,
+            temperature : 0.5,
         },
         {
-            headers: {
-                Authorization: `Bearer ${process.env.COHERE_API_KEY}`,
-                'Content-Type': 'application/json',
+            headers : {
+                Authorization : `Bearer ${process.env.COHERE_API_KEY}`,
+                'Content-Type' : 'application/json',
             },
-        }
-    );
+        });
 
     return response.data.generations[0].text.trim();
 }
 
 // PDFを解析して要約を返す関数
-export async function summarizeScholar(pdfPath) {
+export async function summarizePaper(pdfText) {
     try {
-        const pdfText = await extractPdfText(pdfPath);
-        console.log('✅ PDFからテキストを抽出しました。');
         const summary = await summarizeWithCohere(pdfText);
         return summary;
     } catch (err) {
@@ -78,5 +50,4 @@ export async function summarizeScholar(pdfPath) {
     }
 }
 
-// デフォルトエクスポート
-export default summarizeScholar;
+export default summarizePaper;

@@ -14,45 +14,58 @@
     display: flex;
 }
 
-.registerLeft,
 .registerRight {
+    flex: 1.2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-right: 50px;
+    margin-left: 50px;
+}
+
+.registerLeft{
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
 }
 
 .registerLogo {
-    font-size: 50px;
+    font-size: 90px;
     font-weight: 800;
-    color: rgb(10, 200, 200);
+    color: 	#1D5981;
     margin-bottom: 10px;
+    font-family: 'Lobster', cursive;
 }
 
-.registerDesc {
-    font-size: 20px;
-    color: rgb(79, 104, 104);
+.logoImg {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    margin-bottom: -20px;
 }
 
 .registerBox {
     height: 340px;
     padding: 20px;
-    background-color: rgb(255, 255, 255);
+    background-color: rgb(247, 247, 230);
     border-radius: 10px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    box-shadow: 0px 0px 300px 0px rgb(0, 221, 255);
+    box-shadow: 0px 0px 300px 0px rgb(17, 160, 255);
 }
 
 
 
 .registerMsg {
     font-family: 'Roboto', sans-serif;
-    font-size: 22px;
+    font-size: 25px;
     font-weight: 550;
     text-align: center;
     margin: 10px 0;
+    font-weight: bold;
 }
 
 .registerInput {
@@ -74,7 +87,7 @@
     align-self: center;
     border-radius: 10px;
     border: none;
-    background-color: rgb(10, 200, 200);
+    background-color: rgb(32, 129, 194);
     color: white;
     font-size: 20px;
     cursor: pointer;
@@ -83,7 +96,7 @@
 }
 
 .registerButton:hover {
-    background-color: rgb(10, 180, 180);
+    background-color: rgb(110, 196, 254);
 }
 
 .registerForgot {

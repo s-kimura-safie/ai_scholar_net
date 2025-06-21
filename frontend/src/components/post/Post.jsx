@@ -157,6 +157,7 @@ export default function Post({ post, onMetadataSelect }) {
             const response = await axios.get(`/api/scholar/${post.paperId}/metadata`);
             onMetadataSelect(response.data); // 親コンポーネントにmetadataを渡す
         } catch (err) {
+            alert("論文の詳細データが見つかりませんでした。");
             console.error("Error fetching paper metadata:", err);
         }
     };
@@ -202,13 +203,14 @@ export default function Post({ post, onMetadataSelect }) {
                     </div>
 
                     <div className="postBottomRight">
-                        <div className="postBottomLike">
-                            <img src={heartImgPath} alt="" className="likeIcon" onClick={() => handleLike()} />
-                            <span className="postLikeCounter"> {like}</span>
+                        <div className="reactionItem">
+                            <img src={heartImgPath} alt="" className="icon" onClick={() => handleLike()} />
+                            <span className="counter"> {like}</span>
+
                         </div>
-                        <div className="postBottomComment">
-                            <img src={PUBLIC_FOLDER + "/icons/comment.png"} alt="" className="commentIcon" onClick={() => handleCommentClick()} />
-                            <span className="postCommentText">{numComments} </span>
+                        <div className="reactionItem">
+                            <img src={PUBLIC_FOLDER + "/icons/comment.png"} alt="" className="icon" onClick={() => handleCommentClick()} />
+                            <span className="counter">{numComments} </span>
                         </div>
                     </div>
                 </div>

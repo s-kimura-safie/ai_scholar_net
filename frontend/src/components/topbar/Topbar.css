@@ -10,15 +10,27 @@
 }
 
 .topbarLeft {
-    flex: 3;
+    flex: 3.5;
+}
+
+.logoLink {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+
+.logoImg {
+    width: 10px;
+    height: 50px;
+    object-fit: cover;
 }
 
 .logo {
-    font-size: 28px;
-    font-family: 'Tahoma', sans-serif;
-    color: white;
+    font-size: 45px;
+    font-family: 'Lobster', cursive;
+    color: 	#FFFFDD;
     font-weight: bold;
-    margin-left: 30px;
+    margin-left: -20px;
 }
 
 .searchBar {
@@ -94,7 +106,7 @@
     position: absolute;
     top: -5px;
     right: -5px;
-    background-color: rgb(225, 0, 255);
+    background-color: rgb(29,89,129);
     width: 15px;
     height: 15px;
     border-radius: 50%;

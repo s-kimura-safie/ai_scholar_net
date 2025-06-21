@@ -5,6 +5,8 @@ import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
 import summarizer from "../searcher/summarizer.js";
+import parcePdf from "../searcher/pdfParser.js";
+import axios from "axios";
 
 const router = Router();
 
@@ -71,13 +73,39 @@ const pdfUpload = multer({
     fileFilter: (req, file, cb) => cb(null, path.extname(file.originalname).toLowerCase() === ".pdf")
 });
 
+// PDFアップロードと要約処理 (未利用)
 router.post("/upload-paper", pdfUpload.single("file"), async (req, res) => {
     try {
-        const summary = await summarizer(req.file.path);
+        const textScholar = await parcePdf(req.file.path);
+        console.log('✅ PDFからテキストを抽出しました。');
+        const summary = await summarizer(textScholar);
         res.status(200).json({ summary });
     } catch (error) {
         console.error("Error summarizing paper:", error);
         res.status(500).json({ error: "Failed to summarize paper" });
+    }
+});
+
+router.post("/upload-paper-url", async (req, res) => {
+    const { url } = req.body;
+    if (!url) {
+        return res.status(400).json({ error: "URL is required" });
+    }
+
+    try {
+        // URLをar5ivに書き換え
+        const htmlUrl = url.replace("arxiv.org/abs/", "ar5iv.labs.arxiv.org/html/");
+
+        // URLからHTMLコンテンツを取得
+        const response = await axios.get(htmlUrl);
+        const htmlContent = response.data;
+
+        // 要約処理にHTMLコンテンツを渡す
+        const summary = await summarizer(htmlContent);
+        res.status(200).json({ summary });
+    } catch (error) {
+        console.error("Error processing URL:", error);
+        res.status(500).json({ error: "Failed to process URL" });
     }
 });
 
