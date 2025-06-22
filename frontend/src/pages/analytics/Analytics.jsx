@@ -100,7 +100,8 @@ function Analytics() {
     };
 
     // ❤数別キーワードチャート用のデータ
-    // すべてのレンジからキーワードを収集して、合計いいね数でソートしてユニークなラベルを作成
+    const keywordRankingLabels = Array.isArray(keywordData) ? keywordData.slice(0, 15).map(item => item.keyword) : [];
+
     const keywordTotals = {};
     if (Array.isArray(likeRangeData)) {
         likeRangeData.forEach(range => {
@@ -116,10 +117,8 @@ function Analytics() {
         });
     }
 
-    const allKeywords = Object.entries(keywordTotals)
-        .sort(([, a], [, b]) => b - a) // 合計いいね数の降順でソート
-        .slice(0, 10)
-        .map(([keyword]) => keyword);
+    // 並び順をキーワードランキング（上位15件）に合わせる
+    const allKeywords = keywordRankingLabels;
 
     const detailedChartData = {
         labels: allKeywords,
