@@ -24,22 +24,22 @@ Title:
     // API Documentation: https://docs.cohere.com/v1/reference/generate
     const response = await axios.post(
         'https://api.cohere.ai/v1/generate', {
-            model : 'command-r-plus',
-            prompt,
-            max_tokens : 20000,
-            temperature : 0.5,
-        },
+        model: 'command-r-plus',
+        prompt,
+        max_tokens: 20000,
+        temperature: 0.5,
+    },
         {
-            headers : {
-                Authorization : `Bearer ${process.env.COHERE_API_KEY}`,
-                'Content-Type' : 'application/json',
+            headers: {
+                Authorization: `Bearer ${process.env.COHERE_API_KEY}`,
+                'Content-Type': 'application/json',
             },
         });
 
     return response.data.generations[0].text.trim();
 }
 
-// PDFを解析して要約を返す関数
+// テキスト形式の論文を解析して要約を返す関数
 export async function summarizePaper(pdfText) {
     try {
         const summary = await summarizeWithCohere(pdfText);
