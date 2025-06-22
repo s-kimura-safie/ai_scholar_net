@@ -53,7 +53,9 @@
     justify-content: center;
     align-items: center;
     position: relative;
-    margin-top: 45px;
+    margin-top: 50px;
+    margin-left: 20px;
+    font-family:Verdana, Geneva, Tahoma, sans-serif
 }
 
 .profileName {

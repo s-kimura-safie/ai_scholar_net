@@ -29,6 +29,7 @@ const Profile = () => {
   const [editUsername, setEditUsername] = useState(loginUser?.username || "");
   const [editDesc, setEditDesc] = useState(loginUser?.desc || "");
   const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedPaperMetadata, setSelectedPaperMetadata] = useState(null);
 
 
   useEffect(() => {
@@ -202,7 +203,7 @@ const Profile = () => {
               <img
                 src={user?.coverPicture
                   ? PUBLIC_FOLDER + "/profile/" + user.coverPicture
-                  : PUBLIC_FOLDER + "/profile/noCover.jpeg"}
+                  : PUBLIC_FOLDER + "/profile/noCover.jpg"}
                 alt=""
                 className="profileCoverImg"
                 onClick={() => handleImageClick("cover")} // クリックイベントを追加
@@ -251,9 +252,9 @@ const Profile = () => {
             </div>
           </div>
           <div className="profileRightBottom">
-            <Timeline username={user.username} />
+            <Timeline username={user.username} onMetadataSelect={setSelectedPaperMetadata} />
             <div className="userDetail">
-              <Rightbar user={user} />
+              <Rightbar user={user} metadata={selectedPaperMetadata} />
             </div>
           </div>
         </div>
