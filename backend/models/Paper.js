@@ -12,7 +12,10 @@ const PaperSchema = new mongoose.Schema({
     referenceCount: { type: Number },
     url: { type: String, required: true },
     pdfPath: { type: String },
-    summary: { type: String }
+    keywords: [{
+        word: { type: String, required: true },
+        score: { type: Number, required: true }
+    }]
 });
 
 const Paper = mongoose.model("Paper", PaperSchema);

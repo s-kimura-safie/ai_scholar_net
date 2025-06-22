@@ -1,6 +1,8 @@
 import axios from 'axios';
 
 import Paper from '../models/Paper.js';
+import keywordSelector from "./keywordSelector.js";
+
 
 // 論文検索APIを呼び出す共通関数
 async function excuteSemanticScholarAPI(query, offset, limit) {
@@ -8,16 +10,16 @@ async function excuteSemanticScholarAPI(query, offset, limit) {
         // 検索内容:
         // https://www.semanticscholar.org/search?year%5B0%5D=2023&year%5B1%5D=2025&fos%5B0%5D=engineering&fos%5B1%5D=computer-science&q=conputer%20vision&sort=total-citations&pdf=true
         const response = await axios.get('https://api.semanticscholar.org/graph/v1/paper/search', {
-            params : {
+            params: {
                 query,
-                fields :
+                fields:
                     'paperId,title,authors,year,abstract,fieldsOfStudy,venue,citationCount,referenceCount,url,openAccessPdf',
-                limit : limit,
+                limit: limit,
                 offset,
-                year : '2023-',
-                openAccessPdf : true,
-                fieldsOfStudy : 'Computer Science',
-                sort : 'citationCount:desc'
+                year: '2023-',
+                openAccessPdf: true,
+                fieldsOfStudy: 'Computer Science',
+                sort: 'citationCount:desc'
             }
         });
         return response.data.data;
@@ -49,7 +51,7 @@ export async function searchPapers(query, searchPaperNum) {
 
         for (const paper of papers) {
             // paperId で照合して既にデータベースにある場合はスキップ
-            const isExistingPaper = await Paper.findOne({paperId : paper.paperId});
+            const isExistingPaper = await Paper.findOne({ paperId: paper.paperId });
             if (isExistingPaper) {
                 console.log(`Skipping already posted paper: ${paper.title}`);
                 continue;
@@ -60,18 +62,26 @@ export async function searchPapers(query, searchPaperNum) {
                 continue;
             }
 
+            // 論文のキーワードを取得
+            const keywords = await keywordSelector(paper.title, paper.abstract);
+            const formattedKeywords = Object.entries(keywords).map(([word, score]) => ({
+                word,
+                score
+            }));
+
             results.push({
-                paperId : paper.paperId,
-                title : paper.title,
-                authors : paper.authors.map(author => author.name),
-                year : paper.year,
-                abstract : paper.abstract,
-                fieldsOfStudy : paper.fieldsOfStudy,
-                venue : paper.venue,
-                citationCount : paper.citationCount,
-                referenceCount : paper.referenceCount,
-                url : paper.url,
-                pdfPath : paper.openAccessPdf.url
+                paperId: paper.paperId,
+                title: paper.title,
+                authors: paper.authors.map(author => author.name),
+                year: paper.year,
+                abstract: paper.abstract,
+                fieldsOfStudy: paper.fieldsOfStudy,
+                venue: paper.venue,
+                citationCount: paper.citationCount,
+                referenceCount: paper.referenceCount,
+                url: paper.url,
+                pdfPath: paper.openAccessPdf.url,
+                keywords: formattedKeywords
             });
 
             console.log(`Found paper: ${paper.title}`);
