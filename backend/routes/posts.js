@@ -2,6 +2,7 @@ import { Router } from "express";
 const router = Router();
 import Post from "../models/Post.js";
 import User from "../models/User.js";
+import Paper from "../models/Paper.js";
 
 // Create a Post
 router.post("/", async (req, res) => {
@@ -34,6 +35,9 @@ router.delete("/:id", async (req, res) => {
     try {
         const post = await Post.findById(req.params.id);
         if (post.userId === req.body.userId) {
+            if (post.paperId) {
+                await Paper.deleteOne({ paperId: post.paperId });
+            }
             await post.deleteOne();
             return res.status(200).json("The post was deleted");
         } else {
