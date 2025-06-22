@@ -1,13 +1,15 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import "./Rightbar.css"
 // import Online from '../online/Online'
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { AuthContext } from '../../states/AuthContext';
 
 
 export default function Rightbar({ user, metadata }) {
     const PUBLIC_FOLDER = process.env.REACT_APP_PUBLIC_FOLDER;
+    const { user: currentUser, dispatch } = useContext(AuthContext);
 
     const [showMetadata, setShowMetadata] = useState(!!metadata);
 
@@ -37,6 +39,65 @@ export default function Rightbar({ user, metadata }) {
 
     const ProfileRightbar = () => {
         const [friends, setFriends] = useState([]);
+        const [isEditing, setIsEditing] = useState(false);
+        const [editForm, setEditForm] = useState({
+            origin: user.origin || '',
+            hobby: user.hobby || '',
+            bio: user.bio || ''
+        });
+
+        const handleEdit = () => {
+            setIsEditing(true);
+            setEditForm({
+                origin: user.origin || '',
+                hobby: user.hobby || '',
+                bio: user.bio || ''
+            });
+        };
+
+        const handleCancel = () => {
+            setIsEditing(false);
+            setEditForm({
+                origin: user.origin || '',
+                hobby: user.hobby || '',
+                bio: user.bio || ''
+            });
+        };
+
+        const handleSave = async () => {
+            try {
+                const response = await axios.put(`/api/users/${user._id}`, {
+                    userId: currentUser._id,
+                    origin: editForm.origin,
+                    hobby: editForm.hobby,
+                    bio: editForm.bio
+                });
+
+                // ローカルストレージとコンテキストを更新
+                const updatedUser = { ...user, ...editForm };
+
+                // 現在のユーザーの情報を更新している場合は、認証コンテキストも更新
+                if (currentUser._id === user._id) {
+                    const updatedCurrentUser = { ...currentUser, ...editForm };
+                    dispatch({ type: "LOGIN_SUCCESS", payload: updatedCurrentUser });
+                }
+
+                setIsEditing(false);
+                // 親コンポーネントにユーザー情報の更新を通知（必要に応じて）
+                window.location.reload(); // 簡単な方法として画面をリロード
+
+            } catch (error) {
+                console.error("ユーザー情報の更新に失敗しました:", error);
+                alert("更新に失敗しました。もう一度お試しください。");
+            }
+        };
+
+        const handleInputChange = (field, value) => {
+            setEditForm(prev => ({
+                ...prev,
+                [field]: value
+            }));
+        };
 
         // コンポーネントがレンダリングされた後、フォローしているユーザーの情報を取得
         useEffect(() => { // APIでフォロワー情報を取得し終えたら、setFriendsでfriendsを更新
@@ -56,10 +117,66 @@ export default function Rightbar({ user, metadata }) {
 
         return (
             <>
-                <h4 className="rightbarTitle">ユーザー情報</h4>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h4 className="rightbarTitle">ユーザー情報</h4>
+                    {currentUser && currentUser._id === user._id && (
+                        <div>
+                            {isEditing ? (
+                                <div className="editButtons">
+                                    <button className="saveBtn" onClick={handleSave}>保存</button>
+                                    <button className="cancelBtn" onClick={handleCancel}>キャンセル</button>
+                                </div>
+                            ) : (
+                                <button className="editBtn" onClick={handleEdit}>編集</button>
+                            )}
+                        </div>
+                    )}
+                </div>
+
                 <div className="rightbarInfoItem">
-                    <span className="rightbarInfoKey">出身：</span>
-                    <span className="rightbarInfoKey">-</span>
+                    {isEditing ? (
+                        <>
+                            <div className="editField">
+                                <label className="rightbarInfoKey">出身：</label>
+                                <input
+                                    type="text"
+                                    value={editForm.origin}
+                                    onChange={(e) => handleInputChange('origin', e.target.value)}
+                                    className="editInput"
+                                    placeholder="出身地を入力"
+                                    maxLength="50"
+                                />
+                            </div>
+                            <div className="editField">
+                                <label className="rightbarInfoKey">趣味：</label>
+                                <input
+                                    type="text"
+                                    value={editForm.hobby}
+                                    onChange={(e) => handleInputChange('hobby', e.target.value)}
+                                    className="editInput"
+                                    placeholder="趣味を入力"
+                                    maxLength="50"
+                                />
+                            </div>
+                            <div className="editField">
+                                <label className="rightbarInfoKey">ひとこと：</label>
+                                <input
+                                    type="text"
+                                    value={editForm.bio}
+                                    onChange={(e) => handleInputChange('bio', e.target.value)}
+                                    className="editInput"
+                                    placeholder="ひとことを入力"
+                                    maxLength="50"
+                                />
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <span className="rightbarInfoKey">出身：{`${user.origin || '未設定'}`}</span>
+                            <span className="rightbarInfoKey">趣味：{`${user.hobby || '未設定'}`}</span>
+                            <span className="rightbarInfoKey">ひとこと：{`${user.bio || '未設定'}`}</span>
+                        </>
+                    )}
                 </div>
                 <h4 className="rightbarFriends">{`${user.username}`} の友達</h4>
                 <div className="rightbarFollowings">

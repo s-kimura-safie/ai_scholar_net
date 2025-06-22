@@ -45,9 +45,20 @@ const UserSchema = new mongoose.Schema(
             type: String,
             max: 70,
         },
-        city: {
+        origin: {
             type: String,
             max: 50,
+            default: ""
+        },
+        hobby: {
+            type: String,
+            max: 50,
+            default: ""
+        },
+        bio: {
+            type: String,
+            max: 50,
+            default: ""
         },
     },
 

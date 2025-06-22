@@ -99,8 +99,8 @@
 }
 
 .rightbarTitle {
-    font-size: 18px;
-    font-weight: 550;
+    font-size: 20px;
+    font-weight: bold;
     margin-bottom: 10px;
 }
 
@@ -132,6 +132,7 @@
 
 .rightbarInfoKey {
     font-weight: bold;
+    font-size: 18px;
     color: #333;
     margin-bottom: 5px;
     /* キーと値の間に余白を追加 */
@@ -140,9 +141,8 @@
 .rightbarInfoValue {
     color: #555;
     font-size: 16px;
-    /* 値を少し大きく */
     line-height: 1.5;
-    /* 行間を広げて見やすく */
+    word-break: break-all;
 }
 
 .rightbarFollowings {
@@ -169,4 +169,77 @@
 
 .rightbarFollowingName {
     font-size: 14px;
+}
+
+/* 編集機能のスタイル */
+.editButtons {
+    display: flex;
+    gap: 8px;
+}
+
+.editBtn, .saveBtn, .cancelBtn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.editBtn {
+    background-color: #1976d2;
+    color: white;
+}
+
+.editBtn:hover {
+    background-color: #1565c0;
+}
+
+.saveBtn {
+    background-color: #4caf50;
+    color: white;
+}
+
+.saveBtn:hover {
+    background-color: #45a049;
+}
+
+.cancelBtn {
+    background-color: #f44336;
+    color: white;
+}
+
+.cancelBtn:hover {
+    background-color: #da190b;
+}
+
+.editField {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+    width: 90%;
+}
+
+.editField label {
+    margin-bottom: 4px;
+    font-weight: bold;
+    color: #333;
+}
+
+.editInput {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 10px;
+    background-color: white;
+    transition: border-color 0.2s;
+    height: 40px;
+    line-height: 1.5;
+}
+
+.editInput:focus {
+    outline: none;
+    border-color: #1976d2;
+    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
 }
