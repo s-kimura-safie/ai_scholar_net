@@ -115,7 +115,7 @@ export default function Timeline({ username, onMetadataSelect, showLikedPosts=fa
                     <label>表示順： </label>
                     <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}>
                         <option value="createdAt">投稿時間</option>
-                        <option value="likes">いいね数</option>
+                        <option value="likes">❤数</option>
                         <option value="comments">コメント数</option>
                     </select>
                 </div>

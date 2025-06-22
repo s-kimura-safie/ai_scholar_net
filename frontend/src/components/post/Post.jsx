@@ -58,25 +58,25 @@ export default function Post({ post, onMetadataSelect }) {
         setSelectedPostId(post._id); // コメント表示用にPost IDを設定
     };
 
-    // 投稿のいいね数を更新する関数
+    // 投稿の❤数を更新する関数
     const handleLike = async () => {
         // loginUserがnullの場合は処理をスキップ
         if (!loginUser) return;
 
         try {
-            await axios.put(`/api/posts/${post._id}/like`, // request URL: いいねを押す投稿のID
-                { userId: loginUser._id } // request body: いいねを押すユーザーのID
+            await axios.put(`/api/posts/${post._id}/like`, // request URL: ❤を押す投稿のID
+                { userId: loginUser._id } // request body: ❤を押すユーザーのID
             );
         }
         catch (err) {
             console.log(err);
         }
 
-        // いいね数を更新
-        setLike((prev) => prev + (isLiked ? -1 : 1)); // prevで前のいいね数を参照し、isLikeに応じて増減させる
+        // ❤数を更新
+        setLike((prev) => prev + (isLiked ? -1 : 1)); // prevで前の❤数を参照し、isLikeに応じて増減させる
     }
 
-    // 投稿のいいねの状態を更新
+    // 投稿の❤の状態を更新
     useEffect(() => {
         // loginUserがnullの場合は処理をスキップ
         if (!loginUser) return;

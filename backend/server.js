@@ -9,6 +9,7 @@ import authRoute from "./routes/auth.js";
 import postRoute from "./routes/posts.js";
 import uploadRoute from "./routes/upload.js";
 import searchScholarRoute from "./routes/scholar.js";
+import analyticsRoute from "./routes/analytics.js";
 import initializeScheduler from "./searcher/scheduler.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -51,11 +52,12 @@ app.use("/api/auth", authRoute); // /api/auth にアクセスしたら、authRou
 app.use("/api/posts", postRoute); // /api/posts にアクセスしたら、postRouteを使う
 app.use("/api/upload", uploadRoute); // /api/upload にアクセスしたら、uploadRouteを使う
 app.use("/api/scholar", searchScholarRoute); // /api/scholar にアクセスしたら、searchScholarRouteを使う
+app.use("/api/analytics", analyticsRoute); // /api/analytics にアクセスしたら、analyticsRouteを使う
 
 app.use(express.static(path.join(__dirname, '../frontend/build')));
 
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/build/index.html'));
+    res.sendFile(path.join(__dirname, '../frontend/build/index.html'));
 });
 
 app.listen(PORT, () => {

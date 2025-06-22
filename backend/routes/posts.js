@@ -92,11 +92,11 @@ router.put("/:id/like", async (req, res) => {
         const post = await Post.findById(req.params.id);
 
         if (!post.likes.includes(req.body.userId)) {
-            await post.updateOne({ $push: { likes: req.body.userId } }); // 投稿にいいねしたユーザーを追加
+            await post.updateOne({ $push: { likes: req.body.userId } }); // 投稿に❤したユーザーを追加
             res.status(200).json("Successfully liked");
         }
         else {
-            await post.updateOne({ $pull: { likes: req.body.userId } }); // 投稿にいいねを取り消す
+            await post.updateOne({ $pull: { likes: req.body.userId } }); // 投稿に❤を取り消す
             res.status(200).json("Successfully unliked");
         }
     } catch (err) {
