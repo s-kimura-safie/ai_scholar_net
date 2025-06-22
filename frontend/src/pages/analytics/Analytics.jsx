@@ -14,6 +14,8 @@ import {
     Title,
     Tooltip,
     Legend,
+    BarController,
+    LineController
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 import "./Analytics.css";
@@ -27,7 +29,9 @@ ChartJS.register(
     PointElement,
     Title,
     Tooltip,
-    Legend
+    Legend,
+    BarController,
+    LineController
 );
 
 function Analytics() {
@@ -113,7 +117,7 @@ function Analytics() {
     }
 
     const allKeywords = Object.entries(keywordTotals)
-        .sort(([,a], [,b]) => b - a) // 合計いいね数の降順でソート
+        .sort(([, a], [, b]) => b - a) // 合計いいね数の降順でソート
         .slice(0, 10)
         .map(([keyword]) => keyword);
 
@@ -162,7 +166,7 @@ function Analytics() {
             },
             tooltip: {
                 callbacks: {
-                    label: function(context) {
+                    label: function (context) {
                         const label = context.dataset.label || '';
                         if (label === '論文数') {
                             return `${label}: ${context.parsed.y}論文`;
@@ -254,7 +258,7 @@ function Analytics() {
                                 <div className="statNumber">
                                     {Array.isArray(keywordData) && keywordData.length > 0 ?
                                         (keywordData.reduce((sum, item) => sum + item.heartCount, 0) /
-                                         keywordData.reduce((sum, item) => sum + item.paperCount, 0)).toFixed(1)
+                                            keywordData.reduce((sum, item) => sum + item.paperCount, 0)).toFixed(1)
                                         : 0}
                                 </div>
                                 <div className="statLabel">平均ハート数/論文</div>
@@ -276,7 +280,7 @@ function Analytics() {
                                         keywordData
                                             .filter(item => item.heartCount === keywordData[0].heartCount)
                                             .map(item => item.keyword)
-                                            .join(', ')
+                                            .join(',\n')
                                         : '-'
                                     }
                                 </div>
