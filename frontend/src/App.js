@@ -15,17 +15,15 @@ function App() {
   const { user } = useContext(AuthContext);
   return (
     <ActiveItemProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={user ? <Home /> : <Register />} />
-          <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
-          <Route path="/register" element={user ? <Navigate to="/" /> : <Register />} />
-          <Route path="/profile/:username" element={<Profile />} />
-          <Route path="/upload-paper" element={<UploadPaper />} />
-          <Route path="/analytics" element={<Analytics />} />
-          <Route path="/liked-posts" element={<LikedPosts />} />
-        </Routes>
-      </Router>
+      <Routes>
+        <Route path="/" element={user ? <Home /> : <Register />} />
+        <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
+        <Route path="/register" element={user ? <Navigate to="/" /> : <Register />} />
+        <Route path="/profile/:username" element={<Profile />} />
+        <Route path="/upload-paper" element={<UploadPaper />} />
+        <Route path="/analytics" element={<Analytics />} />
+        <Route path="/liked-posts" element={<LikedPosts />} />
+      </Routes>
     </ActiveItemProvider>
   )
 }
