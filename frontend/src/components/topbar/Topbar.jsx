@@ -7,28 +7,16 @@ import useDebounce from "../../utils/useDebounce";
 
 export default function Topbar() {
     const PUBLIC_FOLDER = process.env.REACT_APP_PUBLIC_FOLDER;
-    const { user } = useContext(AuthContext); // global state
-    const { dispatch } = useContext(AuthContext);
+    const { user, dispatch } = useContext(AuthContext);
     const [searchKeyword, setSearchKeyword] = useState("");
     const debouncedKeyword = useDebounce(searchKeyword, 500);
 
-    // ページが更新されたときに検索キーワードをリセット
     useEffect(() => {
-        if (debouncedKeyword.trim() !== "") {
-            console.log("検索処理を実行:", debouncedKeyword);
-            dispatch({ type: "SET_SEARCH_KEYWORD", payload: debouncedKeyword });
-        } else {
-            dispatch({ type: "SET_SEARCH_KEYWORD", payload: "" });
-        }
+        dispatch({ type: "SET_SEARCH_KEYWORD", payload: debouncedKeyword.trim() });
     }, [debouncedKeyword, dispatch]);
-
-    const handleSearchChange = (e) => {
-        setSearchKeyword(e.target.value);
-    };
 
     const handleClearSearch = () => {
         setSearchKeyword("");
-        dispatch({ type: "SET_SEARCH_KEYWORD", payload: "" });
     };
 
     return (
@@ -41,12 +29,12 @@ export default function Topbar() {
             </div>
             <div className="topbarCenter">
                 <div className="searchBar">
-                    <Search className="searchIcon"></Search>
+                    <Search className="searchIcon" />
                     <input
                         type="text"
                         placeholder="検索キーワードを入力..."
                         value={searchKeyword}
-                        onChange={handleSearchChange}
+                        onChange={(e) => setSearchKeyword(e.target.value)}
                         className="searchInput"
                     />
                     {searchKeyword && ( // 検索キーワードがある場合のみクリアボタンを表示

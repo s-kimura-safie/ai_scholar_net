@@ -51,31 +51,58 @@ router.delete("/:id", async (req, res) => {
 // 検索キーワードを含む投稿を取得
 router.post("/search", async (req, res) => {
     try {
-        const keyword = req.body.keyword?.trim() || ""; // 検索キーワード
-        const posts = req.body.posts || []; // クライアントから送られてきた投稿データ
+        const keyword = req.body.keyword?.trim() || "";
+        const posts = req.body.posts || [];
 
-        // 投稿データに含まれる userId 基づいてユーザー情報を取得
-        const userIds = [...new Set(posts.map((post) => post.userId))];
-        const users = await User.find({ _id: { $in: userIds } });
+        if (!keyword) {
+            return res.status(200).json(posts);
+        }
 
-        // userId をキーにしたユーザーマップを作成
-        const userMap = users.reduce((map, user) => {
-            map[user._id] = user.username;
-            return map;
-        }, {});
+        const lowerKeyword = keyword.toLowerCase();
+
+        // ユーザー情報を取得
+        const userIds = posts.map(post => post.userId);
+        const users = userIds.length > 0 ? await User.find({ _id: { $in: userIds } }) : [];
+        const userMap = Object.fromEntries(users.map(user => [user._id, user.username]));
+
+        // 論文情報を取得
+        const paperIds = posts.filter(post => post.paperId).map(post => post.paperId);
+        const papers = paperIds.length > 0 ? await Paper.find({ paperId: { $in: paperIds } }) : [];
+        const paperMap = Object.fromEntries(papers.map(paper => [paper.paperId, paper]));
 
         // 検索キーワードに一致する投稿をフィルタリング
         const filteredPosts = posts.filter((post) => {
-            const username = userMap[post.userId]?.toLowerCase() || ""; // userId に対応する username を取得
+            const username = userMap[post.userId]?.toLowerCase() || "";
+
+            // 投稿内容とユーザー名での検索
+            if (post.desc?.toLowerCase().includes(lowerKeyword) || username.includes(lowerKeyword)) {
+                return true;
+            }
+
+            // 論文情報での検索
+            const paper = paperMap[post.paperId];
+            if (!paper) return false;
+
+            const paperTitle = paper.title?.toLowerCase() || "";
+            const paperAbstract = paper.abstract?.toLowerCase() || "";
+            const paperVenue = paper.venue?.toLowerCase() || "";
+            const paperAuthors = paper.authors?.join(" ").toLowerCase() || "";
+            const paperFields = paper.fieldsOfStudy?.join(" ").toLowerCase() || "";
+            const paperKeywords = paper.keywords?.map(k => k.word).join(" ").toLowerCase() || "";
+
             return (
-                post.desc?.toLowerCase().includes(keyword.toLowerCase()) || // 投稿内容の部分一致
-                username.includes(keyword.toLowerCase()) // ユーザー名の部分一致
+                paperTitle.includes(lowerKeyword) ||
+                paperAbstract.includes(lowerKeyword) ||
+                paperVenue.includes(lowerKeyword) ||
+                paperAuthors.includes(lowerKeyword) ||
+                paperFields.includes(lowerKeyword) ||
+                paperKeywords.includes(lowerKeyword)
             );
         });
 
-        return res.status(200).json(filteredPosts); // フィルタリングされた投稿を返す
+        return res.status(200).json(filteredPosts);
     } catch (err) {
-        console.error("Error filtering posts:", err);
+        console.error("Error in search endpoint:", err);
         return res.status(500).json({ error: "Internal Server Error" });
     }
 });
