@@ -33,12 +33,29 @@
 }
 
 .commentItem {
+    display: flex;
+    align-items: center;
     margin-bottom: 10px;
     font-size: 14px;
     padding: 10px;
     background-color: #f9f9f9; /* コメントアイテムの背景色 */
     border-radius: 5px;
     box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
+}
+
+.commentUserAvatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+    flex-shrink: 0;
+    border: 2px solid #e0e0e0;
+}
+
+.commentContent {
+    flex: 1;
+    word-wrap: break-word;
 }
 
 .addComment {

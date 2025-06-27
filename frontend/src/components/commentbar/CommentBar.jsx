@@ -30,7 +30,10 @@ export default function CommentBar({ postId, loginUser, setSelectedPostId, setNu
                 username: loginUser.username,
                 text: newComment,
             });
-            const addedComment = response.data;
+            const addedComment = {
+                ...response.data,
+                profilePicture: loginUser.profilePicture
+            };
             setComments((prev) => [...prev, addedComment]); // ローカル状態を更新
             setNumComments((prev) => prev + 1);
             setNewComment("");
@@ -54,7 +57,20 @@ export default function CommentBar({ postId, loginUser, setSelectedPostId, setNu
             <div className="commentsList">
                 {comments.map((comment, index) => (
                     <div key={comment._id || index} className="commentItem">
-                        <strong>{comment.username}</strong> : {comment.text}
+                        <img
+                            src={comment.profilePicture ?
+                                (comment.profilePicture.startsWith('http') ?
+                                    comment.profilePicture :
+                                    `/images/profile/${comment.profilePicture.split('/').pop()}`
+                                ) :
+                                "/images/profile/noAvatar.png"
+                            }
+                            alt={comment.username}
+                            className="commentUserAvatar"
+                        />
+                        <div className="commentContent">
+                            <strong>{comment.username}</strong> : {comment.text}
+                        </div>
                     </div>
                 ))}
             </div>
