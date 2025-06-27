@@ -1,5 +1,5 @@
 import "./Topbar.css"
-import { Search, Chat, Notifications, Close } from '@mui/icons-material'; //  SVG形式のアイコンをインポート
+import { Search, Chat, Notifications, Close } from '@mui/icons-material';
 import React, { useContext, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../states/AuthContext';
