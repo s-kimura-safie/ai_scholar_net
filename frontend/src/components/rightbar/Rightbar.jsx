@@ -99,12 +99,12 @@ export default function Rightbar({ user, metadata }) {
             }));
         };
 
-        // コンポーネントがレンダリングされた後、フォローしているユーザーの情報を取得
+        // コンポーネントがレンダリングされた後、フォローされているユーザーの情報を取得
         useEffect(() => { // APIでフォロワー情報を取得し終えたら、setFriendsでfriendsを更新
             const fetchFriends = async () => {
-                if (user.followings) {
+                if (user.followers) {
                     const friendList = await Promise.all(
-                        user.followings.map(async (userId) => {
+                        user.followers.map(async (userId) => {
                             const response = await axios.get(`/api/users/${userId}`);
                             return response.data;
                         })
@@ -178,7 +178,7 @@ export default function Rightbar({ user, metadata }) {
                         </>
                     )}
                 </div>
-                <h4 className="rightbarFriends">{`${user.username}`} の友達</h4>
+                <h4 className="rightbarFriends">{`${user.username}`} のフォロワー</h4>
                 <div className="rightbarFollowings">
                     {friends.map((friend) => (
                         <div className="rightbarFollowing" key={friend._id}>
