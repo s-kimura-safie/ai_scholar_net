@@ -15,7 +15,7 @@ async function excuteSemanticScholarAPI(query, offset, limit) {
                 fields:
                     'paperId,title,authors,year,abstract,fieldsOfStudy,venue,citationCount,referenceCount,url,openAccessPdf',
                 limit: limit,
-                offset,
+                offset: offset,
                 year: '2023-',
                 openAccessPdf: true,
                 fieldsOfStudy: 'Computer Science',
@@ -24,7 +24,7 @@ async function excuteSemanticScholarAPI(query, offset, limit) {
         });
         return response.data.data;
     } catch (error) {
-        console.error('Error fetching data from Semantic Scholar API:', error);
+        // console.error('Error fetching data from Semantic Scholar API:', error);
         // throw error;
         return [];
     }
@@ -33,20 +33,21 @@ async function excuteSemanticScholarAPI(query, offset, limit) {
 // 論文を検索する
 export async function searchPapers(query, searchPaperNum) {
     let results = [];
-    let attempts = 0;
-    const requestPaperNum = 10; // 一度のAPI呼び出しで取得する論文数
-    const maxAttempts = 5;      // 最大試行回数
-    const delay = 60000;        // 1分の待機時間
+    let attempts = 1;
+    const requestPaperNum = 100; // 一度のAPI呼び出しで取得する論文数
+    const maxAttempts = 5;       // 最大試行回数
+    const delay = 60000;         // 1分の待機時間
 
     while (results.length < searchPaperNum && attempts < maxAttempts) {
         // API制限回避のため、呼び出し間に待機時間を挿入
-        if (attempts > 0) {
+        if (attempts > 1) {
             console.log(`Waiting for ${delay / 1000}sec before next attempt...`);
             await new Promise(resolve => setTimeout(resolve, delay));
         }
 
         // 乱数を使用して0~10でオフセットを計算
-        const offfsetPage = Math.floor(Math.random() * 10);
+        const offfsetPage = Math.floor(Math.random() * 5);
+        console.log(`Attempt ${attempts}: Fetching papers at pege ${offfsetPage}...`);
         const papers = await excuteSemanticScholarAPI(query, offfsetPage, requestPaperNum);
 
         for (const paper of papers) {
@@ -54,11 +55,6 @@ export async function searchPapers(query, searchPaperNum) {
             const isExistingPaper = await Paper.findOne({ paperId: paper.paperId });
             if (isExistingPaper) {
                 console.log(`Skipping already posted paper: ${paper.title}`);
-                continue;
-            }
-
-            if (paper.openAccessPdf.url === null) {
-                console.log(`Skipping paper without open access PDF: ${paper.title}`);
                 continue;
             }
 
@@ -94,5 +90,6 @@ export async function searchPapers(query, searchPaperNum) {
         attempts++;
     }
 
+    console.log(`Search completed. Found ${results.length} accessible papers out of ${searchPaperNum} requested.`);
     return results;
 }
