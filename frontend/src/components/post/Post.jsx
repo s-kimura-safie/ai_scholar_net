@@ -21,6 +21,8 @@ export default function Post({ post, onMetadataSelect }) {
     const [isLiked, setIsLiked] = useState(false);
     const [postUser, setUser] = useState({});
     const [selectedPostId, setSelectedPostId] = useState(null); // コメント表示用のPostID
+    const [likedUsers, setLikedUsers] = useState([]); // いいねしたユーザーの一覧
+    const [showLikedUsers, setShowLikedUsers] = useState(false); // ホバーツールチップの表示状態
 
     // ユーザー情報取得
     useEffect(() => {
@@ -162,6 +164,31 @@ export default function Post({ post, onMetadataSelect }) {
         }
     };
 
+    // いいねしたユーザーの一覧を取得
+    const fetchLikedUsers = async () => {
+        if (like === 0) return; // いいねが0の場合は何もしない
+
+        try {
+            const response = await axios.get(`/api/posts/${post._id}/likedUsers`);
+            setLikedUsers(response.data);
+        } catch (err) {
+            console.error("Error fetching liked users:", err);
+        }
+    };
+
+    // ハートアイコンのホバー開始
+    const handleMouseEnter = () => {
+        if (like > 0) {
+            setShowLikedUsers(true);
+            fetchLikedUsers();
+        }
+    };
+
+    // ハートアイコンのホバー終了
+    const handleMouseLeave = () => {
+        setShowLikedUsers(false);
+    };
+
     return (
         <div className="post">
             <div className="postWrapper">
@@ -204,7 +231,31 @@ export default function Post({ post, onMetadataSelect }) {
 
                     <div className="postBottomRight">
                         <div className="reactionItem">
-                            <img src={heartImgPath} alt="" className="icon" onClick={() => handleLike()} />
+                            <div
+                                className="heartContainer"
+                                onMouseEnter={handleMouseEnter}
+                                onMouseLeave={handleMouseLeave}
+                            >
+                                <img src={heartImgPath} alt="" className="icon" onClick={() => handleLike()} />
+                                {showLikedUsers && likedUsers.length > 0 && (
+                                    <div className="likedUsersTooltip">
+                                        <div className="tooltipContent">
+                                            {likedUsers.map((user, index) => (
+                                                <div key={user._id} className="likedUser">
+                                                    <img
+                                                        src={user.profilePicture
+                                                            ? PUBLIC_FOLDER + "/profile/" + user.profilePicture
+                                                            : PUBLIC_FOLDER + "/profile/noAvatar.png"}
+                                                        alt=""
+                                                        className="likedUserAvatar"
+                                                    />
+                                                    <span className="likedUsername">{user.username}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                             <span className="counter"> {like}</span>
 
                         </div>

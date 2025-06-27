@@ -145,6 +145,17 @@ router.get("/:id/likes", async (req, res) => {
     }
 });
 
+// Get users who liked the post
+router.get("/:id/likedUsers", async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id);
+        const likedUsers = await User.find({ _id: { $in: post.likes } }).select('username profilePicture');
+        return res.status(200).json(likedUsers);
+    } catch (err) {
+        return res.status(500).json(err);
+    }
+});
+
 // Put a comment
 router.put("/:id/comment", async (req, res) => {
     try {

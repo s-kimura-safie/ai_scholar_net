@@ -126,3 +126,67 @@
     color: rgb(73, 73, 73);
 
 }
+
+/* ハートアイコンのコンテナ */
+.heartContainer {
+    position: relative;
+    display: inline-block;
+}
+
+/* いいねしたユーザー一覧のツールチップ */
+.likedUsersTooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 8px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    min-width: 200px;
+    max-width: 300px;
+    margin-bottom: 8px;
+}
+
+.likedUsersTooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: white;
+}
+
+.tooltipContent {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.likedUser {
+    display: flex;
+    align-items: center;
+    padding: 4px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.likedUser:last-child {
+    border-bottom: none;
+}
+
+.likedUserAvatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 8px;
+    border: 1px solid #ddd;
+}
+
+.likedUsername {
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
+}
