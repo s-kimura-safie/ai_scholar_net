@@ -180,7 +180,20 @@ router.put("/:id/comment", async (req, res) => {
 router.get("/:id/comments", async (req, res) => {
     try {
         const post = await Post.findById(req.params.id);
-        return res.status(200).json(post.comments);
+        const comments = post.comments;
+
+        // ユーザー情報を補完する
+        const enrichedComments = await Promise.all(
+            comments.map(async (comment) => {
+                const user = await User.findById(comment.userId);
+                return {
+                    ...comment.toObject(),
+                    profilePicture: user ? user.profilePicture : null
+                };
+            })
+        );
+
+        return res.status(200).json(enrichedComments);
     } catch (err) {
         return res.status(500).json(err);
     }
