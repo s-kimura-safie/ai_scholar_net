@@ -76,7 +76,8 @@ export default function Sidebar() {
                                     <span className="sidebarListItemText">ホーム</span>
                                 </li>
                             </Link>
-                            <Link to={`/profile/${loginUser.username}`} style={{ textDecoration: 'none', color: "black" }}>
+
+                            {/* <Link to={`/profile/${loginUser.username}`} style={{ textDecoration: 'none', color: "black" }}>
                                 <li
                                     className={`sidebarListItem ${activeItem === 'profile' ? 'active' : ''}`}
                                     onClick={() => handleItemClick('profile')}
@@ -84,16 +85,8 @@ export default function Sidebar() {
                                     <Person className="sidebarIcon" />
                                     <span className="sidebarListItemText">マイページ</span>
                                 </li>
-                            </Link>
-                            <Link to="/liked-posts" style={{ textDecoration: 'none', color: "black" }}>
-                                <li
-                                    className={`sidebarListItem ${activeItem === 'liked-posts' ? 'active' : ''}`}
-                                    onClick={() => handleItemClick('liked-posts')}
-                                >
-                                    <Favorite className="sidebarIcon" />
-                                    <span className="sidebarListItemText">お気に入り</span>
-                                </li>
-                            </Link>
+                            </Link> */}
+
                             <Link to="/upload-paper" style={{ textDecoration: 'none', color: "black" }}>
                                 <li
                                     className={`sidebarListItem ${activeItem === 'upload-paper' ? 'active' : ''}`}
@@ -103,6 +96,7 @@ export default function Sidebar() {
                                     <span className="sidebarListItemText">論文投稿</span>
                                 </li>
                             </Link>
+
                             <Link to="/analytics" style={{ textDecoration: 'none', color: "black" }}>
                                 <li
                                     className={`sidebarListItem ${activeItem === 'analytics' ? 'active' : ''}`}
@@ -112,13 +106,24 @@ export default function Sidebar() {
                                     <span className="sidebarListItemText">統計情報</span>
                                 </li>
                             </Link>
-                            <li
+
+                            <Link to="/liked-posts" style={{ textDecoration: 'none', color: "black" }}>
+                                <li
+                                    className={`sidebarListItem ${activeItem === 'liked-posts' ? 'active' : ''}`}
+                                    onClick={() => handleItemClick('liked-posts')}
+                                >
+                                    <Favorite className="sidebarIcon" />
+                                    <span className="sidebarListItemText">お気に入り</span>
+                                </li>
+                            </Link>
+
+                            {/* <li
                                 className={`sidebarListItem ${activeItem === 'settings' ? 'active' : ''}`}
                                 onClick={() => handleItemClick('settings')}
                             >
                                 <Settings className="sidebarIcon" />
                                 <span className="sidebarListItemText">設定</span>
-                            </li>
+                            </li> */}
                         </div>
                     ) : (
                         <Link to="/login" style={{ textDecoration: 'none', color: "black" }}>
