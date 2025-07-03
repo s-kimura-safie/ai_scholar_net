@@ -217,6 +217,9 @@ router.get("/timeline/:userId", async (req, res) => {
 
     try {
         const currentUser = await User.findById(req.params.userId);
+        if (!currentUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
 
         // 自分の投稿を取得
         const myPosts = await Post.find({ userId: currentUser._id })
@@ -265,6 +268,54 @@ router.get("/profile/:username", async (req, res) => {
         return res.status(200).json(posts);
     } catch (err) {
         console.log("error");
+        return res.status(500).json(err);
+    }
+});
+
+// Get user's comment-related posts (posts the user commented on and posts with comments on user's posts)
+router.get("/comments/user/:userId", async (req, res) => {
+    try {
+        const userId = req.params.userId;
+
+        // 1. ユーザーがコメントした投稿を取得
+        const postsUserCommentedOn = await Post.find({
+            "comments.userId": userId
+        }).populate('userId', 'username profilePicture').sort({ updatedAt: -1 });
+
+        // 2. ユーザーの投稿にコメントされた投稿を取得
+        const userPosts = await Post.find({
+            userId: userId,
+            comments: { $exists: true, $not: { $size: 0 } }
+        }).populate('userId', 'username profilePicture').sort({ updatedAt: -1 });
+
+        // 結果をマージして重複を除去
+        const allCommentRelatedPosts = [...postsUserCommentedOn, ...userPosts];
+        const uniquePosts = allCommentRelatedPosts.filter((post, index, self) =>
+            index === self.findIndex(p => p._id.toString() === post._id.toString())
+        );
+
+        // 各投稿のコメントにユーザー情報を付加
+        const enrichedPosts = await Promise.all(
+            uniquePosts.map(async (post) => {
+                const enrichedComments = await Promise.all(
+                    post.comments.map(async (comment) => {
+                        const user = await User.findById(comment.userId);
+                        return {
+                            ...comment.toObject(),
+                            profilePicture: user ? user.profilePicture : null,
+                            username: user ? user.username : comment.username
+                        };
+                    })
+                );
+                return {
+                    ...post.toObject(),
+                    comments: enrichedComments
+                };
+            })
+        );
+
+        return res.status(200).json(enrichedPosts);
+    } catch (err) {
         return res.status(500).json(err);
     }
 });

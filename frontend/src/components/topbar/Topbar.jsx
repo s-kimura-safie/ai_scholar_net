@@ -4,12 +4,14 @@ import React, { useContext, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../states/AuthContext';
 import useDebounce from "../../utils/useDebounce";
+import CommentModal from '../commentModal/CommentModal';
 
 export default function Topbar() {
     const PUBLIC_FOLDER = process.env.REACT_APP_PUBLIC_FOLDER;
     const { user, dispatch } = useContext(AuthContext);
     const [searchKeyword, setSearchKeyword] = useState("");
     const debouncedKeyword = useDebounce(searchKeyword, 500);
+    const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
 
     useEffect(() => {
         dispatch({ type: "SET_SEARCH_KEYWORD", payload: debouncedKeyword.trim() });
@@ -17,6 +19,14 @@ export default function Topbar() {
 
     const handleClearSearch = () => {
         setSearchKeyword("");
+    };
+
+    const handleCommentModalOpen = () => {
+        setIsCommentModalOpen(true);
+    };
+
+    const handleCommentModalClose = () => {
+        setIsCommentModalOpen(false);
     };
 
     return (
@@ -48,13 +58,8 @@ export default function Topbar() {
             </div>
             <div className="topbarRight">
                 <div className="topbarIconItems">
-                    <div className="topbarIconItem">
+                    <div className="topbarIconItem" onClick={handleCommentModalOpen}>
                         <Chat />
-                        <span className="topbarIconBadge">?</span>
-                    </div>
-                    <div className="topbarIconItem">
-                        <Notifications />
-                        <span className="topbarIconBadge">?</span>
                     </div>
                     {user ? (
                         <Link to={`/profile/${user.username}`}>
@@ -71,6 +76,10 @@ export default function Topbar() {
                     )}
                 </div>
             </div>
+            <CommentModal
+                isOpen={isCommentModalOpen}
+                onClose={handleCommentModalClose}
+            />
         </div>
     );
 }
