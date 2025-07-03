@@ -14,7 +14,7 @@ function initializeScheduler() {
 
         try {
             const query = 'Computer vision';                            // 検索クエリ
-            const postingPaperNum = 5;                                  // 一度に投稿する論文の数
+            const postingPaperNum = 2;                              // 一度に投稿する論文の数
             const results = await searchPapers(query, postingPaperNum); // 論文を検索
 
             for (const paper of results) {
