@@ -5,7 +5,17 @@ import "./CommentBar.css";
 export default function CommentBar({ postId, loginUser, setSelectedPostId, setNumComments }) {
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState("");
-    const [isExpanded, setIsExpanded] = useState(true);
+    const [isExpanded, setIsExpanded] = useState(false); // 初期状態を false に変更
+    const [isVisible, setIsVisible] = useState(true); // 表示状態を管理
+
+    // コンポーネントがマウントされたときにアニメーションを開始
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setIsExpanded(true);
+        }, 50); // 少し遅延を入れてアニメーションが見えるようにする
+
+        return () => clearTimeout(timer);
+    }, []);
 
     // コメント一覧を取得
     useEffect(() => {
@@ -46,10 +56,13 @@ export default function CommentBar({ postId, loginUser, setSelectedPostId, setNu
     const handleCommentClose = () => {
         setIsExpanded(false); // 折りたたみ状態にする
         setTimeout(() => {
-            setSelectedPostId(null); // アニメーション後に親コンポーネントの状態を更新
+            setIsVisible(false); // アニメーション完了後に非表示
+            setSelectedPostId(null); // 親コンポーネントの状態を更新
         }, 500); // アニメーションの時間に合わせる
-
     };
+
+    // コンポーネントが非表示の場合は何も表示しない
+    if (!isVisible) return null;
 
     return (
         <div className={`commentSection ${isExpanded ? "expanded" : "collapsed"}`}>
@@ -79,10 +92,21 @@ export default function CommentBar({ postId, loginUser, setSelectedPostId, setNu
                     type="text"
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
+                    onKeyPress={(e) => {
+                        if (e.key === 'Enter' && newComment.trim()) {
+                            handleAddComment();
+                        }
+                    }}
                     placeholder="コメントを入力..."
                     className="commentInput"
                 />
-                <button onClick={handleAddComment} className="commentButton">コメント</button>
+                <button
+                    onClick={handleAddComment}
+                    className="commentButton"
+                    disabled={!newComment.trim()}
+                >
+                    送信
+                </button>
                 <button onClick={handleCommentClose} className="commentCloseButton">閉じる</button>
             </div>
             <div className="commentTemplates">
