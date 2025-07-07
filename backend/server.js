@@ -10,7 +10,7 @@ import postRoute from "./routes/posts.js";
 import uploadRoute from "./routes/upload.js";
 import searchScholarRoute from "./routes/scholar.js";
 import analyticsRoute from "./routes/analytics.js";
-import initializeScheduler from "./searcher/scheduler.js";
+import setScheduler from "./searcher/scheduler.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,7 +21,7 @@ const app = express();
 const PORT = 8008;
 
 // ボットの論文投稿スケジュールを初期化
-initializeScheduler();
+setScheduler();
 
 // connect to MongoDB
 mongoose
