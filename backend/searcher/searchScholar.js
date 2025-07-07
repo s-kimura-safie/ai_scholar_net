@@ -31,23 +31,24 @@ async function excuteSemanticScholarAPI(query, offset, limit) {
 }
 
 // 論文を検索する
-export async function searchPapers(query, searchPaperNum) {
+export async function searchPapers(query) {
     let results = [];
     let attempts = 1;
-    const requestPaperNum = 10; // 一度のAPI呼び出しで取得する論文数
     const maxAttempts = 10;       // 最大試行回数
-    const delay = 60000;         // 1分の待機時間
+    const delay = 60000;          // 1分の待機時間
+    const requestPaperNum = 100;  // 一度のAPI呼び出しで取得する論文数
+    const resultPaperLimit = 5;   // キーワード取得の回数を制限するために結果の取得を打ち切る
 
-    while (results.length < searchPaperNum && attempts < maxAttempts) {
+    searchLoop: while (attempts < maxAttempts) {
         // API制限回避のため、呼び出し間に待機時間を挿入
         if (attempts > 1) {
-            console.log(`Waiting for ${delay / 1000}sec before next attempt...`);
+            console.log(`Waiting for ${delay / 1000}sec before next attempt ...`);
             await new Promise(resolve => setTimeout(resolve, delay));
         }
 
         // 乱数を使用して0~10でオフセットを計算
         const offfsetPage = Math.floor(Math.random() * 5);
-        console.log(`Attempt ${attempts}: Fetching papers at pege ${offfsetPage}...`);
+        console.log(`Attempt ${attempts}: Fetching papers at pege ${offfsetPage}`);
         const papers = await excuteSemanticScholarAPI(query, offfsetPage, requestPaperNum);
         console.log(`Fetched ${papers.length} papers from Semantic Scholar API.`);
 
@@ -81,11 +82,15 @@ export async function searchPapers(query, searchPaperNum) {
                 keywords: formattedKeywords
             });
 
+            if (results.length >= resultPaperLimit) {
+                console.log(`Found ${results.length} papers, and stop searching.`);
+                break searchLoop;  // 外側のwhile loopからも抜ける
+            }
         }
 
         attempts++;
     }
 
-    console.log(`Search completed. Found ${results.length} accessible papers out of ${searchPaperNum} requested.`);
+    console.log(`Search completed. Found ${results.length} accessible papers.`);
     return results;
 }

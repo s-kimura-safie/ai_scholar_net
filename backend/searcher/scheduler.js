@@ -5,7 +5,7 @@ import Post from "../models/Post.js";
 
 import extractPdfText from "./pdfParser.js";
 import { searchPapers } from "./searchScholar.js";
-import summarizer from "./summarizer.js";
+import { summarizePaper, abstructSummarize } from "./summarizer.js";
 
 // スケジュールタスクを設定
 function setScheduler() {
@@ -14,22 +14,25 @@ function setScheduler() {
 
         try {
             const query = 'Computer vision'; // 検索クエリ
-            const postingPaperNum = 2; // 一度に投稿する論文の数
-            const results = await searchPapers(query, postingPaperNum); // 論文を検索
+            const papers = await searchPapers(query); // 論文を検索
 
+            const postingPaperNum = 2; // 一度に投稿する論文の数
             let postedPaperCount = 0;
-            for (const paper of results) {
+            for (const paper of papers) {
                 // 要約作成
                 let summary = '';
 
                 try {
                     const pdfText = await extractPdfText(paper.pdfPath);
-                    summary = await summarizer(pdfText);
+                    summary = await summarizePaper(pdfText);
                 } catch (error) {
                     console.error(`Error summarizing paper ${paper.title}:`, error);
-                    // 要約が失敗した場合は、論文のタイトルとアブストractを使用
-                    summary = `多忙のため要約できませんでしたが、注目の論文なので紹介します。\n
-                    Title: ${paper.title}\nAbstract: ${paper.abstract}`;
+                    // 要約が失敗した場合は、論文のタイトルとアブストラクトを使って要約
+                    summary = await abstructSummarize(paper.title, paper.abstract);
+                }
+                if (!summary) {
+                    console.warn(`Skipping paper "${paper.title}" due to failed summarization.`);
+                    continue;
                 }
 
                 // 検索した論文の要約をボットの Post としてデータベースに保存

@@ -16,7 +16,7 @@ export async function summarizeWithCohere(text) {
 - 以下のフォーマットを厳密に守ってください
 
 【出力フォーマット】
-Title: [英語論文タイトル]
+タイトル: [英語論文タイトル]
 
 ◇ 一言でいうと？
 [25-75文字で、論文の主題や目的を簡潔に記述]
@@ -25,7 +25,7 @@ Title: [英語論文タイトル]
 [180-220文字で、背景・課題・目的を明確に記述]
 
 ◇ 先行研究と比べてどこがすごい？
-[180-220文字で、何が新しく、どこで従来を上回ったかを具体的に記述]
+[180-220文字で、何が新しく、従来技術との違いを具体的に記述]
 
 ◇ 技術や手法のキモはどこ？
 [180-220文字で、提案手法の要点と仕組み・工夫点を明確に記述]
@@ -58,25 +58,68 @@ ${truncatedText}
     return response.data.generations[0].text.trim();
 }
 
+// タイトルとアブストラクトから要約を生成する関数
+export async function abstructSummarize(title, abstract) {
+    const prompt = `
+あなたは論文要約の専門家です。
+【論文の内容】を読み取り、【出力フォーマット】の4点について、それぞれ100文字以内の簡潔な日本語で記述してください。
+【出力フォーマット】を厳密に守ってください。
+タイトルは英文のまま出力してください。
+
+【出力フォーマット】
+タイトル:
+◇ 論文の概要
+◇ 従来技術との違い
+◇ 提案手法の仕組み・工夫点
+◇ 結果と結論
+
+【論文の内容】
+タイトル: ${title}
+アブストラクト: ${abstract}
+`;
+
+    // API Documentation: https://docs.cohere.com/v1/reference/generate
+    const response = await axios.post(
+        'https://api.cohere.ai/v1/generate', {
+        model: 'command-r-plus',
+        prompt,
+        max_tokens: 15000,  // 出力長を制限
+        temperature: 0.1,  // より一貫性のある出力のため低く設定
+        k: 0,              // トップkフィルタリングを無効化
+        p: 0.95,           // トップpフィルタリング
+        frequency_penalty: 0.1,  // 繰り返しを減らす
+        presence_penalty: 0.1,   // 新しいトピックを促進
+    },
+        {
+            headers: {
+                Authorization: `Bearer ${process.env.COHERE_API_KEY}`,
+                'Content-Type': 'application/json',
+            },
+        });
+
+    return response.data.generations[0].text.trim();
+}
+
 // テキスト形式の論文を解析して要約を返す関数
 export async function summarizePaper(pdfText) {
     try {
         const summary = await summarizeWithCohere(pdfText);
 
-        // 出力の品質チェック
-        const isValidOutput = validateSummaryOutput(summary);
-
-        if (!isValidOutput) {
-            console.warn('⚠️ 要約出力の品質が不十分です。再試行します...');
+        if (!validateSummaryOutput(summary)) {
+            console.warn('⚠️ 要約出力の品質が不十分なため、再試行します...');
             // 2回目の試行（より制約を強化）
             const retrySummary = await summarizeWithCohereRetry(pdfText);
+            if (!validateSummaryOutput(retrySummary)) {
+                console.warn('⚠️ 再試行でも要約出力の品質が不十分です。');
+                return null; // 再試行でも品質が不十分な場合はnullを返す
+            }
             return retrySummary;
         }
-
         return summary;
+
     } catch (err) {
         console.error('❌ エラー:', err.message);
-        throw err;
+        return null; // エラーが発生した場合はnullを返す
     }
 }
 
@@ -104,16 +147,19 @@ async function summarizeWithCohereRetry(text) {
 3. 各セクション200文字程度
 
 【出力フォーマット】
-Title: [論文タイトル]
+タイトル: [論文タイトル]
+
+◇ 一言でいうと？
+[50文字程度で、論文の主題や目的を簡潔に記述]
 
 ◇ どんなもの？
-→ [日本語で200文字程度]
+[日本語で200文字程度]
 
 ◇ 先行研究と比べてどこがすごい？
-→ [日本語で200文字程度]
+[日本語で200文字程度]
 
 ◇ 技術や手法のキモはどこ？
-→ [日本語で200文字程度]
+[日本語で200文字程度]
 
 論文内容：
 ${truncatedText}
