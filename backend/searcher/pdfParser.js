@@ -15,62 +15,65 @@ const __dirname = path.dirname(__filename);
 // Axiosを使った直接PDFダウンロード（代替手段）
 async function downloadPdfDirect(pdfUrl, outputDir) {
     try {
+        console.log(`Starting direct download from: ${pdfUrl}`);
+
         const response = await axios({
             method: 'GET',
             url: pdfUrl,
-            responseType: 'stream',
-            timeout: 45000, // タイムアウトを45秒に延長
-            maxRedirects: 5, // リダイレクトを許可
+            responseType: 'arraybuffer', // streamからarraybufferに変更
+            timeout: 90000, // タイムアウトを90秒に延長
+            maxRedirects: 10, // リダイレクトを増やす
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
                 'Accept': 'application/pdf,application/octet-stream,*/*',
                 'Accept-Language': 'en-US,en;q=0.9',
-                'Accept-Encoding': 'gzip, deflate, br',
                 'Cache-Control': 'no-cache',
                 'Pragma': 'no-cache'
             }
         });
 
         // Content-TypeがPDFかチェック
-        const contentType = response.headers['content-type'];
-        if (contentType && !contentType.includes('application/pdf') && !contentType.includes('application/octet-stream')) {
+        const contentType = response.headers['content-type'] || '';
+        console.log(`Content-Type: ${contentType}`);
+
+        if (contentType && !contentType.includes('application/pdf') && !contentType.includes('application/octet-stream') && !contentType.includes('binary/octet-stream')) {
             throw new Error(`Invalid content type: ${contentType}`);
+        }
+
+        // レスポンスデータを確認
+        if (!response.data || response.data.byteLength < 1000) {
+            throw new Error('Downloaded file is too small, likely an error page');
+        }
+
+        // PDFの署名をチェック（%PDF）
+        const buffer = Buffer.from(response.data);
+        const pdfSignature = buffer.slice(0, 4).toString();
+        console.log(`File signature: ${pdfSignature}`);
+
+        if (!pdfSignature.startsWith('%PDF')) {
+            // HTMLファイルかどうかチェック
+            const content = buffer.toString('utf8', 0, 1000);
+            if (content.includes('<html') || content.includes('<!DOCTYPE')) {
+                throw new Error('Downloaded file is HTML, not PDF');
+            }
+            console.warn('File does not have PDF signature but proceeding...');
         }
 
         const fileName = `${Date.now()}-${path.basename(pdfUrl).split('?')[0]}.pdf`;
         const filePath = path.join(outputDir, fileName);
 
-        const writer = fs.createWriteStream(filePath);
-        response.data.pipe(writer);
+        await fs.writeFile(filePath, buffer);
 
-        return new Promise((resolve, reject) => {
-            writer.on('finish', () => {
-                // ファイルサイズをチェック
-                const stats = fs.statSync(filePath);
-                if (stats.size < 1000) { // 1KB未満の場合はエラーとみなす
-                    fs.unlinkSync(filePath);
-                    reject(new Error('Downloaded file is too small, likely an error page'));
-                } else {
-                    resolve(filePath);
-                }
-            });
-            writer.on('error', (error) => {
-                // ファイルが作成されていれば削除
-                if (fs.existsSync(filePath)) {
-                    fs.unlinkSync(filePath);
-                }
-                reject(error);
-            });
+        // ファイルサイズを再確認
+        const stats = await fs.stat(filePath);
+        console.log(`Downloaded file size: ${stats.size} bytes`);
 
-            // タイムアウト処理
-            setTimeout(() => {
-                writer.destroy();
-                if (fs.existsSync(filePath)) {
-                    fs.unlinkSync(filePath);
-                }
-                reject(new Error('Download timeout'));
-            }, 60000); // 60秒でタイムアウト
-        });
+        if (stats.size < 1000) {
+            await fs.unlink(filePath);
+            throw new Error('Downloaded file is too small, likely an error page');
+        }
+
+        return filePath;
     } catch (error) {
         throw new Error(`Direct PDF download failed: ${error.message}`);
     }
@@ -115,12 +118,14 @@ async function savePdf(pdfUrl, outputDir) {
 
         // ダウンロード完了を監視
         let downloadCompleted = false;
+        let downloadError = null;
         const downloadPromise = new Promise((resolve, reject) => {
             const timeout = setTimeout(() => {
                 if (!downloadCompleted) {
-                    reject(new Error('Download timeout'));
+                    downloadError = new Error('Download timeout');
+                    reject(downloadError);
                 }
-            }, 45000); // 45秒のタイムアウト
+            }, 90000); // 90秒のタイムアウト
 
             client.on('Page.downloadProgress', (event) => {
                 if (event.state === 'completed') {
@@ -128,8 +133,9 @@ async function savePdf(pdfUrl, outputDir) {
                     clearTimeout(timeout);
                     resolve(event.guid);
                 } else if (event.state === 'canceled') {
+                    downloadError = new Error('Download was canceled');
                     clearTimeout(timeout);
-                    reject(new Error('Download was canceled'));
+                    reject(downloadError);
                 }
             });
         });
@@ -161,19 +167,23 @@ async function savePdf(pdfUrl, outputDir) {
             // ダウンロードが開始されるまで待機
             await Promise.race([downloadPromise, new Promise(resolve => setTimeout(resolve, 10000))]);
 
-        } catch (downloadError) {
-            console.warn('Download monitoring failed, trying fallback method:', downloadError.message);
+        } catch (err) {
+            // 監視エラーやタイムアウト時も、ダウンロードディレクトリを再確認
+            console.warn('Download monitoring failed, trying fallback method:', err.message);
         }
 
+        // 監視エラー時も、ダウンロードディレクトリにPDFが落ちていないか再確認
         await browser.close();
         browser = null;
 
-        // ダウンロードされた PDF を取得
         await new Promise(resolve => setTimeout(resolve, 2000)); // 少し待機
         const files = await fs.readdir(outputDir);
         const pdfFiles = files.filter(f => f.endsWith('.pdf'));
 
         if (pdfFiles.length === 0) {
+            if (downloadError) {
+                throw downloadError;
+            }
             throw new Error('PDFファイルがダウンロードされませんでした');
         }
 
@@ -240,13 +250,77 @@ export async function extractPdfText(pdfUrl) {
             }
         }
 
+        // PDFファイルの有効性をチェック
         const dataBuffer = await fs.readFile(pdfLocalPath);
-        const data = await pdfParse(dataBuffer);
+
+        // ファイルサイズをチェック
+        if (dataBuffer.length < 100) {
+            throw new Error('Downloaded file is too small to be a valid PDF');
+        }
+
+        // PDFファイルの先頭を確認（PDF magic number）
+        const pdfHeader = dataBuffer.slice(0, 4).toString();
+        console.log(`PDF file header: ${pdfHeader}`);
+
+        if (!pdfHeader.startsWith('%PDF')) {
+            // HTMLファイルかどうかチェック
+            const content = dataBuffer.toString('utf8', 0, 1000);
+            if (content.includes('<html') || content.includes('<!DOCTYPE')) {
+                // HTMLのタイトルやbodyの一部もログ出力
+                const htmlTitleMatch = content.match(/<title>(.*?)<\/title>/i);
+                const htmlTitle = htmlTitleMatch ? htmlTitleMatch[1] : '';
+                const htmlBodyMatch = content.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+                const htmlBody = htmlBodyMatch ? htmlBodyMatch[1].slice(0, 200) : '';
+                console.error('Downloaded file is HTML, not PDF. URL:', pdfUrl);
+                if (htmlTitle) console.error('HTML Title:', htmlTitle);
+                if (htmlBody) console.error('HTML Body (first 200 chars):', htmlBody);
+                throw new Error('Downloaded file is HTML, not PDF');
+            }
+
+            // バイナリファイルがJPEGやPNGでないかチェック
+            if (dataBuffer[0] === 0xFF && dataBuffer[1] === 0xD8) {
+                throw new Error('Downloaded file is JPEG image, not PDF');
+            }
+            if (dataBuffer[0] === 0x89 && dataBuffer[1] === 0x50) {
+                throw new Error('Downloaded file is PNG image, not PDF');
+            }
+
+            console.warn('File does not appear to be a valid PDF, but attempting to parse...');
+        }
+
+        console.log('Attempting to parse PDF...');
+        const data = await pdfParse(dataBuffer, {
+            // PDFパースオプションを追加
+            max: 0, // 最大ページ数の制限を無効化
+            version: 'v1.10.100' // PDFバージョンを指定
+        });
 
         console.log(`Successfully extracted PDF text from: ${pdfUrl}`);
+
+        if (data.text.length < 50) {
+            console.warn('Extracted text is very short, PDF might be image-based or empty');
+        }
+
         return data.text;
     } catch (error) {
         console.error(`PDF extraction failed for ${pdfUrl}:`, error.message);
+
+        // ダウンロードしたファイルの内容をデバッグのために確認
+        if (pdfLocalPath && await fs.pathExists(pdfLocalPath)) {
+            try {
+                const buffer = await fs.readFile(pdfLocalPath);
+                const preview = buffer.slice(0, 200).toString('utf8');
+                console.log('File preview (first 200 chars):', preview);
+                console.log('File size:', buffer.length, 'bytes');
+
+                // バイナリ形式での先頭バイトを表示
+                const hexPreview = buffer.slice(0, 16).toString('hex');
+                console.log('File hex preview:', hexPreview);
+            } catch (previewError) {
+                console.log('Could not read file for preview:', previewError.message);
+            }
+        }
+
         throw error;
     } finally {
         // PDFファイルのクリーンアップ
