@@ -19,31 +19,35 @@ function setScheduler() {
 
             for (const paper of results) {
                 // 要約作成
+                var summary = '';
+
                 try {
                     const pdfText = await extractPdfText(paper.pdfPath);
-                    const summary = await summarizer(pdfText);
-
-                    // 検索した論文の要約をボットの Post としてデータベースに保存
-                    const newPost = new Post({
-                        userId: '68568248fc5027153a504774', // ボットアカウントのユーザーID
-                        desc: `${summary}`,
-                        createdAt: new Date(),
-                        paperId: paper.paperId
-                    });
-
-                    await newPost.save();
-
-                    // 検索した論文を Paper のデータベースに保存
-                    await Paper.findOneAndUpdate(
-                        { paperId: paper.paperId },
-                        { $set: paper },
-                        { upsert: true, new: true }
-                    );
-
+                    summary = await summarizer(pdfText);
                 } catch (error) {
-                    console.error(`Error occured in summarizeing paper "${paper.title}"\n`, error);
-                    continue;
+                    console.error(`Error summarizing paper ${paper.title}:`, error);
+                    // 要約が失敗した場合は、論文のタイトルとアブストractを使用
+                    summary = `多忙のため要約できませんでしたが、注目の論文なので紹介します。\n
+                    Title: ${paper.title}\nAbstract: ${paper.abstract}`;
                 }
+
+                // 検索した論文の要約をボットの Post としてデータベースに保存
+                const newPost = new Post({
+                    userId: '68568248fc5027153a504774', // ボットアカウントのユーザーID
+                    desc: `${summary} `,
+                    createdAt: new Date(),
+                    paperId: paper.paperId
+                });
+
+                await newPost.save();
+
+                // 検索した論文を Paper のデータベースに保存
+                await Paper.findOneAndUpdate(
+                    { paperId: paper.paperId },
+                    { $set: paper },
+                    { upsert: true, new: true }
+                );
+
             }
 
             console.log('Bot has posted papers successfully');
