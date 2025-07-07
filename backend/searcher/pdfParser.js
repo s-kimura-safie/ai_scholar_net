@@ -20,15 +20,22 @@ async function downloadPdfDirect(pdfUrl, outputDir) {
         const response = await axios({
             method: 'GET',
             url: pdfUrl,
-            responseType: 'arraybuffer', // streamからarraybufferに変更
-            timeout: 90000, // タイムアウトを90秒に延長
-            maxRedirects: 10, // リダイレクトを増やす
+            responseType: 'arraybuffer',
+            timeout: 90000,
+            maxRedirects: 10,
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
                 'Accept': 'application/pdf,application/octet-stream,*/*',
                 'Accept-Language': 'en-US,en;q=0.9',
                 'Cache-Control': 'no-cache',
-                'Pragma': 'no-cache'
+                'Pragma': 'no-cache',
+                'Referer': 'https://academic.oup.com/',
+                'Accept-Encoding': 'gzip, deflate, br',
+                'Connection': 'keep-alive',
+                'Upgrade-Insecure-Requests': '1'
+            },
+            validateStatus: function (status) {
+                return status >= 200 && status < 400; // 3xxリダイレクトも許可
             }
         });
 
@@ -94,13 +101,29 @@ async function savePdf(pdfUrl, outputDir) {
                 '--no-zygote',
                 '--disable-gpu',
                 '--disable-web-security',
-                '--disable-features=VizDisplayCompositor'
+                '--disable-features=VizDisplayCompositor',
+                '--disable-blink-features=AutomationControlled'
             ]
         });
         const page = await browser.newPage();
 
-        // User-Agentを設定してボット検出を回避
+        // より詳細なUser-Agentを設定
         await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+
+        // 追加のヘッダーを設定
+        await page.setExtraHTTPHeaders({
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Referer': 'https://academic.oup.com/',
+            'Sec-Fetch-Dest': 'document',
+            'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-Site': 'same-origin',
+            'Upgrade-Insecure-Requests': '1'
+        });
+
+        // JavaScriptを有効化
+        await page.setJavaScriptEnabled(true);
 
         // ビューポートを設定
         await page.setViewport({ width: 1920, height: 1080 });
@@ -125,7 +148,7 @@ async function savePdf(pdfUrl, outputDir) {
                     downloadError = new Error('Download timeout');
                     reject(downloadError);
                 }
-            }, 90000); // 90秒のタイムアウト
+            }, 120000); // タイムアウトを120秒に延長
 
             client.on('Page.downloadProgress', (event) => {
                 if (event.state === 'completed') {
@@ -140,20 +163,29 @@ async function savePdf(pdfUrl, outputDir) {
             });
         });
 
-        // リクエストインターセプトを無効化（ダウンロードの妨げになる可能性があるため）
-        await page.setRequestInterception(false);
-
         try {
+            // まず基本ページにアクセスしてCookieを取得
+            const baseUrl = new URL(pdfUrl).origin;
+            await page.goto(baseUrl, { waitUntil: 'networkidle0', timeout: 30000 });
+            await page.waitForTimeout(2000);
+
             // PDF URL にアクセス
+            console.log('Navigating to PDF URL with Puppeteer...');
             const response = await page.goto(pdfUrl, {
                 waitUntil: 'domcontentloaded',
-                timeout: 30000
+                timeout: 45000
             });
 
+            // レスポンスの詳細をログ出力
+            console.log('Response status:', response.status());
+            console.log('Response headers:', response.headers());
+
+            const contentType = response.headers()['content-type'] || '';
+            console.log('Content-Type from Puppeteer:', contentType);
+
             // レスポンスがPDFかチェック
-            const contentType = response.headers()['content-type'];
-            if (contentType && contentType.includes('application/pdf')) {
-                // 直接PDFの場合は、レスポンスからバッファを取得
+            if (contentType.includes('application/pdf')) {
+                console.log('Direct PDF response detected');
                 const buffer = await response.buffer();
                 await fs.writeFile(filePath, buffer);
                 await browser.close();
@@ -161,15 +193,100 @@ async function savePdf(pdfUrl, outputDir) {
                 return filePath;
             }
 
-            // HTMLページの場合はダウンロードリンクを探す
-            await page.waitForTimeout(3000);
+            // HTMLページの場合、PDFダウンロードリンクを探す
+            console.log('HTML page detected, looking for PDF download options...');
+            await page.waitForTimeout(5000);
+
+            // 複数のダウンロード戦略を試行
+            const downloadStrategies = [
+                // 戦略1: PDFビューアーのiframeを探す
+                async () => {
+                    const iframes = await page.$$('iframe');
+                    for (const iframe of iframes) {
+                        const src = await iframe.evaluate(el => el.src);
+                        if (src && src.includes('pdf')) {
+                            console.log('Found PDF iframe:', src);
+                            await page.goto(src, { waitUntil: 'domcontentloaded' });
+                            const iframeResponse = await page.goto(src);
+                            if (iframeResponse.headers()['content-type']?.includes('application/pdf')) {
+                                const buffer = await iframeResponse.buffer();
+                                await fs.writeFile(filePath, buffer);
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
+                },
+
+                // 戦略2: PDF直接リンクを探す
+                async () => {
+                    const pdfLinks = await page.$$eval('a[href*="pdf"], a[href*=".pdf"]', links =>
+                        links.map(link => link.href).filter(href => href && href.includes('pdf'))
+                    );
+
+                    for (const link of pdfLinks) {
+                        console.log('Trying PDF link:', link);
+                        try {
+                            const linkResponse = await page.goto(link, { waitUntil: 'domcontentloaded' });
+                            if (linkResponse.headers()['content-type']?.includes('application/pdf')) {
+                                const buffer = await linkResponse.buffer();
+                                await fs.writeFile(filePath, buffer);
+                                return true;
+                            }
+                        } catch (e) {
+                            console.log('PDF link failed:', e.message);
+                        }
+                    }
+                    return false;
+                },
+
+                // 戦略3: ダウンロードボタンをクリック
+                async () => {
+                    const downloadSelectors = [
+                        'a[href*="pdf"]',
+                        'button[title*="PDF"]',
+                        'a[title*="PDF"]',
+                        '.pdf-download',
+                        '[data-download-type="pdf"]'
+                    ];
+
+                    for (const selector of downloadSelectors) {
+                        try {
+                            const element = await page.$(selector);
+                            if (element) {
+                                console.log(`Clicking download element: ${selector}`);
+                                await element.click();
+                                await page.waitForTimeout(3000);
+                                // ダウンロードが開始されたかチェック
+                                const files = await fs.readdir(outputDir);
+                                const newPdfFiles = files.filter(f => f.endsWith('.pdf') && f.includes(Date.now().toString().substring(0, 10)));
+                                if (newPdfFiles.length > 0) {
+                                    return true;
+                                }
+                            }
+                        } catch (e) {
+                            console.log(`Download strategy failed for ${selector}:`, e.message);
+                        }
+                    }
+                    return false;
+                }
+            ];
+
+            // 各戦略を順番に試行
+            for (let i = 0; i < downloadStrategies.length; i++) {
+                console.log(`Trying download strategy ${i + 1}...`);
+                const success = await downloadStrategies[i]();
+                if (success) {
+                    console.log(`Download strategy ${i + 1} succeeded`);
+                    break;
+                }
+            }
 
             // ダウンロードが開始されるまで待機
-            await Promise.race([downloadPromise, new Promise(resolve => setTimeout(resolve, 10000))]);
+            await Promise.race([downloadPromise, new Promise(resolve => setTimeout(resolve, 15000))]);
 
         } catch (err) {
-            // 監視エラーやタイムアウト時も、ダウンロードディレクトリを再確認
-            console.warn('Download monitoring failed, trying fallback method:', err.message);
+            console.warn('Puppeteer navigation/download failed:', err.message);
         }
 
         // 監視エラー時も、ダウンロードディレクトリにPDFが落ちていないか再確認
@@ -203,6 +320,122 @@ async function savePdf(pdfUrl, outputDir) {
     }
 }
 
+// 学術サイト用の特別なダウンロード戦略
+async function downloadFromAcademicSite(pdfUrl, outputDir) {
+    let browser;
+    try {
+        console.log('Trying academic site specific download strategy...');
+
+        browser = await puppeteer.launch({
+            headless: 'new',
+            args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-dev-shm-usage',
+                '--disable-web-security',
+                '--disable-features=VizDisplayCompositor',
+                '--disable-blink-features=AutomationControlled'
+            ]
+        });
+
+        const page = await browser.newPage();
+
+        // より実際のブラウザに近い設定
+        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+        await page.setViewport({ width: 1366, height: 768 });
+
+        // JavaScriptを有効にしてウェブページのスクリプトも実行
+        await page.setJavaScriptEnabled(true);
+
+        // 必要に応じてページを段階的に読み込み
+        if (pdfUrl.includes('academic.oup.com')) {
+            // Oxford Academic用の特別な処理
+            console.log('Detected Oxford Academic, using specific strategy...');
+
+            // まずarticleページにアクセス
+            const articleUrl = pdfUrl.replace('/article-pdf/', '/article/').split('/')[0] + '//' + pdfUrl.split('//')[1].split('/').slice(0, -1).join('/');
+
+            try {
+                await page.goto(articleUrl, { waitUntil: 'networkidle0', timeout: 30000 });
+                await page.waitForTimeout(3000);
+
+                // PDF ダウンロードリンクを探す
+                const pdfDownloadLink = await page.$eval('a[href*="article-pdf"], .al-link[href*="pdf"]', el => el.href).catch(() => null);
+
+                if (pdfDownloadLink) {
+                    console.log('Found PDF download link:', pdfDownloadLink);
+                    const response = await page.goto(pdfDownloadLink, { waitUntil: 'domcontentloaded' });
+
+                    if (response.headers()['content-type']?.includes('application/pdf')) {
+                        const buffer = await response.buffer();
+                        const fileName = `${Date.now()}-oxford.pdf`;
+                        const filePath = path.join(outputDir, fileName);
+                        await fs.writeFile(filePath, buffer);
+                        return filePath;
+                    }
+                }
+            } catch (e) {
+                console.log('Oxford specific strategy failed:', e.message);
+            }
+        }
+
+        // 一般的な戦略：直接PDFにアクセス
+        console.log('Trying direct PDF access...');
+        const response = await page.goto(pdfUrl, {
+            waitUntil: 'domcontentloaded',
+            timeout: 45000
+        });
+
+        // Content-Typeをチェック
+        const contentType = response.headers()['content-type'] || '';
+        if (contentType.includes('application/pdf')) {
+            const buffer = await response.buffer();
+            const fileName = `${Date.now()}-direct.pdf`;
+            const filePath = path.join(outputDir, fileName);
+            await fs.writeFile(filePath, buffer);
+            return filePath;
+        }
+
+        // HTMLが返された場合、5秒待ってからPDFに変換されるかチェック
+        await page.waitForTimeout(5000);
+
+        // ページ内のPDFリンクを探す
+        const pdfLinks = await page.evaluate(() => {
+            const links = Array.from(document.querySelectorAll('a, iframe'));
+            return links.map(link => {
+                const href = link.href || link.src;
+                if (href && (href.includes('.pdf') || href.includes('pdf'))) {
+                    return href;
+                }
+                return null;
+            }).filter(Boolean);
+        });
+
+        for (const link of pdfLinks) {
+            try {
+                console.log('Trying PDF link found in page:', link);
+                const linkResponse = await page.goto(link, { waitUntil: 'domcontentloaded' });
+                if (linkResponse.headers()['content-type']?.includes('application/pdf')) {
+                    const buffer = await linkResponse.buffer();
+                    const fileName = `${Date.now()}-found.pdf`;
+                    const filePath = path.join(outputDir, fileName);
+                    await fs.writeFile(filePath, buffer);
+                    return filePath;
+                }
+            } catch (e) {
+                console.log('PDF link failed:', e.message);
+            }
+        }
+
+        throw new Error('No valid PDF found using academic site strategy');
+
+    } finally {
+        if (browser) {
+            await browser.close();
+        }
+    }
+}
+
 // PDFからテキストを抽出する関数
 export async function extractPdfText(pdfUrl) {
     let pdfLocalPath;
@@ -217,35 +450,48 @@ export async function extractPdfText(pdfUrl) {
             console.log('Direct download successful');
         } catch (directError) {
             console.log('Direct download failed:', directError.message);
-            console.log('Trying Puppeteer download...');
-            try {
-                // 直接ダウンロードが失敗した場合、Puppeteerを使用
-                pdfLocalPath = await savePdf(pdfUrl, outputDir);
-                console.log('Puppeteer download successful');
-            } catch (puppeteerError) {
-                console.log('Puppeteer download failed:', puppeteerError.message);
-                // 最後の手段として、URLが直接PDFの場合はaxiosで再試行
-                if (pdfUrl.endsWith('.pdf') || pdfUrl.includes('pdf')) {
-                    console.log('Trying final fallback download...');
-                    try {
-                        const response = await axios.get(pdfUrl, {
-                            responseType: 'arraybuffer',
-                            timeout: 60000,
-                            headers: {
-                                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-                            }
-                        });
 
-                        const fileName = `${Date.now()}-fallback.pdf`;
-                        const filePath = path.join(outputDir, fileName);
-                        await fs.writeFile(filePath, response.data);
-                        pdfLocalPath = filePath;
-                        console.log('Fallback download successful');
-                    } catch (fallbackError) {
-                        throw new Error(`All download methods failed. Last error: ${fallbackError.message}`);
+            // 学術サイト用の特別な戦略を試行
+            try {
+                console.log('Trying academic site specific strategy...');
+                pdfLocalPath = await downloadFromAcademicSite(pdfUrl, outputDir);
+                console.log('Academic site strategy successful');
+            } catch (academicError) {
+                console.log('Academic site strategy failed:', academicError.message);
+                console.log('Trying Puppeteer download...');
+
+                try {
+                    // 通常のPuppeteer戦略を使用
+                    pdfLocalPath = await savePdf(pdfUrl, outputDir);
+                    console.log('Puppeteer download successful');
+                } catch (puppeteerError) {
+                    console.log('Puppeteer download failed:', puppeteerError.message);
+
+                    // 最後の手段として、URLが直接PDFの場合はaxiosで再試行
+                    if (pdfUrl.endsWith('.pdf') || pdfUrl.includes('pdf')) {
+                        console.log('Trying final fallback download...');
+                        try {
+                            const response = await axios.get(pdfUrl, {
+                                responseType: 'arraybuffer',
+                                timeout: 60000,
+                                headers: {
+                                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                                    'Referer': 'https://academic.oup.com/',
+                                    'Accept': 'application/pdf,*/*'
+                                }
+                            });
+
+                            const fileName = `${Date.now()}-fallback.pdf`;
+                            const filePath = path.join(outputDir, fileName);
+                            await fs.writeFile(filePath, response.data);
+                            pdfLocalPath = filePath;
+                            console.log('Fallback download successful');
+                        } catch (fallbackError) {
+                            throw new Error(`All download methods failed. Last error: ${fallbackError.message}`);
+                        }
+                    } else {
+                        throw new Error(`All download methods failed. Puppeteer error: ${puppeteerError.message}`);
                     }
-                } else {
-                    throw new Error(`All download methods failed. Puppeteer error: ${puppeteerError.message}`);
                 }
             }
         }
@@ -264,17 +510,32 @@ export async function extractPdfText(pdfUrl) {
 
         if (!pdfHeader.startsWith('%PDF')) {
             // HTMLファイルかどうかチェック
-            const content = dataBuffer.toString('utf8', 0, 1000);
-            if (content.includes('<html') || content.includes('<!DOCTYPE')) {
+            const content = dataBuffer.toString('utf8', 0, 2000); // より多くの内容を確認
+            if (content.includes('<html') || content.includes('<!DOCTYPE') || content.includes('<template')) {
                 // HTMLのタイトルやbodyの一部もログ出力
                 const htmlTitleMatch = content.match(/<title>(.*?)<\/title>/i);
                 const htmlTitle = htmlTitleMatch ? htmlTitleMatch[1] : '';
                 const htmlBodyMatch = content.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
-                const htmlBody = htmlBodyMatch ? htmlBodyMatch[1].slice(0, 200) : '';
+                const htmlBody = htmlBodyMatch ? htmlBodyMatch[1].slice(0, 300) : '';
+
                 console.error('Downloaded file is HTML, not PDF. URL:', pdfUrl);
+                console.error('File size:', dataBuffer.length, 'bytes');
+                console.error('Content preview (first 500 chars):', content.slice(0, 500));
                 if (htmlTitle) console.error('HTML Title:', htmlTitle);
-                if (htmlBody) console.error('HTML Body (first 200 chars):', htmlBody);
-                throw new Error('Downloaded file is HTML, not PDF');
+                if (htmlBody) console.error('HTML Body (first 300 chars):', htmlBody);
+
+                // 可能であれば、HTMLからPDFの実際のURLを抽出を試行
+                const pdfLinkMatch = content.match(/href=["']([^"']*\.pdf[^"']*)/i);
+                if (pdfLinkMatch) {
+                    console.log('Found potential PDF link in HTML:', pdfLinkMatch[1]);
+                }
+
+                throw new Error(`Downloaded file is HTML, not PDF. Possible reasons:
+                1. URL requires authentication or cookies
+                2. URL redirects to a landing page
+                3. PDF is served through JavaScript
+                4. Access is restricted by IP or user-agent
+                Original URL: ${pdfUrl}`);
             }
 
             // バイナリファイルがJPEGやPNGでないかチェック
