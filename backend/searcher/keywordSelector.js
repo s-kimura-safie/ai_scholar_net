@@ -157,7 +157,6 @@ export async function run(title, abstract) {
     try {
         const keywords = await selectKeywordsWithCohere(title, abstract);
         const parsedKeywords = JSON.parse(keywords);
-        console.log('✅ キーワードを抽出しました:', parsedKeywords);
         return parsedKeywords;
     } catch (err) {
         console.error('❌ エラー:', err.message);

@@ -24,7 +24,7 @@ async function excuteSemanticScholarAPI(query, offset, limit) {
         });
         return response.data.data;
     } catch (error) {
-        // console.error('Error fetching data from Semantic Scholar API:', error);
+        console.error('Error fetching data from Semantic Scholar API:', error.message);
         // throw error;
         return [];
     }
@@ -34,8 +34,8 @@ async function excuteSemanticScholarAPI(query, offset, limit) {
 export async function searchPapers(query, searchPaperNum) {
     let results = [];
     let attempts = 1;
-    const requestPaperNum = 100; // 一度のAPI呼び出しで取得する論文数
-    const maxAttempts = 5;       // 最大試行回数
+    const requestPaperNum = 10; // 一度のAPI呼び出しで取得する論文数
+    const maxAttempts = 10;       // 最大試行回数
     const delay = 60000;         // 1分の待機時間
 
     while (results.length < searchPaperNum && attempts < maxAttempts) {
@@ -49,6 +49,7 @@ export async function searchPapers(query, searchPaperNum) {
         const offfsetPage = Math.floor(Math.random() * 5);
         console.log(`Attempt ${attempts}: Fetching papers at pege ${offfsetPage}...`);
         const papers = await excuteSemanticScholarAPI(query, offfsetPage, requestPaperNum);
+        console.log(`Fetched ${papers.length} papers from Semantic Scholar API.`);
 
         for (const paper of papers) {
             // paperId で照合して既にデータベースにある場合はスキップ
@@ -80,11 +81,6 @@ export async function searchPapers(query, searchPaperNum) {
                 keywords: formattedKeywords
             });
 
-            console.log(`Found paper: ${paper.title}`);
-
-            if (results.length >= searchPaperNum) {
-                break; // 必要な数の論文が見つかったらループを抜ける
-            }
         }
 
         attempts++;

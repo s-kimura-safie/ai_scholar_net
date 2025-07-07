@@ -13,13 +13,14 @@ function setScheduler() {
         console.log('Bot is running to post papers');
 
         try {
-            const query = 'Computer vision';                            // 検索クエリ
-            const postingPaperNum = 2;                              // 一度に投稿する論文の数
+            const query = 'Computer vision'; // 検索クエリ
+            const postingPaperNum = 2; // 一度に投稿する論文の数
             const results = await searchPapers(query, postingPaperNum); // 論文を検索
 
+            let postedPaperCount = 0;
             for (const paper of results) {
                 // 要約作成
-                var summary = '';
+                let summary = '';
 
                 try {
                     const pdfText = await extractPdfText(paper.pdfPath);
@@ -47,6 +48,13 @@ function setScheduler() {
                     { $set: paper },
                     { upsert: true, new: true }
                 );
+
+                postedPaperCount++;
+                console.log(`Posted paper: ${paper.title}`);
+
+                if (postedPaperCount >= postingPaperNum) {
+                    break; // 必要な数の論文が見つかったらループを抜ける
+                }
 
             }
 
