@@ -1,12 +1,12 @@
 .timeline {
-    width: 60%;
-    margin-left: 18%;
+    width: 68%;
+    margin-left: 14%;
     /* サイドバーの幅と同じだけ左に余白を追加 */
 }
 
 .timelineWrapper {
-    padding: 0px 0px 0px 40px;
-    width: 90%;
+    padding: 0px 0px 0px 50px;
+    width: 95%;
     margin: 0 auto;
 }
 
