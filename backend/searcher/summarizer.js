@@ -143,12 +143,12 @@ export async function abstructSummarize(title, abstract) {
 // テキスト形式の論文を解析して要約を返す関数
 export async function summarizePaper(pdfText) {
     try {
-        const summary = await summarizeWithCohere(pdfText);
+        const summary = await summarizeWithGemini(pdfText);
 
         if (!validateSummaryOutput(summary)) {
             console.warn('⚠️ 要約出力の品質が不十分なため、再試行します...');
-            // 2回目の試行（Geminiで要約）
-            const retrySummary = await summarizeWithGemini(pdfText);
+            // 2回目の試行（Cohereで要約）
+            const retrySummary = await summarizeWithCohere(pdfText);
             if (!validateSummaryOutput(retrySummary)) {
                 console.warn('⚠️ 再試行でも要約出力の品質が不十分です。');
                 return null; // 再試行でも品質が不十分な場合はnullを返す
