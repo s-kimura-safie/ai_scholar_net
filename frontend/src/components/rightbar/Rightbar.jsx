@@ -219,15 +219,8 @@ export default function Rightbar({ user, metadata }) {
                                 <a href={value} target="_blank" rel="noopener noreferrer" className="rightbarInfoValue">
                                     {value}
                                 </a>
-                            ) : key === 'keywords' ? (
-                                <span className="rightbarInfoValue">
-                                    {Array.isArray(value) ?
-                                        value.slice(0, 5).map(item => item.word).join(', ') :
-                                        value
-                                    }
-                                </span>
                             ) : (
-                                <span className="rightbarInfoValue">{value}</span>
+                                <span className="rightbarInfoValue">{String(value)}</span>
                             )}
                         </div>
                     ))}

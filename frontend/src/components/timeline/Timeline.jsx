@@ -2,11 +2,12 @@ import React, { useEffect, useState, useContext } from 'react';
 import "./Timeline.css";
 import Shere from '../share/Share';
 import Post from '../post/Post';
+import LikedPostsList from '../likedPostsList/LikedPostsList';
 import axios from 'axios';
 import { AuthContext } from '../../states/AuthContext';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
-export default function Timeline({ username, onMetadataSelect, showLikedPosts=false }) {
+export default function Timeline({ username, onMetadataSelect, showLikedPosts=false, openIds: propOpenIds, onToggle }) {
     const [posts, setPosts] = useState([]);
     const [filteredPosts, setFilteredPosts] = useState([]);
     const [page, setPage] = useState(1);
@@ -107,6 +108,61 @@ export default function Timeline({ username, onMetadataSelect, showLikedPosts=fa
         filterPosts();
     }, [searchKeyword, posts, sortOrder]);
 
+    // いいねリストページ用の一覧表示
+    // userIdしかない場合のユーザー情報キャッシュ
+    const [userCache, setUserCache] = useState({});
+
+    useEffect(() => {
+        if (!showLikedPosts || !filteredPosts.length) return;
+        const idsToFetch = filteredPosts
+            .filter(post => !post.username && post.userId && !userCache[post.userId])
+            .map(post => post.userId);
+        if (idsToFetch.length === 0) return;
+        const fetchUsers = async () => {
+            try {
+                const promises = idsToFetch.map(id => axios.get(`/api/users?userId=${id}`));
+                const results = await Promise.all(promises);
+                const newCache = { ...userCache };
+                idsToFetch.forEach((id, idx) => {
+                    const userData = results[idx].data.user || results[idx].data;
+                    newCache[id] = userData;
+                });
+                setUserCache(newCache);
+            } catch (err) {
+                // 失敗時は何もしない
+            }
+        };
+        fetchUsers();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [showLikedPosts, filteredPosts]);
+
+    // openIdsは親から受け取る（なければ内部で管理）
+    const [internalOpenIds, setInternalOpenIds] = useState([]);
+    const openIds = propOpenIds !== undefined ? propOpenIds : internalOpenIds;
+
+    const handleToggle = (id) => {
+        if (onToggle) {
+            onToggle(id);
+        } else {
+            setInternalOpenIds((prev) =>
+                prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+            );
+        }
+    };
+
+    if (showLikedPosts) {
+        return (
+            <LikedPostsList
+                filteredPosts={filteredPosts}
+                openIds={openIds}
+                handleToggle={handleToggle}
+                onMetadataSelect={onMetadataSelect}
+                userCache={userCache}
+            />
+        );
+    }
+
+    // 通常タイムライン表示
     return (
         <div className="timeline">
             <div className="timelineWrapper">

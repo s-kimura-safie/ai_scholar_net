@@ -1,12 +1,17 @@
 .timeline {
     width: 60%;
-    margin-left: 18%; /* サイドバーの幅と同じだけ左に余白を追加 */
+    margin-left: 18%;
+    /* サイドバーの幅と同じだけ左に余白を追加 */
 }
 
 .timelineWrapper {
-    padding: 0px 0px  0px 40px;
+    padding: 0px 0px 0px 40px;
     width: 90%;
     margin: 0 auto;
+}
+
+.timelineWrapper h2 {
+    margin-bottom: 18px;
 }
 
 .sortOptions {
@@ -32,6 +37,6 @@
 
 .sortOptions select:focus {
     outline: none;
-    border-color: #0091b2;;
+    border-color: #0091b2;
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
