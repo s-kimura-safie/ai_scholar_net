@@ -19,7 +19,7 @@ async function excuteSemanticScholarAPI(query, offset, limit) {
                 year: '2023-',
                 openAccessPdf: true,
                 fieldsOfStudy: 'Computer Science',
-                sort: 'citationCount:desc'
+                sort: 'influentialCitationCount:desc'
             }
         });
         return response.data.data;
