@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@google/genai": "^1.11.0",
     "axios": "^1.8.1",
     "jsonwebtoken": "^9.0.2",
     "node-fetch": "^3.3.2",

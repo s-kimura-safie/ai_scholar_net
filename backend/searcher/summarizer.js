@@ -1,13 +1,8 @@
 import axios from 'axios';
+import { GoogleGenAI } from "@google/genai";
 
-// Cohere APIを使用して要約を生成する関数
-export async function summarizeWithCohere(text) {
-
-    // 入力テキストを適切な長さに制限
-    const maxInputLength = 250000;
-    const truncatedText = text.length > maxInputLength ?
-        text.substring(0, maxInputLength) + "..." : text;
-
+// プロンプトを構築する関数
+function buildSummaryPrompt(text) {
     const prompt = `あなたは論文要約の専門家です。以下の論文内容を読み取り、指定のフォーマットに沿って日本語で要約してください。
 
 【重要な指示】
@@ -31,9 +26,23 @@ export async function summarizeWithCohere(text) {
 [180-220文字で、提案手法の要点と仕組み・工夫点を明確に記述]
 
 【論文の内容】
-${truncatedText}
+${text}
 
 必ず日本語で指定した文字数の範囲内で要約してください。`;
+
+    return prompt;
+}
+
+
+// Cohere APIを使用して要約を生成する関数
+export async function summarizeWithCohere(text) {
+
+    // 入力テキストを適切な長さに制限
+    const maxInputLength = 250000;
+    const truncatedText = text.length > maxInputLength ?
+        text.substring(0, maxInputLength) + "..." : text;
+
+    const prompt = buildSummaryPrompt(truncatedText);
 
     // API Documentation: https://docs.cohere.com/v1/reference/generate
     const response = await axios.post(
@@ -56,6 +65,37 @@ ${truncatedText}
         });
 
     return response.data.generations[0].text.trim();
+}
+
+// 再試行用の関数（Gemini APIを利用）
+async function summarizeWithGemini(text) {
+    console.log('Summarizing with Gemini AI...');
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+        throw new Error('GEMINI_API_KEY is not set in environment variables.');
+    }
+    const ai = new GoogleGenAI({ apiKey });
+
+    const maxInputLength = 100000;
+    const truncatedText = text.length > maxInputLength ?
+        text.substring(0, maxInputLength) + "..." : text;
+
+    const prompt = buildSummaryPrompt(truncatedText);
+
+    const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+    });
+
+    // Geminiのレスポンスから要約テキストを抽出
+    // GoogleGenAI SDKの返却値は response.candidates[0].content.parts[0].text 形式
+    if (response && response.candidates && response.candidates.length > 0) {
+        const parts = response.candidates[0].content.parts;
+        if (parts && parts.length > 0 && parts[0].text) {
+            return parts[0].text.trim();
+        }
+    }
+    throw new Error('Gemini APIから要約テキストが取得できませんでした');
 }
 
 // タイトルとアブストラクトから要約を生成する関数
@@ -107,8 +147,8 @@ export async function summarizePaper(pdfText) {
 
         if (!validateSummaryOutput(summary)) {
             console.warn('⚠️ 要約出力の品質が不十分なため、再試行します...');
-            // 2回目の試行（より制約を強化）
-            const retrySummary = await summarizeWithCohereRetry(pdfText);
+            // 2回目の試行（Geminiで要約）
+            const retrySummary = await summarizeWithGemini(pdfText);
             if (!validateSummaryOutput(retrySummary)) {
                 console.warn('⚠️ 再試行でも要約出力の品質が不十分です。');
                 return null; // 再試行でも品質が不十分な場合はnullを返す
@@ -131,57 +171,6 @@ function validateSummaryOutput(summary) {
     const japaneseChars = summary.match(/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/g) || [];
     const isMainlyJapanese = japaneseChars.length > summary.length * 0.3;
     return isNotTooLong && isNotTooShort && isMainlyJapanese;
-}
-
-// 再試行用の関数（より厳しい制約）
-async function summarizeWithCohereRetry(text) {
-    const maxInputLength = 100000; // 短く制限
-    const truncatedText = text.length > maxInputLength ?
-        text.substring(0, maxInputLength) + "..." : text;
-
-    const prompt = `論文要約タスク：以下の論文を日本語で要約してください。
-
-【絶対に守ること】
-1. 必ず日本語で出力
-2. 英語の原文をコピーしない
-3. 各セクション200文字程度
-
-【出力フォーマット】
-タイトル: [論文タイトル]
-
-◇ 一言でいうと？
-[50文字程度で、論文の主題や目的を簡潔に記述]
-
-◇ どんなもの？
-[日本語で200文字程度]
-
-◇ 先行研究と比べてどこがすごい？
-[日本語で200文字程度]
-
-◇ 技術や手法のキモはどこ？
-[日本語で200文字程度]
-
-論文内容：
-${truncatedText}
-
-必ず上記フォーマットで日本語要約を出力してください。`;
-
-    const response = await axios.post(
-        'https://api.cohere.ai/v1/generate', {
-        model: 'command-r-plus',
-        prompt,
-        max_tokens: 1000,  // さらに制限
-        temperature: 0.05, // より一貫性重視
-        stop_sequences: ["---", "参考文献", "References", "Abstract", "Introduction"]
-    },
-        {
-            headers: {
-                Authorization: `Bearer ${process.env.COHERE_API_KEY}`,
-                'Content-Type': 'application/json',
-            },
-        });
-
-    return response.data.generations[0].text.trim();
 }
 
 export default summarizePaper;
