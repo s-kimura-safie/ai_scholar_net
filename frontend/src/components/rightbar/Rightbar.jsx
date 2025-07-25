@@ -215,7 +215,13 @@ export default function Rightbar({ user, metadata }) {
                     {Object.entries(metadata).map(([key, value]) => (
                         <div className="rightbarInfoItem" key={key}>
                             <span className="rightbarInfoKey">{formatKey(key)}:</span>
-                            {key === 'url' ? (
+                            {key === 'keywords' ? (
+                                <ul className="rightbarInfoValue">
+                                    {value.map((kw, i) => (
+                                        <li key={i}>{kw.word}（{kw.score}）</li>
+                                    ))}
+                                </ul>
+                            ) : key === 'url' ? (
                                 <a href={value} target="_blank" rel="noopener noreferrer" className="rightbarInfoValue">
                                     {value}
                                 </a>
