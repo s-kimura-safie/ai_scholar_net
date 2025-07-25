@@ -1,7 +1,8 @@
 import axios from 'axios';
+import { GoogleGenAI } from "@google/genai";
 
-// Cohere APIを使用して要約を生成する関数
-export async function selectKeywordsWithCohere(title, abstract) {
+// プロンプトを構築する関数
+function buildKeywordPrompt(title, abstract) {
     const prompt = `
 次の「論文内容」を読み取り、【処理方法】に従ってキーワードの関連度スコアを算出してください。
 
@@ -119,13 +120,14 @@ title: ${title}
 abstract: ${abstract}
 
 【処理方法】
-- 論文内容に関連性の高いキーワードをリストから選びます。
-- キーワードは10個以内で選んでください。
-- 選んだキーワードに0〜100の整数で関連度のスコアを付けてください。
-- スコアの合計は必ず100点になるように割り振ってください。
-- スコアが低いキーワードも0より大きい値にしてください。
-- 出力は説明なしで、キーワードをキー、スコアを値としたJSON形式。
-- 出力例：
+論文内容に関連性の高いキーワードをリストから選びます。
+キーワードは5個以内で選んでください。
+選んだキーワードに0〜100の整数で関連度のスコアを付けてください。
+スコアの合計は必ず100点になるように割り振ってください。
+スコアが低いキーワードも0より大きい値にしてください。
+出力は説明なしで、キーワードをキー、スコアを値としたJSON形式。
+
+出力例：
 {
   'Object Detection': 15,
   'Transformer': 8,
@@ -133,6 +135,14 @@ abstract: ${abstract}
 }
 JSONの出力形式は絶対に守ってください。
 `;
+    return prompt;
+}
+
+// Cohere APIを使用してキーワードを抽出する関数
+export async function selectKeywordsWithCohere(title, abstract) {
+
+    const prompt = buildKeywordPrompt(title, abstract);
+    console.log('Keyword extraction with Cohere AI...');
 
     // API Documentation: https://docs.cohere.com/v1/reference/generate
     const response = await axios.post(
@@ -152,15 +162,39 @@ JSONの出力形式は絶対に守ってください。
     return response.data.generations[0].text.trim();
 }
 
+// Gemini APIを使用してキーワードを抽出する関数
+async function selectKeywordsWithGemini(title, abstract) {
+    console.log('Keyword extraction with Gemini AI...');
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+        throw new Error('GEMINI_API_KEY is not set in environment variables.');
+    }
+    const ai = new GoogleGenAI({ apiKey });
+    const prompt = buildKeywordPrompt(title, abstract);
+
+    const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+    });
+
+    return response.candidates[0].content.parts[0].text.trim();
+}
+
 // 論文のタイトル・要約を解析してキーワードとスコアを返す関数
 export async function run(title, abstract) {
     try {
-        const keywords = await selectKeywordsWithCohere(title, abstract);
-        const parsedKeywords = JSON.parse(keywords);
-        return parsedKeywords;
-    } catch (err) {
-        console.error('❌ エラー:', err.message);
-        throw err;
+        let keywords;
+        try {
+            keywords = await selectKeywordsWithGemini(title, abstract);
+            return JSON.parse(keywords);
+        } catch (err) {
+            console.warn('⚠️ Geminiでエラー。Cohereで再試行します...');
+            keywords = await selectKeywordsWithCohere(title, abstract);
+            return JSON.parse(keywords);
+        }
+    } catch (e) {
+        console.error('❌ エラー:', e.message);
+        throw e;
     }
 }
 
